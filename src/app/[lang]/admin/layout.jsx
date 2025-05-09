@@ -24,6 +24,8 @@ import { i18n } from '@configs/i18n'
 import { getDictionary } from '@/utils/getDictionary'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 import AdminGuard from '@/hocs/AdminGuard'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/libs/auth'
 
 const Layout = async props => {
   const params = await props.params
@@ -34,6 +36,8 @@ const Layout = async props => {
   const dictionary = await getDictionary(params.lang)
   const mode = await getMode()
   const systemMode = await getSystemMode()
+  const session = await getServerSession(authOptions)
+  const userType = session.user.userType;
 
   return (
     <Providers direction={direction}>
@@ -43,7 +47,7 @@ const Layout = async props => {
             systemMode={systemMode}
             verticalLayout={
               <VerticalLayout
-                navigation={<Navigation dictionary={dictionary} mode={mode} />}
+                navigation={<Navigation dictionary={dictionary} mode={mode} userType={userType} />}
                 navbar={<Navbar />}
                 footer={<VerticalFooter />}
               >
@@ -51,7 +55,7 @@ const Layout = async props => {
               </VerticalLayout>
             }
             horizontalLayout={
-              <HorizontalLayout header={<Header dictionary={dictionary} />} footer={<HorizontalFooter />}>
+              <HorizontalLayout header={<Header dictionary={dictionary} userType={userType} />} footer={<HorizontalFooter />}>
                 {children}
               </HorizontalLayout>
             }

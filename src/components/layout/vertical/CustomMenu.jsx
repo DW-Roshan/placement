@@ -23,6 +23,7 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
 import customVerticalMenuData from '@/data/navigation/customVerticalMenuData'
+import adminMenuData from '@/data/navigation/adminMenuData'
 
 const RenderExpandIcon = ({ open, transitionDuration }) => (
   <StyledVerticalNavExpandIcon open={open} transitionDuration={transitionDuration}>
@@ -30,7 +31,7 @@ const RenderExpandIcon = ({ open, transitionDuration }) => (
   </StyledVerticalNavExpandIcon>
 )
 
-const CustomVerticalMenu = ({ dictionary, scrollMenu }) => {
+const CustomVerticalMenu = ({ dictionary, scrollMenu, userType }) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
@@ -64,7 +65,7 @@ const CustomVerticalMenu = ({ dictionary, scrollMenu }) => {
           renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
           menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
         >
-          <GenerateVerticalMenu menuData={customVerticalMenuData(dictionary)} />
+          <GenerateVerticalMenu menuData={userType && userType === 'A' ? adminMenuData(dictionary) : customVerticalMenuData(dictionary)} />
         </Menu>
     </ScrollWrapper>
   )

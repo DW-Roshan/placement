@@ -12,7 +12,7 @@ export default async function AdminGuard({ children, locale }) {
   const session = await getServerSession(authOptions)
   const userType = session.user.userType;
 
-  console.log('session', session);
+  // console.log('session', session);
 
   if(userType !== 'A') {
     redirect(`/not-authorized`);

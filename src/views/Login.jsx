@@ -142,7 +142,7 @@ const Login = ({ mode }) => {
 
     if (res && res.ok && res.error === null) {
       // Vars
-      const redirectURL = searchParams.get('redirectTo') ?? '/'
+      const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
 
       router.replace(getLocalizedUrl(redirectURL, locale))
     } else {

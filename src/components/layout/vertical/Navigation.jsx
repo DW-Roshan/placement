@@ -43,7 +43,7 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
 
 const Navigation = props => {
   // Props
-  const { dictionary, mode } = props
+  const { dictionary, mode, userType } = props
 
   // Hooks
   const verticalNavOptions = useVerticalNav()
@@ -116,7 +116,7 @@ const Navigation = props => {
       </NavHeader>
       <StyledBoxForShadow ref={shadowRef} />
       {/* <VerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} /> */}
-      <CustomVerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} />
+      <CustomVerticalMenu dictionary={dictionary} scrollMenu={scrollMenu} userType={userType} />
     </VerticalNav>
   )
 }

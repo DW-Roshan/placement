@@ -8,13 +8,16 @@ import { authOptions } from '@/libs/auth';
 
 // Component Imports
 import AuthRedirect from '@/components/AuthRedirect'
+import { getLocalizedUrl } from '@/utils/i18n';
 
 export default async function UserGuard({ children, locale }) {
   const session = await getServerSession(authOptions)
   const userType = session.user.userType;
 
-  if(userType !== 'U') {
-    redirect(`/not-authorized`);
+  if(userType === 'A') {
+    redirect(getLocalizedUrl(`/admin/dashboard`, locale));
+  } else if(userType !== 'U') {
+    redirect(getLocalizedUrl(`/not-authorized`, locale));
   }
 
   return <>{session ? children : <AuthRedirect lang={locale} />}</>

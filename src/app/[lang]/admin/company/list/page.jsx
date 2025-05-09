@@ -3,7 +3,7 @@ import UserList from '@views/apps/user/list'
 
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
-import { getCookie } from '@/utils/cookies'
+
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/libs/auth'
 
