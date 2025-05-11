@@ -79,9 +79,8 @@ const TableFilters = ({ setData, tableData }) => {
             }}
           >
             <MenuItem value=''>Select Status</MenuItem>
-            <MenuItem value='pending'>Pending</MenuItem>
-            <MenuItem value='active'>Active</MenuItem>
-            <MenuItem value='inactive'>Inactive</MenuItem>
+            <MenuItem value='1'>Active</MenuItem>
+            <MenuItem value='0'>Inactive</MenuItem>
           </CustomTextField>
         </Grid>
       </Grid>

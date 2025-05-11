@@ -45,6 +45,10 @@ export const authOptions = {
           if (res.status === 401) {
             throw new Error(JSON.stringify(data))
           }
+          
+          if (res.status === 403) {
+            throw new Error(JSON.stringify(data))
+          }
 
           if (res.status === 200) {
             /*

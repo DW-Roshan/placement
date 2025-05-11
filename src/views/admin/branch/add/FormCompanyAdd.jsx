@@ -217,7 +217,7 @@ const FormCompanyAdd = ({statesData }) => {
 
         sessionStorage.setItem('success', result.message);
 
-        router.push('/admin/user/list');
+        router.push('/admin/branch/list');
 
         reset();
 
@@ -235,7 +235,7 @@ const FormCompanyAdd = ({statesData }) => {
       } else {
         sessionStorage.setItem('error', result.message);
 
-        router.push('/admin/company/list');
+        router.push('/admin/branch/list');
 
       }
     }
@@ -444,7 +444,7 @@ const FormCompanyAdd = ({statesData }) => {
                 render={({ field }) => (
                   <CustomTextField select fullWidth label='Size of Branch'
                     SelectProps={{ MenuProps }}
-                    error={!!errors.branchSize} helperText={errors?.status?.message} {...field}>
+                    error={!!errors.branchSize} helperText={errors?.branchSize?.message} {...field}>
                     <MenuItem value="">Select Size</MenuItem>
                     <MenuItem value="0-10">0-10</MenuItem>
                     <MenuItem value="10-50">10-50</MenuItem>

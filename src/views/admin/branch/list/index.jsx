@@ -6,6 +6,8 @@ import UserListTable from './UserListTable'
 import UserListCards from './UserListCards'
 
 const UserList = ({ userData }) => {
+
+  console.log("branches", userData);
   return (
     <Grid container spacing={6}>
       {/* <Grid size={{ xs: 12 }}>

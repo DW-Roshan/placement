@@ -16,6 +16,8 @@ export default async function UserGuard({ children, locale }) {
 
   if(userType === 'A') {
     redirect(getLocalizedUrl(`/admin/dashboard`, locale));
+  } else if(userType === 'B') {
+    redirect(getLocalizedUrl(`/branch/dashboard`, locale));
   } else if(userType !== 'U') {
     redirect(getLocalizedUrl(`/not-authorized`, locale));
   }

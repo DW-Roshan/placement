@@ -7,18 +7,18 @@ const adminMenuData = dictionary => [
     href: '/admin/dashboard'
   },
   {
-    label: 'Company',
+    label: 'Branch',
     icon: 'tabler-user',
     children: [
       {
         label: dictionary['navigation'].list,
         icon: 'tabler-circle',
-        href: '/admin/company/list'
+        href: '/admin/branch/list'
       },
       {
         label: dictionary['navigation'].add,
         icon: 'tabler-circle',
-        href: '/admin/company/add'
+        href: '/admin/branch/add'
       }
     ]
   },

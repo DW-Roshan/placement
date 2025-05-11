@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid2'
 
 // Component Imports
 import FormUserAdd from '@/views/apps/user/add/FormUserAdd'
-import FormCompanyAdd from '@/views/admin/company/add/FormCompanyAdd'
+import FormCompanyAdd from '@/views/admin/branch/add/FormCompanyAdd'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/libs/auth';
 
@@ -25,7 +25,7 @@ const getData = async () => {
       });
       const data = await response.json();
 
-      return data;
+      return data.states;
     } else{
       return [];
     }
@@ -45,7 +45,7 @@ const AddCompany = async () => {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <FormCompanyAdd statesData={data.states || []} />
+        <FormCompanyAdd statesData={data || []} />
         {/* <FormUserAdd /> */}
       </Grid>
     </Grid>

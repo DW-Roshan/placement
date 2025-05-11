@@ -4,22 +4,22 @@ const customVerticalMenuData = dictionary => [
   {
     label: dictionary['navigation'].dashboard,
     icon: 'tabler-smart-home',
-    href: '/admin/dashboard'
+    href: '/branch/dashboard'
   },
   {
     label: dictionary['navigation'].user,
     icon: 'tabler-user',
     children: [
-        {
+      {
         label: dictionary['navigation'].list,
         icon: 'tabler-circle',
-        href: '/admin/user/list'
-        },
-        {
+        href: '/branch/user/list'
+      },
+      {
         label: dictionary['navigation'].add,
         icon: 'tabler-circle',
-        href: '/admin/user/add'
-        }
+        href: '/branch/user/add'
+      }
     ]
   }
 ]

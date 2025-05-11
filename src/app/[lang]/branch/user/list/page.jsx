@@ -3,7 +3,7 @@ import UserList from '@views/apps/user/list'
 
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
-
+import { getCookie } from '@/utils/cookies'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/libs/auth'
 
@@ -23,7 +23,7 @@ const getUserData = async () => {
 
     if(token){
 
-      const res = await fetch(`${process.env.API_URL}/admin/users`, {
+      const res = await fetch(`${process.env.API_URL}/branch/users`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -49,6 +49,8 @@ const UserListApp = async () => {
 
   // Vars
   const userData = await getUserData()
+
+  console.log("userData", userData);
 
   return <UserList userData={userData} />
 }
