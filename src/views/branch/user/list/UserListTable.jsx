@@ -47,11 +47,12 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
-
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { getCookie } from '@/utils/cookies'
+import { useSession } from 'next-auth/react'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -108,11 +109,11 @@ const userStatusObj = {
 // Column Definitions
 const columnHelper = createColumnHelper()
 
-const UserListTable = ({ tableData }) => {
+const UserListTable = ({userData}) => {
   // States
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[tableData])
+  const [data, setData] = useState(...[userData])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -166,14 +167,14 @@ const UserListTable = ({ tableData }) => {
           />
         )
       },
-      columnHelper.accessor('business_name', {
-        header: 'Branch',
+      columnHelper.accessor('fullName', {
+        header: 'User',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original?.profile_image, branchName: row.original?.business_name })}
+            {getAvatar({ avatar: row.original?.profile_image, fullName: row.original?.first_name+" "+row.original?.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
-                {row.original?.business_name}
+                {row.original?.first_name+" "+row.original?.last_name}
               </Typography>
               <Typography variant='body2'>{row.original?.username}</Typography>
             </div>
@@ -207,6 +208,30 @@ const UserListTable = ({ tableData }) => {
         header: 'Mobile No.',
         cell: ({ row }) => <Typography>{row.original?.mobile_no}</Typography>
       }),
+      columnHelper.accessor('department', {
+        header: 'Department',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original?.department?.name}
+          </Typography>
+        )
+      }),
+      // columnHelper.accessor('division', {
+      //   header: 'Division',
+      //   cell: ({ row }) => (
+      //     <Typography className='capitalize' color='text.primary'>
+      //       {row.original?.division?.division_name}
+      //     </Typography>
+      //   )
+      // }),
+      columnHelper.accessor('designation', {
+        header: 'Designation',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original?.designation?.designation_name}
+          </Typography>
+        )
+      }),
       columnHelper.accessor('state', {
         header: 'State',
         cell: ({ row }) => (
@@ -223,55 +248,7 @@ const UserListTable = ({ tableData }) => {
           </Typography>
         )
       }),
-      columnHelper.accessor('address', {
-        header: 'Address',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original?.address}
-          </Typography>
-        )
-      }),
-      // columnHelper.accessor('branch', {
-      //   header: 'Branch',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.branch?.branch_name}
-      //     </Typography>
-      //   )
-      // }),
-      // columnHelper.accessor('division', {
-      //   header: 'Division',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.division?.division_name}
-      //     </Typography>
-      //   )
-      // }),
-      // columnHelper.accessor('designation', {
-      //   header: 'Designation',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.designation?.designation_name}
-      //     </Typography>
-      //   )
-      // }),
-      // columnHelper.accessor('stationHeadQuarter', {
-      //   header: 'Station Head Quarter Code',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.station_head_quarter?.station_name}
-      //     </Typography>
-      //   )
-      // }),
-      // columnHelper.accessor('checkingAuthorityNo', {
-      //   header: 'Checking Authority No.',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.authority_no}
-      //     </Typography>
-      //   )
-      // }),
-      columnHelper.accessor('expiry_date', {
+      columnHelper.accessor('validUpto', {
         header: 'Valid Up to',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
@@ -283,23 +260,23 @@ const UserListTable = ({ tableData }) => {
           </Typography>
         )
       }),
-      // columnHelper.accessor('taSrNo', {
-      //   header: 'Ta Sr No.',
-      //   cell: ({ row }) => (
-      //     <Typography className='capitalize' color='text.primary'>
-      //       {row.original?.ta_sr_no}
-      //     </Typography>
-      //   )
-      // }),
+      columnHelper.accessor('taSrNo', {
+        header: 'Ta Sr No.',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original?.ta_sr_no}
+          </Typography>
+        )
+      }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
             <Chip
               variant='tonal'
-              label={row.original?.status == 1 ? 'Active' : 'Inactive'}
+              label={row.original?.is_active == 1 ? 'Active' : 'Inactive'}
               size='small'
-              color={userStatusObj[row.original?.status]}
+              color={userStatusObj[row.original?.is_active]}
               className='capitalize'
             />
           </div>
@@ -375,12 +352,12 @@ const UserListTable = ({ tableData }) => {
   })
 
   const getAvatar = params => {
-    const { avatar, branchName } = params
+    const { avatar, fullName } = params
 
     if (avatar) {
       return <CustomAvatar src={avatar} size={34} />
     } else {
-      return <CustomAvatar size={34}>{getInitials(branchName)}</CustomAvatar>
+      return <CustomAvatar size={34}>{getInitials(fullName)}</CustomAvatar>
     }
   }
 
@@ -415,7 +392,7 @@ const UserListTable = ({ tableData }) => {
             >
               Export
             </Button>
-            <Link href={getLocalizedUrl('/admin/user/add', locale)}>
+            <Link href={getLocalizedUrl('/branch/user/add', locale)}>
               <Button
                 variant='contained'
                 startIcon={<i className='tabler-plus' />}

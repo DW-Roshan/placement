@@ -448,46 +448,6 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                             <Typography variant="body2" className="font-medium">2. User Info</Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 12 }}>
-                            <div className='flex max-sm:flex-col items-center gap-6'>
-                                <img height={100} width={100} className='rounded' src={imgSrc} alt='Profile' />
-                                <div className='flex flex-grow flex-col gap-4'>
-                                    <div className='flex flex-col sm:flex-row gap-4'>
-                                        <Controller
-                                            name='profileImage'
-                                            control={control}
-                                            render={({ field: { onChange, ref }, fieldState: { error } }) => (
-                                                <>
-                                                    <Button component='label' variant='contained'>
-                                                        Upload New Photo
-                                                        <input
-                                                            hidden
-                                                            type='file'
-                                                            accept='image/png, image/jpeg'
-                                                            onChange={handleFileChange(onChange)}
-                                                            ref={ref}
-                                                        />
-                                                    </Button>
-                                                    <Button variant='tonal' color='secondary' onClick={handleFileInputReset}>
-                                                        Reset
-                                                    </Button>
-                                                </>
-                                            )}
-                                            rules={{
-                                                required: 'This field is required',
-                                                validate: (file) =>
-                                                    !file || file.size < 800 * 1024 || 'Max file size is 800KB',
-                                            }}
-                                        />
-                                    </div>
-                                    <Typography>Allowed JPG, GIF or PNG. Max size of 800K</Typography>
-
-                                    {errors.profileImage && (
-                                        <FormHelperText error>{errors.profileImage.message}</FormHelperText>
-                                    )}
-                                </div>
-                            </div>
-                        </Grid>
 
                         {/* First & Last Name */}
                         {[
@@ -752,6 +712,47 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                     <CustomTextField fullWidth multiline minRows={2} maxRows={4} label='Notes'
                                         error={!!errors.note} helperText={errors.note?.message} {...field} />
                                 )} />
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <div className='flex max-sm:flex-col items-center gap-6'>
+                                <img height={100} width={100} className='rounded' src={imgSrc} alt='Profile' />
+                                <div className='flex flex-grow flex-col gap-4'>
+                                    <div className='flex flex-col sm:flex-row gap-4'>
+                                        <Controller
+                                            name='profileImage'
+                                            control={control}
+                                            render={({ field: { onChange, ref }, fieldState: { error } }) => (
+                                                <>
+                                                    <Button component='label' variant='contained'>
+                                                        Upload New Photo
+                                                        <input
+                                                            hidden
+                                                            type='file'
+                                                            accept='image/png, image/jpeg'
+                                                            onChange={handleFileChange(onChange)}
+                                                            ref={ref}
+                                                        />
+                                                    </Button>
+                                                    <Button variant='tonal' color='secondary' onClick={handleFileInputReset}>
+                                                        Reset
+                                                    </Button>
+                                                </>
+                                            )}
+                                            rules={{
+                                                required: 'This field is required',
+                                                validate: (file) =>
+                                                    !file || file.size < 800 * 1024 || 'Max file size is 800KB',
+                                            }}
+                                        />
+                                    </div>
+                                    <Typography>Allowed JPG, GIF or PNG. Max size of 800K</Typography>
+
+                                    {errors.profileImage && (
+                                        <FormHelperText error>{errors.profileImage.message}</FormHelperText>
+                                    )}
+                                </div>
+                            </div>
                         </Grid>
 
 
