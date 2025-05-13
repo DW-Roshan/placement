@@ -171,7 +171,7 @@ const UserListTable = ({userData}) => {
         header: 'User',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original?.profile_image, fullName: row.original?.first_name+" "+row.original?.last_name })}
+            {getAvatar({ avatar: `${process.env.NEXT_PUBLIC_ASSET_URL}${row.original?.profile_image}`, fullName: row.original?.first_name+" "+row.original?.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
                 {row.original?.first_name+" "+row.original?.last_name}
@@ -228,7 +228,7 @@ const UserListTable = ({userData}) => {
         header: 'Designation',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original?.designation?.designation_name}
+            {row.original?.designation?.name}
           </Typography>
         )
       }),
@@ -260,23 +260,15 @@ const UserListTable = ({userData}) => {
           </Typography>
         )
       }),
-      columnHelper.accessor('taSrNo', {
-        header: 'Ta Sr No.',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original?.ta_sr_no}
-          </Typography>
-        )
-      }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
             <Chip
               variant='tonal'
-              label={row.original?.is_active == 1 ? 'Active' : 'Inactive'}
+              label={row.original?.status == 1 ? 'Active' : 'Inactive'}
               size='small'
-              color={userStatusObj[row.original?.is_active]}
+              color={userStatusObj[row.original?.status]}
               className='capitalize'
             />
           </div>
