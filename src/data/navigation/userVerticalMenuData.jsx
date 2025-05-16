@@ -7,42 +7,47 @@ const userVerticalMenuData = dictionary => [
     href: '/dashboard'
   },
   {
-    label: 'Traveling Allowances',
+    label: 'Candidates',
     icon: 'tabler-user',
     children: [
       {
         label: 'List',
         icon: 'tabler-circle',
-        href: '/traveling-allowances/list'
+        href: '/candidates/list'
       },
       {
         label: 'Add',
         icon: 'tabler-circle',
-        href: '/traveling-allowances/add'
+        href: '/candidates/add'
+      },
+      {
+        label: 'Upload',
+        icon: 'tabler-circle',
+        href: '/candidates/upload'
       }
     ]
   },
-  {
-    label: 'Reports',
-    icon: 'tabler-report',
-    children: [
-      {
-        label: 'Movement Report (MR)',
-        icon: 'tabler-circle',
-        href: '/reports/movement-report'
-      },
-      {
-        label: 'Night Allowance Journal (NDA)',
-        icon: 'tabler-circle',
-        href: '/reports/night-allowance-journal'
-      },
-      {
-        label: 'Traveling Allowance Journal (TA)',
-        icon: 'tabler-circle',
-        href: '/reports/traveling-allowance-journal'
-      }
-    ]
-  }
+  // {
+  //   label: 'Reports',
+  //   icon: 'tabler-report',
+  //   children: [
+  //     {
+  //       label: 'Movement Report (MR)',
+  //       icon: 'tabler-circle',
+  //       href: '/reports/movement-report'
+  //     },
+  //     {
+  //       label: 'Night Allowance Journal (NDA)',
+  //       icon: 'tabler-circle',
+  //       href: '/reports/night-allowance-journal'
+  //     },
+  //     {
+  //       label: 'Traveling Allowance Journal (TA)',
+  //       icon: 'tabler-circle',
+  //       href: '/reports/traveling-allowance-journal'
+  //     }
+  //   ]
+  // }
 ]
 
 export default userVerticalMenuData

@@ -1,0 +1,496 @@
+'use client'
+
+// React Imports
+import { useEffect, useState } from 'react'
+
+// MUI Imports
+import List from '@mui/material/List'
+import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
+import ListItem from '@mui/material/ListItem'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+
+// Third-party Imports
+import { toast } from 'react-toastify'
+
+// Icon Imports
+import { useDropzone } from 'react-dropzone'
+import Grid from '@mui/material/Grid2'
+import AppReactDropzone from '@/libs/styles/AppReactDropzone'
+import { Autocomplete, Card, CardContent, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem } from '@mui/material'
+import AddCandidateForm from '../add/AddCandidateForm'
+import { Controller, useForm } from 'react-hook-form'
+import CustomTextField from '@/@core/components/mui/TextField'
+import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
+import { experienceData, MenuProps } from '@/configs/customDataConfig'
+import { useSession } from 'next-auth/react'
+
+const UploadCandidate = () => {
+  // States
+  const [files, setFiles] = useState([])
+  const [uploadedData, setUploadedData] = useState([]);
+  const [selected, setSelected] = useState();
+  const [cities, setCities] = useState();
+  const { data: session } = useSession();
+  const token = session?.user?.token;
+
+  // Hooks
+  const { getRootProps, getInputProps } = useDropzone({
+    multiple: false,
+    maxSize: 2000000, // 2 MB
+    accept: {
+      'application/pdf': ['.pdf']
+    },
+    onDrop: async (acceptedFiles) => {
+      // setFiles(acceptedFiles.map(file => Object.assign(file)))
+
+      const formData = new FormData();
+
+      formData.append('file', acceptedFiles[0])
+
+      if(acceptedFiles){
+        try {
+          const res = await fetch(`http://103.246.170.178:8000/api/upload/`, {
+            method: 'POST',
+            body: formData
+            // Add headers only if required (no need for Content-Type with FormData)
+          });
+
+          if (!res.ok) {
+            throw new Error('Upload failed');
+          }
+
+          setFiles(acceptedFiles.map(file => Object.assign(file)))
+
+          const data = await res.json();
+          const workStatus = data?.experience ? 'experienced' : 'fresher';
+          setUploadedData(data);
+          setSelected(workStatus);
+          console.log('Upload successful:', data);
+          // You can show a success toast or update state here
+        } catch (error) {
+          console.error('Upload error:', error);
+          toast.error('Upload failed. Please try again.', { autoClose: 3000 });
+        }
+      }
+
+    },
+    onDropRejected: () => {
+      toast.error('Only one PDF file is allowed, and the size must be under 2 MB.', {
+        autoClose: 3000
+      })
+    }
+  });
+
+  const renderFilePreview = file => {
+    if (file.type === 'application/pdf') {
+      return <i className='tabler-file-type-pdf' style={{ fontSize: 38 }} />
+    } else {
+      return <i className='tabler-alert-circle' style={{ fontSize: 38, color: 'red' }} />
+    }
+  }
+
+  useEffect(() => {
+
+    const fetchCity = async () => {
+      // const token = await getCookie('token');
+
+      if(!token) return
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/city`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const citiesData = await response.json();
+
+        setCities(citiesData || []);
+        // setData(jsonData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setCities(null);
+      }
+    };
+
+    fetchCity();
+
+  }, [token]);
+
+  const matchedCity = cities ? cities.find(
+    (city) => city?.city_name.toLowerCase() === (uploadedData?.['City'] || '').toLowerCase()
+  ) : '';
+
+  const { control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+    values: {
+      fullName: uploadedData?.full_name || '',
+      email: uploadedData?.email || '',
+      mobileNo: uploadedData?.mobil_no || '',
+      city: matchedCity?.id || '',
+      profileTitle: uploadedData?.profile_title || '',
+      profileSummary: uploadedData?.profile_summary || '',
+      workStatus: uploadedData?.experience ? 'experienced' : '' || '',
+      totalExperience: uploadedData?.total_experience || '',
+      currentCTC: uploadedData?.current_ctc || '',
+      experiences: [
+        {
+          company: '',
+          jobTitle: '',
+          location: '',
+          startDate: null,
+          endDate: null,
+          isCurrent: true
+        }
+      ],
+      createAccount: Boolean(uploadedData?.password)
+    }
+  });
+
+
+  const handleRemoveFile = file => {
+    const uploadedFiles = files
+    const filtered = uploadedFiles.filter(i => i.name !== file.name)
+
+    setFiles([...filtered])
+  }
+
+  const fileList = files.map(file => (
+    <ListItem key={file.name}>
+      <div className='file-details'>
+        <div className='file-preview'>{renderFilePreview(file)}</div>
+        <div>
+          <Typography className='file-name'>{file.name}</Typography>
+          <Typography className='file-size' variant='body2'>
+            {Math.round(file.size / 100) / 10 > 1000
+              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
+              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
+          </Typography>
+        </div>
+      </div>
+      <IconButton onClick={() => handleRemoveFile(file)}>
+        <i className='tabler-x text-xl' />
+      </IconButton>
+    </ListItem>
+  ))
+
+  const handleChange = (prop) => {
+    setSelected(prop)
+
+    // console.log("work status", prop)
+  }
+
+  const candidateForm = () => {
+    return (
+    <Grid container spacing={5}>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller name="fullName" control={control}
+          rules={{
+            required: 'This field is required.',
+
+          }}
+          render={({ field }) => (
+            <CustomTextField fullWidth label={<>Full Name <span className='text-error'>*</span></>}
+              required={false}
+              error={!!errors?.fullName} helperText={errors?.fullName?.message} {...field} />
+          )} />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller name="email" control={control}
+          rules={{
+            required: 'This field is required.',
+            pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: 'Invalid email' }
+          }}
+          render={({ field }) => (
+            <CustomTextField fullWidth required={false} label={<>Email <span className='text-error'>*</span></>} type="email"
+              error={!!errors.email} helperText={errors.email?.message} {...field} />
+          )} />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name="mobileNo"
+          control={control}
+          rules={{
+            required: 'This field is required',
+            validate: {
+              validFormat: (value) => {
+                // Remove all non-digit characters to sanitize input
+                const cleaned = value.replace(/\D/g, '');
+                // Remove optional prefixes
+                const normalized = cleaned.replace(/^(\+91|91|0)/, '');
+                if (!/^[6-9]\d{9}$/.test(normalized)) {
+                  return 'Please enter a valid 10-digit mobile number';
+                }
+                return true;
+              },
+            }
+          }}
+          render={({ field }) => (
+            <CustomTextField
+              fullWidth
+              required={false}
+              label={<>Mobile No. <span className='text-error'>*</span></>}
+              error={!!errors.mobileNo}
+              helperText={errors.mobileNo?.message}
+              {...field}
+              onInput={(e) => {
+                // Allow digits and "+" only, prevent all other characters
+                e.target.value = e.target.value.replace(/[^0-9+]/g, '');
+              }}
+              inputProps={{
+                maxLength: 13, // Max: +91 + 10 digits = 13 characters
+                inputMode: 'tel', // best suited for phone numbers on mobile
+              }}
+            />
+          )}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller name="city" control={control}
+          rules={{ required: 'This field is required.' }}
+          render={({ field }) => (
+            <Autocomplete
+              fullWidth
+              value={cities && cities.length > 0 && cities.find(city => city.id === field.value) || null}
+              options={ cities || [] }
+              getOptionKey={option => option.id}
+              getOptionLabel={(city) => city.city_name || ''}
+              onChange={(event, value) => {
+                  field.onChange(value?.id || '')
+              }}
+              renderInput={(params) => (
+                <CustomTextField
+                  {...params}
+                  label={<>Current City <span className='text-error'>*</span></>}
+                  error={!!errors.city}
+                  helperText={errors?.city?.message}
+                />
+              )}
+            />
+          )}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name="profileTitle"
+          control={control}
+          render={({ field }) => (
+            <CustomTextField
+              fullWidth
+              label='Profile Title'
+              placeholder='PHP | MERN | Full Stack or Student'
+              error={!!errors?.profileTitle}
+              helperText={errors?.profileTitle?.message}
+              {...field}
+            />
+          )}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name="profileSummary"
+          control={control}
+          render={({ field }) => (
+            <CustomTextField
+              fullWidth
+              multiline
+              maxRows={4}
+              label='Profile Summary'
+              error={!!errors?.profileSummary}
+              helperText={errors?.profileSummary?.message}
+              {...field}
+            />
+          )}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Work Status <span className='text-error'>*</span></FormLabel>
+        <Grid container spacing={4}>
+          <Controller
+            name="workStatus"
+            control={control}
+            rules={{
+              required: 'This field is required',
+            }}
+            render={({ field }) => (
+              <>
+              <CustomInputVertical
+              {...field}
+                type='radio'
+                data={{
+                  meta: 'Free',
+                  title: 'Experienced',
+                  content: "Candidate have work experience (excluding internships)",
+                  value: 'experienced'
+                }}
+                error={true}
+                // data={{ ...item, asset }}
+                selected={field.value}
+                // handleChange={(e) => console.log("value change:", e)}
+                handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                gridProps={{ size: { xs: 12, sm: 6 } }}
+              /></>
+            )}
+          />
+          <Controller
+            name="workStatus"
+            control={control}
+            rules={{
+              required: 'This field is required',
+            }}
+            render={({ field }) => (
+              <CustomInputVertical
+                type='radio'
+                data={{
+                  meta: 'Free',
+                  title: 'Fresher',
+                  content: "Candidate is a student/ Haven't worked after graduation",
+                  value: 'fresher'
+                }}
+                // data={{ ...item, asset }}
+                selected={field.value}
+                // handleChange={(e) => field.onChange(e)}
+                handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                gridProps={{ size: { xs: 12, sm: 6 } }}
+              />
+            )}
+          />
+
+          {errors?.workStatus && <FormHelperText error>{errors?.workStatus?.message}</FormHelperText>}
+        </Grid>
+      </Grid>
+      {selected === 'experienced' &&
+        <Grid container spacing={5} size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12 }}>
+            <Controller
+              name="totalExperience"
+              control={control}
+              rules={{
+                required: 'This field is required',
+              }}
+              render={({ field }) => (
+                <CustomTextField
+                  select
+                  fullWidth
+                  label={<>Total Experience {<span className='text-error'>*</span> }</>}
+                  {...field}
+                  error={Boolean(errors?.totalExperience)}
+                  helperText={errors?.totalExperience?.message}
+                  SelectProps={{ MenuProps }}
+                >
+                  {experienceData && experienceData.length > 0 ? experienceData.map((experience, index) => (
+                    <MenuItem key={index} value={experience}>
+                      {experience}
+                    </MenuItem>
+                  )) :(
+                    <MenuItem>No records found</MenuItem>
+                  )}
+                </CustomTextField>
+              )}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <Controller
+              name="currentCTC"
+              control={control}
+              rules={{
+                required: 'This field is required',
+                validate: {
+                  isValidCTC: (value) => {
+                    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+                      return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                    }
+                    return true;
+                  },
+                },
+              }}
+              render={({ field }) => (
+                <CustomTextField
+                  fullWidth
+                  label={
+                    <>
+                      Current CTC <span className="text-error">*</span>
+                    </>
+                  }
+                  error={!!errors.currentCTC}
+                  helperText={errors.currentCTC?.message}
+                  {...field}
+                  onInput={(e) => {
+                    // Allow digits and a single dot
+                    e.target.value = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+                    field.onChange(e); // Update value in form
+                  }}
+                  inputProps={{
+                    maxLength: 10,
+                    pattern: '[0-9.]*',
+                    inputMode: 'decimal', // Enables decimal input keyboards on mobile
+                  }}
+                />
+              )}
+            />
+          </Grid>
+        </Grid>
+      }
+
+      <Grid size={{ xs: 12 }}>
+        <FormControl error={Boolean(errors.checkbox)}>
+          <Controller
+            name='createAccount'
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Create Account' />
+            )}
+          />
+          <FormHelperText>Mobile No. will be default password</FormHelperText>
+          {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
+        </FormControl>
+      </Grid>
+
+    </Grid>
+    )
+  }
+
+  const handleRemoveAllFiles = () => {
+    setFiles([])
+  }
+
+  return (
+    <Card>
+      <CardContent>
+        <AppReactDropzone>
+          <div {...getRootProps({ className: 'dropzone' })}>
+            <input {...getInputProps()} />
+            <div className='flex items-center flex-col'>
+              <Avatar variant='rounded' className='bs-12 is-12 mbe-9'>
+                <i className='tabler-upload' />
+              </Avatar>
+              <Typography variant='h4' className='mbe-2.5'>
+                Drop files here or click to upload.
+              </Typography>
+              <Typography>Allowed *.pdf</Typography>
+              <Typography>Only 1 file and max size of 2 MB</Typography>
+            </div>
+          </div>
+          {files.length ? (
+            <>
+              <List>{fileList}</List>
+              {candidateForm()}
+              {/* <AddCandidateForm /> */}
+              <div className='buttons'>
+                <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
+                  Remove All
+                </Button>
+                <Button variant='contained'>Upload Files</Button>
+              </div>
+            </>
+          ) : null}
+        </AppReactDropzone>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default UploadCandidate

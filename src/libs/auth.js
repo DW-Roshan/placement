@@ -45,7 +45,7 @@ export const authOptions = {
           if (res.status === 401) {
             throw new Error(JSON.stringify(data))
           }
-          
+
           if (res.status === 403) {
             throw new Error(JSON.stringify(data))
           }
@@ -59,8 +59,11 @@ export const authOptions = {
             return {
               name: data.name,
               email: data.email,
+              first_name: data.first_name,
+              last_name: data.last_name,
               user_type: data.user_type,
-              token: data.token
+              token: data.token,
+              profile_image: data.profile_image,
             }
           }
 
@@ -122,6 +125,7 @@ export const authOptions = {
         token.userId = user.id;
         token.userType = user.user_type;
         token.token = user.token;
+        token.profileImage = user.profile_image;
       }
 
       return token
@@ -151,6 +155,7 @@ export const authOptions = {
         session.user.userId = token.userId;
         session.user.userType = token.userType;
         session.user.token = token.token;
+        session.user.profileImage = token.profileImage;
       }
 
       return session
