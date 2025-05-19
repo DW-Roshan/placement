@@ -1,10 +1,13 @@
+import { getServerSession } from 'next-auth';
+
 // MUI Imports
 import Grid from '@mui/material/Grid2'
 
 // Component Imports
 import FormUserAdd from '@/views/apps/user/add/FormUserAdd'
+
 import FormCompanyAdd from '@/views/admin/branch/add/FormCompanyAdd'
-import { getServerSession } from 'next-auth';
+
 import { authOptions } from '@/libs/auth';
 
 const getData = async () => {
@@ -23,6 +26,7 @@ const getData = async () => {
           'Authorization': `Bearer ${token}`
         }
       });
+
       const data = await response.json();
 
       return data.states;

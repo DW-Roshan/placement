@@ -28,7 +28,9 @@ import { useSettings } from '@core/hooks/useSettings'
 
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
-import { deleteCookie, getCookie } from '@/utils/cookies'
+
+// import { deleteCookie, getCookie } from '@/utils/cookies'
+
 // import { signOut } from 'next-auth/react'
 
 // Styled component for badge content
@@ -87,6 +89,7 @@ const UserDropdown = () => {
         });
 
       }
+
       await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
 
     } catch (error) {

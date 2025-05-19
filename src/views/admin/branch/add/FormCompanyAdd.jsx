@@ -22,6 +22,8 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { Autocomplete, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Menu, Radio, RadioGroup, Select, TextField } from '@mui/material'
 
+import { useSession } from 'next-auth/react'
+
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -29,11 +31,11 @@ import CustomTextField from '@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 
-import { getCookie } from '@/utils/cookies'
+// import { getCookie } from '@/utils/cookies'
 
 import { MenuProps } from '@/configs/customDataConfig'
-import { debounce } from 'lodash'
-import { useSession } from 'next-auth/react'
+
+// import { debounce } from 'lodash'
 
 
 // import { toast } from 'react-toastify'
@@ -459,6 +461,7 @@ const FormCompanyAdd = ({statesData }) => {
                 render={({ field }) => (
                   <Autocomplete
                     fullWidth
+
                     // {...field}
                     value={statesData.find(state => state.id === field.value) || null}
                     options={statesData || []}
@@ -534,6 +537,7 @@ const FormCompanyAdd = ({statesData }) => {
                     helperText={errors.contractOrNDAfile?.message}
                     onChange={(e) => {
                       const file = e.target.files[0];
+
                       field.onChange(file);     // updates the RHF form state
                     }}
                     inputProps={{ multiple: false }}

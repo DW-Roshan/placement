@@ -22,6 +22,8 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { Autocomplete, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Menu, Radio, RadioGroup, Select, TextField } from '@mui/material'
 
+import { useSession } from 'next-auth/react'
+
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -29,11 +31,11 @@ import CustomTextField from '@core/components/mui/TextField'
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 
-import { getCookie } from '@/utils/cookies'
+// import { getCookie } from '@/utils/cookies'
 
 import { MenuProps } from '@/configs/customDataConfig'
-import { debounce } from 'lodash'
-import { useSession } from 'next-auth/react'
+
+// import { debounce } from 'lodash'
 
 
 // import { toast } from 'react-toastify'
@@ -292,12 +294,15 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
 
     const handleFileChange = (onChange) => (e) => {
         const file = e.target.files?.[0];
+
         if (file) {
             const fileReader = new FileReader();
+
             fileReader.onload = () => {
                 setImgSrc(fileReader.result);
                 onChange(file); // store the actual file in form state
             };
+
             fileReader.readAsDataURL(file);
         }
     };
@@ -454,7 +459,9 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                             ['firstName', 'First Name', true],
                             ['lastName', 'Last Name'],
                             ['mobileNumber', 'Mobile No.', true, 'number'],
+
                             //   ['websiteUrl', 'Website URL'],
+
                         ].map(([name, label, required = false, type = "text"]) => (
                             <Grid size={{ xs: 12, sm: 6 }} key={name}>
                                 <Controller name={name} control={control}
@@ -538,7 +545,9 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                 render={({ field }) => (
                                     <Autocomplete
                                         fullWidth
+
                                         // {...field}
+                                        
                                         value={reportingManagers && reportingManagers.find(reporting => reporting.id === field.value) || null}
                                         options={reportingManagers || []}
                                         getOptionKey={option => option.id}
@@ -555,6 +564,7 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                             />
                                         )}
                                     />
+
                                     // <CustomTextField select fullWidth label={<>Reporting Manager <span className='text-error'>*</span></>}
                                     //     SelectProps={{ MenuProps }}
                                     //     error={!!errors.reportingManager} helperText={errors?.reportingManager?.message} {...field}>
@@ -565,6 +575,7 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                     //     <MenuItem value="50-100">50-100</MenuItem>
                                     //     <MenuItem value="100+">100+</MenuItem>
                                     // </CustomTextField>
+
                                 )} />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
@@ -573,7 +584,9 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                 render={({ field }) => (
                                     <Autocomplete
                                         fullWidth
+
                                         // {...field}
+
                                         value={departments && departments.find(department => department.id === field.value) || null}
                                         options={departments || []}
                                         getOptionKey={option => option.id}
@@ -621,7 +634,9 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                 render={({ field }) => (
                                     <Autocomplete
                                         fullWidth
+
                                         // {...field}
+
                                         value={statesData && statesData.find(state => state.id === field.value) || null}
                                         options={statesData || []}
                                         getOptionLabel={(state) => state.state_name || ''}
@@ -665,8 +680,10 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                         {[
                             ['address', 'Address', true],
                             ['pincode', 'Pincode', false, 'number'],
+
                             // ['experience', 'Years in Business', false, 'number'],
                             // ['industrySpecializedIn', 'Industries Specialized In'],
+
                         ].map(([name, label, required = false, type = "text"]) => (
                             <Grid size={{ xs: 12, sm: 6 }} key={name}>
                                 <Controller name={name} control={control}

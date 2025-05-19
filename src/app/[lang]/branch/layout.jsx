@@ -1,3 +1,5 @@
+import { getServerSession } from 'next-auth'
+
 // MUI Imports
 import Button from '@mui/material/Button'
 
@@ -22,9 +24,9 @@ import { i18n } from '@configs/i18n'
 
 // Util Imports
 import { getDictionary } from '@/utils/getDictionary'
+
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 import BranchGuard from '@/hocs/BranchGuard'
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/libs/auth'
 
 const Layout = async props => {

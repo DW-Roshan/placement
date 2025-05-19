@@ -39,7 +39,9 @@ import { toast } from 'react-toastify'
 
 // Component Imports
 import TableFilters from './TableFilters'
+
 // import AddUserDrawer from './AddUserDrawer'
+
 import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import CustomTextField from '@core/components/mui/TextField'
@@ -200,7 +202,23 @@ const CandidatesListTable = ({ tableData }) => {
           </Typography>
         )
       }),
-      columnHelper.accessor('city_name', {
+      columnHelper.accessor('industry', {
+        header: 'Industry',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original?.industry}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('department', {
+        header: 'Department',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original?.department}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('city.city_name', {
         header: 'Current City',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>

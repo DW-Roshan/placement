@@ -23,20 +23,21 @@ import { Autocomplete, Checkbox, Chip, FormControl, FormControlLabel, FormHelper
 // Components Imports
 import classNames from 'classnames'
 
+import { TabContext, TabList, TabPanel } from '@mui/lab'
+
+import { useSession } from 'next-auth/react'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-import { getCookie } from '@/utils/cookies'
+// import { getCookie } from '@/utils/cookies'
 
 import { experienceData, MenuProps } from '@/configs/customDataConfig'
-import { useSession } from 'next-auth/react'
+
+
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
-import { TabContext, TabList, TabPanel } from '@mui/lab'
-
-
-
 
 const AddCandidateForm = ({candidateId}) => {
   // States
@@ -88,34 +89,37 @@ const AddCandidateForm = ({candidateId}) => {
 
   }, [candidateId, token])
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   const fetchData = async () => {
-  //     // const token = await getCookie('token');
+    const fetchData = async () => {
+      
+      // const token = await getCookie('token');
 
-  //     if(!token) return
+      if(!token) return
 
-  //     try {
-  //       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/add`, {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'Authorization': `Bearer ${token}`
-  //         }
-  //       });
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/add`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-  //       const jsonData = await response.json();
+        const jsonData = await response.json();
 
-  //       setCities(jsonData.cities || []);
-  //       // setData(jsonData);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //       setCities(null);
-  //     }
-  //   };
+        setCities(jsonData.cities || []);
 
-  //   fetchData();
+        // setData(jsonData);
 
-  // }, [token]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setCities(null);
+      }
+    };
+
+    fetchData();
+
+  }, [token]);
 
   const { control, handleSubmit, watch, reset, formState: { errors } } = useForm({
     // defaultValues: {
@@ -331,13 +335,21 @@ const AddCandidateForm = ({candidateId}) => {
                       required: 'This field is required',
                       validate: {
                         validFormat: (value) => {
+
                           // Remove all non-digit characters to sanitize input
+
                           const cleaned = value.replace(/\D/g, '');
+
                           // Remove optional prefixes
+
                           const normalized = cleaned.replace(/^(\+91|91|0)/, '');
+
                           if (!/^[6-9]\d{9}$/.test(normalized)) {
+
                             return 'Please enter a valid 10-digit mobile number';
+
                           }
+
                           return true;
                         },
                       }
@@ -460,9 +472,13 @@ const AddCandidateForm = ({candidateId}) => {
                             value: 'experienced'
                           }}
                           error={true}
+
                           // data={{ ...item, asset }}
+
                           selected={field.value}
+
                           // handleChange={(e) => console.log("value change:", e)}
+
                           handleChange={(e) => {handleChange(e); field.onChange(e)}}
                           gridProps={{ size: { xs: 12, sm: 6 } }}
                         /></>
@@ -483,9 +499,13 @@ const AddCandidateForm = ({candidateId}) => {
                             content: "Candidate is a student/ Haven't worked after graduation",
                             value: 'fresher'
                           }}
+
                           // data={{ ...item, asset }}
+
                           selected={field.value}
+
                           // handleChange={(e) => field.onChange(e)}
+
                           handleChange={(e) => {handleChange(e); field.onChange(e)}}
                           gridProps={{ size: { xs: 12, sm: 6 } }}
                         />
@@ -536,6 +556,7 @@ const AddCandidateForm = ({candidateId}) => {
                               if (!/^\d+(\.\d{1,2})?$/.test(value)) {
                                 return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
                               }
+
                               return true;
                             },
                           },

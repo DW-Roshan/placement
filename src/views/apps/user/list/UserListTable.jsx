@@ -51,8 +51,9 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { getCookie } from '@/utils/cookies'
-import { useSession } from 'next-auth/react'
+
+// import { getCookie } from '@/utils/cookies'
+// import { useSession } from 'next-auth/react'
 
 // Styled Components
 const Icon = styled('i')({})

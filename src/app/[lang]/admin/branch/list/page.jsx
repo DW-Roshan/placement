@@ -1,10 +1,11 @@
+import { getServerSession } from 'next-auth'
+
 // Component Imports
 import UserList from '@views/admin/branch/list'
 
 // Data Imports
 // import { getUserData, getUserDataL } from '@/app/server/actions'
 
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/libs/auth'
 
 /**

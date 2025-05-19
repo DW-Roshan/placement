@@ -8,29 +8,92 @@ import MenuItem from '@mui/material/MenuItem'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
+import { MenuProps } from '@/configs/customDataConfig'
+import { useSession } from 'next-auth/react'
 
 const TableFilters = ({ setData, tableData }) => {
   // States
+  const [industry, setIndustry] = useState('')
+  const [department, setDepartment] = useState('')
   const [role, setRole] = useState('')
   const [plan, setPlan] = useState('')
   const [status, setStatus] = useState('')
+  const [industries, setIndustries] = useState(null);
+  const [departments, setDepartments] = useState(null);
+  const { data: session } = useSession()
+  const token = session?.user?.token
 
   useEffect(() => {
     const filteredData = tableData?.filter(user => {
       // if (role && user.role !== role) return false
       // if (plan && user.currentPlan !== plan) return false
-      // if (status && user.status !== status) return false
+      if (status && user.status != status) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [role, plan, status, tableData, setData])
+  }, [status, tableData, setData])
+
+  useEffect(() => {
+
+    if(!token) return
+
+    const getIndustry = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/industry`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const jsonData = await response.json();
+
+        setIndustries(jsonData?.industries || []);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIndustries(null);
+      }
+    }
+
+    getIndustry()
+  }, [token])
 
   return (
     <CardContent>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 4 }}>
+          <CustomTextField
+            select
+            fullWidth
+            id='select-industry'
+            value={role}
+            onChange={e => setIndustry(e.target.value)}
+            slotProps={{
+              select: { displayEmpty: true, MenuProps }
+            }}
+          >
+            <MenuItem value=''>Select Industry</MenuItem>
+          </CustomTextField>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <CustomTextField
+            select
+            fullWidth
+            id='select-department'
+            value={role}
+            onChange={e => setDepartment(e.target.value)}
+            slotProps={{
+              select: { displayEmpty: true, MenuProps }
+            }}
+          >
+            <MenuItem value=''>Select Department</MenuItem>
+          </CustomTextField>
+        </Grid>
+        {/* <Grid size={{ xs: 12, sm: 4 }}>
           <CustomTextField
             select
             fullWidth
@@ -48,8 +111,8 @@ const TableFilters = ({ setData, tableData }) => {
             <MenuItem value='maintainer'>Maintainer</MenuItem>
             <MenuItem value='subscriber'>Subscriber</MenuItem>
           </CustomTextField>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        </Grid> */}
+        {/* <Grid size={{ xs: 12, sm: 4 }}>
           <CustomTextField
             select
             fullWidth
@@ -66,7 +129,7 @@ const TableFilters = ({ setData, tableData }) => {
             <MenuItem value='enterprise'>Enterprise</MenuItem>
             <MenuItem value='team'>Team</MenuItem>
           </CustomTextField>
-        </Grid>
+        </Grid> */}
         <Grid size={{ xs: 12, sm: 4 }}>
           <CustomTextField
             select
@@ -79,9 +142,8 @@ const TableFilters = ({ setData, tableData }) => {
             }}
           >
             <MenuItem value=''>Select Status</MenuItem>
-            <MenuItem value='pending'>Pending</MenuItem>
-            <MenuItem value='active'>Active</MenuItem>
-            <MenuItem value='inactive'>Inactive</MenuItem>
+            <MenuItem value='1'>Active</MenuItem>
+            <MenuItem value='0'>Inactive</MenuItem>
           </CustomTextField>
         </Grid>
       </Grid>

@@ -231,6 +231,7 @@ const UserListTable = ({ tableData }) => {
           </Typography>
         )
       }),
+      
       // columnHelper.accessor('branch', {
       //   header: 'Branch',
       //   cell: ({ row }) => (
@@ -283,6 +284,7 @@ const UserListTable = ({ tableData }) => {
           </Typography>
         )
       }),
+
       // columnHelper.accessor('taSrNo', {
       //   header: 'Ta Sr No.',
       //   cell: ({ row }) => (

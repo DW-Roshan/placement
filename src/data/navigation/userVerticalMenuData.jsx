@@ -27,6 +27,7 @@ const userVerticalMenuData = dictionary => [
       }
     ]
   },
+  
   // {
   //   label: 'Reports',
   //   icon: 'tabler-report',

@@ -72,6 +72,7 @@ const getData = async () => {
     };
   } catch (error) {
     console.error('Error fetching data:', error);
+    
     return { states: [], departments: [], reportingManagers: [] };
   }
 };

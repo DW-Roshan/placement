@@ -1,10 +1,13 @@
+import { getServerSession } from 'next-auth'
+
 // Component Imports
 import CandidatesList from '@/views/user/candidates/list'
 
 // Data Imports
+
 // import { getcandidatesData, getcandidatesDataL } from '@/app/server/actions'
 import { getCookie } from '@/utils/cookies'
-import { getServerSession } from 'next-auth'
+
 import { authOptions } from '@/libs/auth'
 
 /**
