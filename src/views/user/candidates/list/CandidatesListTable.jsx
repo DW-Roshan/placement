@@ -197,16 +197,23 @@ const CandidatesListTable = ({ tableData }) => {
       columnHelper.accessor('work_status', {
         header: 'Work Status',
         cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original?.work_status}
-          </Typography>
+          <Chip
+            variant='tonal'
+            label={row.original?.work_status == 'experienced' ? 'Experienced' : 'Fresher'}
+            size='small'
+            color={row.original?.work_status == 'experienced' ? 'success' : 'error'}
+            className='capitalize'
+          />
+          // <Typography className='capitalize' color='text.primary'>
+          //   {row.original?.work_status}
+          // </Typography>
         )
       }),
       columnHelper.accessor('industry', {
-        header: 'Industry',
+        header: 'Industry Type',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original?.industry}
+            {row.original?.industry?.name}
           </Typography>
         )
       }),
@@ -214,7 +221,7 @@ const CandidatesListTable = ({ tableData }) => {
         header: 'Department',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original?.department}
+            {row.original?.department?.name}
           </Typography>
         )
       }),

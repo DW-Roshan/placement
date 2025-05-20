@@ -42,6 +42,8 @@ const UploadCandidate = () => {
   const [uploadedData, setUploadedData] = useState([]);
   const [selected, setSelected] = useState();
   const [cities, setCities] = useState();
+  const [industries, setIndustries] = useState();
+  const [departments, setDepartments] = useState();
   const { data: session } = useSession();
   const token = session?.user?.token;
   const router = useRouter();
@@ -135,11 +137,42 @@ const UploadCandidate = () => {
 
   }, [token]);
 
+  useEffect(() => {
+
+    const fetchCity = async () => {
+      // const token = await getCookie('token');
+
+      if(!token) return
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/industry`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        setIndustries(data?.industries || []);
+
+        // setData(jsonData);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIndustries(null);
+      }
+    };
+
+    fetchCity();
+
+  }, [token]);
+
   const matchedCity = cities ? cities.find(
     (city) => city?.city_name.toLowerCase() === (uploadedData?.['City'] || '').toLowerCase()
   ) : '';
 
-  const { control, handleSubmit, watch, reset, setError, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, reset, setError, setValue, formState: { errors } } = useForm({
     values: {
       fullName: uploadedData?.full_name || '',
       email: uploadedData?.email || '',
@@ -331,7 +364,7 @@ const UploadCandidate = () => {
                     const cleaned = value.replace(/\D/g, '');
                     const normalized = cleaned.replace(/^(\+91|0)/, '');
 
-                    if (!/^[6-9]\d{9}$/.test(normalized)) {
+                    if (!/^[6-9]\d{11}$/.test(normalized)) {
 
                       return 'Please enter a valid 10-digit mobile number';
                     }
@@ -380,6 +413,58 @@ const UploadCandidate = () => {
                       label={<>Current City <span className='text-error'>*</span></>}
                       error={!!errors.city}
                       helperText={errors?.city?.message}
+                    />
+                  )}
+                />
+              )}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Controller name="industry" control={control}
+              rules={{ required: 'This field is required.' }}
+              render={({ field }) => (
+                <Autocomplete
+                  fullWidth
+                  value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
+                  options={industries || []}
+                  getOptionKey={option => option.id}
+                  getOptionLabel={(industry) => industry.name || ''}
+                  onChange={(event, value) => {
+                      field.onChange(value?.id || '');
+                      setDepartments(value?.departments || null);
+                      setValue('department', '')
+                  }}
+                  renderInput={(params) => (
+                    <CustomTextField
+                      {...params}
+                      label={<>Industry <span className='text-error'>*</span></>}
+                      error={!!errors.industry}
+                      helperText={errors?.industry?.message}
+                    />
+                  )}
+                />
+              )}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Controller name="department" control={control}
+              rules={{ required: 'This field is required.' }}
+              render={({ field }) => (
+                <Autocomplete
+                  fullWidth
+                  value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
+                  options={departments || []}
+                  getOptionKey={option => option.id}
+                  getOptionLabel={(department) => department.name || ''}
+                  onChange={(event, value) => {
+                      field.onChange(value?.id || '')
+                  }}
+                  renderInput={(params) => (
+                    <CustomTextField
+                      {...params}
+                      label={<>Department <span className='text-error'>*</span></>}
+                      error={!!errors.department}
+                      helperText={errors?.department?.message}
                     />
                   )}
                 />

@@ -7,16 +7,13 @@ import Grid from '@mui/material/Grid2'
 import MenuItem from '@mui/material/MenuItem'
 
 // Component Imports
-import CustomTextField from '@core/components/mui/TextField'
-import { MenuProps } from '@/configs/customDataConfig'
 import { useSession } from 'next-auth/react'
+import { Autocomplete, TextField } from '@mui/material'
 
 const TableFilters = ({ setData, tableData }) => {
   // States
   const [industry, setIndustry] = useState('')
   const [department, setDepartment] = useState('')
-  const [role, setRole] = useState('')
-  const [plan, setPlan] = useState('')
   const [status, setStatus] = useState('')
   const [industries, setIndustries] = useState(null);
   const [departments, setDepartments] = useState(null);
@@ -24,16 +21,16 @@ const TableFilters = ({ setData, tableData }) => {
   const token = session?.user?.token
 
   useEffect(() => {
-    const filteredData = tableData?.filter(user => {
-      // if (role && user.role !== role) return false
-      // if (plan && user.currentPlan !== plan) return false
-      if (status && user.status != status) return false
+    const filteredData = tableData?.filter(candidate => {
+      if (industry && candidate.industry_id != industry) return false
+      if (department && candidate.department_id != department) return false
+      if (status && candidate.status != status) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [status, tableData, setData])
+  }, [industry, department, status, tableData, setData])
 
   useEffect(() => {
 
@@ -66,85 +63,56 @@ const TableFilters = ({ setData, tableData }) => {
     <CardContent>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <CustomTextField
-            select
+          <Autocomplete
             fullWidth
-            id='select-industry'
-            value={role}
-            onChange={e => setIndustry(e.target.value)}
-            slotProps={{
-              select: { displayEmpty: true, MenuProps }
+            options={industries || []}
+            getOptionLabel={(industry) => industry?.name || ''}
+            value={industries && industries.find((opt) => opt.id === industry) || null}
+            onChange={(event, value) => {
+              if(value?.id){
+                setIndustry(value?.id || '');
+                setDepartments(value?.departments || null)
+              } else {
+                setIndustry('');
+                setDepartment('');
+                setDepartments(null)
+              }
             }}
-          >
-            <MenuItem value=''>Select Industry</MenuItem>
-          </CustomTextField>
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            renderInput={(params) => (
+              <TextField label='Select Industry Type' {...params}/>
+            )}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <CustomTextField
-            select
+          <Autocomplete
             fullWidth
-            id='select-department'
-            value={role}
-            onChange={e => setDepartment(e.target.value)}
-            slotProps={{
-              select: { displayEmpty: true, MenuProps }
+            options={departments || []}
+            getOptionLabel={(department) => department?.name || ''}
+            value={departments && departments.find(opt => opt.id === department) || null}
+            onChange={(event, value) => {
+              setDepartment(value?.id || '');
             }}
-          >
-            <MenuItem value=''>Select Department</MenuItem>
-          </CustomTextField>
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            renderInput={(params) => (
+              <TextField label='Select Department' {...params}/>
+            )}
+          />
         </Grid>
-        {/* <Grid size={{ xs: 12, sm: 4 }}>
-          <CustomTextField
-            select
-            fullWidth
-            id='select-role'
-            value={role}
-            onChange={e => setRole(e.target.value)}
-            slotProps={{
-              select: { displayEmpty: true }
-            }}
-          >
-            <MenuItem value=''>Select Role</MenuItem>
-            <MenuItem value='admin'>Admin</MenuItem>
-            <MenuItem value='author'>Author</MenuItem>
-            <MenuItem value='editor'>Editor</MenuItem>
-            <MenuItem value='maintainer'>Maintainer</MenuItem>
-            <MenuItem value='subscriber'>Subscriber</MenuItem>
-          </CustomTextField>
-        </Grid> */}
-        {/* <Grid size={{ xs: 12, sm: 4 }}>
-          <CustomTextField
-            select
-            fullWidth
-            id='select-plan'
-            value={plan}
-            onChange={e => setPlan(e.target.value)}
-            slotProps={{
-              select: { displayEmpty: true }
-            }}
-          >
-            <MenuItem value=''>Select Plan</MenuItem>
-            <MenuItem value='basic'>Basic</MenuItem>
-            <MenuItem value='company'>Company</MenuItem>
-            <MenuItem value='enterprise'>Enterprise</MenuItem>
-            <MenuItem value='team'>Team</MenuItem>
-          </CustomTextField>
-        </Grid> */}
         <Grid size={{ xs: 12, sm: 4 }}>
-          <CustomTextField
-            select
+          <Autocomplete
             fullWidth
-            id='select-status'
-            value={status}
-            onChange={e => setStatus(e.target.value)}
-            slotProps={{
-              select: { displayEmpty: true }
+            options={[{id: '1', name: 'Active'},{id: '0', name: 'Inactive'}]}
+            getOptionLabel={(department) => department?.name || ''}
+            value={[{id: '1', name: 'Active'},{id: '0', name: 'Inactive'}].find(opt => opt.id === status) || null}
+            onChange={(event, value) => {
+              setStatus(value?.id || '');
             }}
-          >
-            <MenuItem value=''>Select Status</MenuItem>
-            <MenuItem value='1'>Active</MenuItem>
-            <MenuItem value='0'>Inactive</MenuItem>
-          </CustomTextField>
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            renderInput={(params) => (
+              <TextField label='Select Status' {...params}/>
+            )}
+          />
         </Grid>
       </Grid>
     </CardContent>

@@ -43,12 +43,14 @@ const AddCandidateForm = ({candidateId}) => {
   // States
   const [data, setData] = useState();
   const [cities, setCities] = useState();
+  const [industries, setIndustries] = useState();
+  const [departments, setDepartments] = useState();
   const [candidateData, setCandidateData] = useState();
   const { data: session } = useSession()
   const token = session?.user?.token
 
   const router = useRouter();
-  const [value, setValue] = useState('personal_info')
+  const [value, setTabValue] = useState('personal_info')
 
   const [selected, setSelected] = useState('')
 
@@ -74,6 +76,8 @@ const AddCandidateForm = ({candidateId}) => {
           const jsonData = await response.json();
 
           setCities(jsonData.cities || []);
+          setIndustries(jsonData.industries);
+          setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate.industry_id).departments)
           setSelected(jsonData.candidate.work_status || '')
           setCandidateData(jsonData.candidate || null);
 
@@ -92,7 +96,7 @@ const AddCandidateForm = ({candidateId}) => {
   useEffect(() => {
 
     const fetchData = async () => {
-      
+
       // const token = await getCookie('token');
 
       if(!token) return
@@ -108,12 +112,14 @@ const AddCandidateForm = ({candidateId}) => {
         const jsonData = await response.json();
 
         setCities(jsonData.cities || []);
+        setIndustries(jsonData.industries);
 
         // setData(jsonData);
 
       } catch (error) {
         console.error('Error fetching data:', error);
         setCities(null);
+        setIndustries(null);
       }
     };
 
@@ -121,7 +127,7 @@ const AddCandidateForm = ({candidateId}) => {
 
   }, [token]);
 
-  const { control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, reset, setValue, formState: { errors } } = useForm({
     // defaultValues: {
     //   fullName: '',
     //   email: '',
@@ -159,6 +165,8 @@ const AddCandidateForm = ({candidateId}) => {
       fullName: candidateData?.full_name || '',
       email: candidateData?.email || '',
       mobileNo: candidateData?.mobile_no || '',
+      industry: candidateData?.industry_id || '',
+      department: candidateData?.department_id || '',
       city: candidateData?.city_id || '',
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
@@ -281,7 +289,7 @@ const AddCandidateForm = ({candidateId}) => {
   };
 
     const handleTabChange = (event, newValue) => {
-      setValue(newValue)
+      setTabValue(newValue)
     }
 
     const handleChange = (prop) => {
@@ -342,7 +350,7 @@ const AddCandidateForm = ({candidateId}) => {
 
                           // Remove optional prefixes
 
-                          const normalized = cleaned.replace(/^(\+91|91|0)/, '');
+                          const normalized = cleaned.replace(/^(\+91|0)/, '');
 
                           if (!/^[6-9]\d{9}$/.test(normalized)) {
 
@@ -393,6 +401,58 @@ const AddCandidateForm = ({candidateId}) => {
                             label={<>Current City <span className='text-error'>*</span></>}
                             error={!!errors.city}
                             helperText={errors?.city?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller name="industry" control={control}
+                    rules={{ required: 'This field is required.' }}
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
+                        options={industries || []}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, value) => {
+                            field.onChange(value?.id || '');
+                            setDepartments(value?.departments || null);
+                            setValue('department', '')
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label={<>Industry <span className='text-error'>*</span></>}
+                            error={!!errors.industry}
+                            helperText={errors?.industry?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller name="department" control={control}
+                    rules={{ required: 'This field is required.' }}
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
+                        options={departments || []}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(department) => department.name || ''}
+                        onChange={(event, value) => {
+                            field.onChange(value?.id || '')
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label={<>Department <span className='text-error'>*</span></>}
+                            error={!!errors.department}
+                            helperText={errors?.department?.message}
                           />
                         )}
                       />
@@ -1289,7 +1349,7 @@ const AddCandidateForm = ({candidateId}) => {
             <Button type='submit' variant='contained' className='mie-2'>
               Submit
             </Button>
-            <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset(); setSelected(candidateData?.work_status || '')}}>
+            <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset(); setSelected(candidateData?.work_status || ''); setDepartments(industries.find( industry =>  industry.id === candidateData?.industry_id)?.departments || [])}}>
               Reset
             </Button>
           </CardActions>
