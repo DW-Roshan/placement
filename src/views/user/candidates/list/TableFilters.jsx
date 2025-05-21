@@ -62,7 +62,7 @@ const TableFilters = ({ setData, tableData }) => {
   return (
     <CardContent>
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Autocomplete
             fullWidth
             options={industries || []}
@@ -84,7 +84,7 @@ const TableFilters = ({ setData, tableData }) => {
             )}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Autocomplete
             fullWidth
             options={departments || []}
@@ -99,7 +99,7 @@ const TableFilters = ({ setData, tableData }) => {
             )}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Autocomplete
             fullWidth
             options={[{id: '1', name: 'Active'},{id: '0', name: 'Inactive'}]}

@@ -50,6 +50,8 @@ import CustomAvatar from '@core/components/mui/Avatar'
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
 
+import { formatToLacOrCr } from '@/utils/formatCTC'
+
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
@@ -144,6 +146,34 @@ const CandidatesListTable = ({ tableData }) => {
     });
   }, []);
 
+  // const formatToLacOrCr = (number) => {
+  //   // Check if the number is greater than or equal to 1 Crore
+  //   if (number >= 10000000) {
+  //     // Convert to Crore (divide by 10,000,000)
+  //     const valueInCrore = number / 10000000;
+
+  //     // Format the value using `Intl.NumberFormat`
+  //     const formattedValue = new Intl.NumberFormat("en-IN", {
+  //       maximumFractionDigits: 2, // Limit to 2 decimal places
+  //     }).format(valueInCrore);
+
+  //     return `${formattedValue} Cr`; // Append "Cr" for Crore
+  //   } else if (number >= 100000) {
+  //     // Convert to Lakh (divide by 100,000)
+  //     const valueInLakh = number / 100000;
+
+  //     // Format the value using `Intl.NumberFormat`
+  //     const formattedValue = new Intl.NumberFormat("en-IN", {
+  //       maximumFractionDigits: 2, // Limit to 2 decimal places
+  //     }).format(valueInLakh);
+
+  //     return `${formattedValue} Lac`; // Append "Lac" for Lakh
+  //   } else {
+  //     // For values less than 1 Lakh, simply return the number formatted with commas
+  //     return new Intl.NumberFormat("en-IN").format(number);
+  //   }
+  // };
+
   const columns = useMemo(
     () => [
       {
@@ -204,9 +234,11 @@ const CandidatesListTable = ({ tableData }) => {
             color={row.original?.work_status == 'experienced' ? 'success' : 'error'}
             className='capitalize'
           />
+
           // <Typography className='capitalize' color='text.primary'>
           //   {row.original?.work_status}
           // </Typography>
+
         )
       }),
       columnHelper.accessor('industry', {
@@ -245,7 +277,7 @@ const CandidatesListTable = ({ tableData }) => {
         header: 'Current CTC',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original?.current_ctc}
+            {row.original?.current_ctc ? formatToLacOrCr(row.original?.current_ctc) : ''}
           </Typography>
         )
       }),
@@ -364,7 +396,7 @@ const CandidatesListTable = ({ tableData }) => {
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Search User'
+              placeholder='Search Candidate'
               className='max-sm:is-full'
             />
             <Button

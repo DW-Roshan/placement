@@ -31,6 +31,8 @@ import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 
 // import AddCandidateForm from '../add/AddCandidateForm'
 
+import { formatCTC } from '@/utils/formatCTC'
+
 import CustomTextField from '@/@core/components/mui/TextField'
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
@@ -602,7 +604,13 @@ const UploadCandidate = () => {
                     required: 'This field is required',
                     validate: {
                       isValidCTC: (value) => {
-                        if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+
+                        // Remove commas from the value for proper numeric validation
+                        const sanitizedValue = value.replace(/,/g, '');
+
+                        // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                        if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
                           return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
                         }
 
@@ -621,15 +629,23 @@ const UploadCandidate = () => {
                       error={!!errors.currentCTC}
                       helperText={errors.currentCTC?.message}
                       {...field}
+
+                      // Set placeholder with default formatted CTC
+
+                      placeholder="4,24,000"
+                      value={formatCTC(field.value)}  // Apply formatting to the value here
                       onInput={(e) => {
-                        // Allow digits and a single dot
-                        e.target.value = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-                        field.onChange(e); // Update value in form
+
+                        // Allow only digits and one dot for decimal separator
+
+                        const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+                        
+                        field.onChange(sanitizedValue);  // Update value in form
                       }}
                       inputProps={{
-                        maxLength: 10,
-                        pattern: '[0-9.]*',
-                        inputMode: 'decimal', // Enables decimal input keyboards on mobile
+                        maxLength: 12,  // Optional: restrict the length of the number
+                        pattern: '[0-9.,]*',  // Allow numbers and one dot for decimal
+                        inputMode: 'decimal',  // Enable numeric keypad with decimal on mobile
                       }}
                     />
                   )}
