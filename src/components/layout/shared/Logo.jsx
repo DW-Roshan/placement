@@ -59,7 +59,8 @@ const Logo = ({ color }) => {
 
   return (
     <div className='flex items-center'>
-      <VuexyLogo className='text-2xl text-primary' />
+      <img src='/images/logos/dw_icon.png' width={100} />
+      {/* <VuexyLogo className='text-2xl text-primary' />
       <LogoText
         color={color}
         ref={logoTextRef}
@@ -69,7 +70,7 @@ const Logo = ({ color }) => {
         isBreakpointReached={isBreakpointReached}
       >
         {themeConfig.templateName}
-      </LogoText>
+      </LogoText> */}
     </div>
   )
 }
