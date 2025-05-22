@@ -26,6 +26,10 @@ import { valibotResolver } from '@hookform/resolvers/valibot'
 import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
 import classnames from 'classnames'
 
+import { toast } from 'react-toastify'
+
+import { CircularProgress } from '@mui/material'
+
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
@@ -39,7 +43,8 @@ import { useSettings } from '@core/hooks/useSettings'
 
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
-import { setCookie } from '@/utils/cookies'
+
+// import { setCookie } from '@/utils/cookies'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -95,6 +100,7 @@ const Login = ({ mode }) => {
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const [loading, setLoading] = useState(false)
 
   const {
     control,
@@ -134,23 +140,35 @@ const Login = ({ mode }) => {
     //   body: JSON.stringify({ username: data.username, password: data.password }),
     // });
 
-    const res = await signIn('credentials', {
-      email: data.username,
-      password: data.password,
-      redirect: false
-    })
+    setLoading(true);
 
-    if (res && res.ok && res.error === null) {
-      // Vars
-      const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
+    try {
 
-      router.replace(getLocalizedUrl(redirectURL, locale))
-    } else {
-      if (res?.error) {
-        const error = JSON.parse(res.error)
+      const res = await signIn('credentials', {
+        email: data.username,
+        password: data.password,
+        redirect: false
+      })
 
-        setErrorState(error)
+      if (res && res.ok && res.error === null) {
+        // Vars
+        const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
+
+        router.replace(getLocalizedUrl(redirectURL, locale))
+      } else {
+        if (res?.error) {
+          const error = JSON.parse(res.error)
+
+          setErrorState(error)
+        }
       }
+
+    } catch (error) {
+      toast.error("Something went wrong. Server is not working", {
+        autoClose: 3000
+      });
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -247,7 +265,7 @@ const Login = ({ mode }) => {
                 />
               )}
             />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
+            {/* <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
               <Typography
                 className='text-end'
@@ -257,11 +275,12 @@ const Login = ({ mode }) => {
               >
                 Forgot password?
               </Typography>
-            </div>
-            <Button fullWidth variant='contained' type='submit'>
+            </div> */}
+            <Button fullWidth variant='contained' type='submit' className='gap-2' disabled={loading}>
+              {loading && <CircularProgress size={20} color='inherit' />}
               Login
             </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
+            {/* <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
               <Typography component={Link} href={getLocalizedUrl('/register', locale)} color='primary.main'>
                 Create an account
@@ -276,7 +295,7 @@ const Login = ({ mode }) => {
               onClick={() => signIn('google')}
             >
               Sign in with Google
-            </Button>
+            </Button> */}
           </form>
         </div>
       </div>
