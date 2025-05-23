@@ -21,22 +21,6 @@ const adminMenuData = dictionary => [
         href: '/admin/branch/add'
       }
     ]
-  },
-  {
-    label: dictionary['navigation'].user,
-    icon: 'tabler-user',
-    children: [
-      {
-        label: dictionary['navigation'].list,
-        icon: 'tabler-circle',
-        href: '/admin/user/list'
-      },
-      {
-        label: dictionary['navigation'].add,
-        icon: 'tabler-circle',
-        href: '/admin/user/add'
-      }
-    ]
   }
 ]
 
