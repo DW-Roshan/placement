@@ -173,11 +173,11 @@ const Footer = ({ mode }) => {
             <span>{`© ${new Date().getFullYear()}, Made with `}</span>
             <span>{`❤️`}</span>
             <span>{` by `}</span>
-            <Link href='https://pixinvent.com/' target='_blank' className='font-medium text-white'>
-              Pixinvent
+            <Link href='#' target='_blank' className='font-medium text-white'>
+              Dream Weavers
             </Link>
           </Typography>
-          <div className='flex gap-1.5 items-center'>
+          {/* <div className='flex gap-1.5 items-center'>
             <IconButton component={Link} size='small' href='https://github.com/pixinvent' target='_blank'>
               <i className='tabler-brand-github-filled text-white text-lg' />
             </IconButton>
@@ -195,7 +195,7 @@ const Footer = ({ mode }) => {
             >
               <i className='tabler-brand-youtube-filled text-white text-lg' />
             </IconButton>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

@@ -112,7 +112,7 @@ const UserDropdown = () => {
         <Avatar
           ref={anchorRef}
           alt={session?.user?.name || ''}
-          src={session?.user?.image || ''}
+          src={`${process.env.NEXT_PUBLIC_ASSET_URL}${session?.user?.profileImage}` || ''}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -136,7 +136,7 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
+                    <Avatar alt={session?.user?.name || ''} src={`${process.env.NEXT_PUBLIC_ASSET_URL}${session?.user?.profileImage}` || ''} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
                         {session?.user?.name || ''}
@@ -145,21 +145,9 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/user-profile')}>
-                    <i className='tabler-user' />
-                    <Typography color='text.primary'>My Profile</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/account-settings')}>
-                    <i className='tabler-settings' />
-                    <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/pricing')}>
-                    <i className='tabler-currency-dollar' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/faq')}>
-                    <i className='tabler-help-circle' />
-                    <Typography color='text.primary'>FAQ</Typography>
+                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/change-password')}>
+                    <i className='tabler-key' />
+                    <Typography color='text.primary'>Change Password</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
@@ -182,6 +170,89 @@ const UserDropdown = () => {
       </Popper>
     </>
   )
+
+  // return (
+  //   <>
+  //     <Badge
+  //       ref={anchorRef}
+  //       overlap='circular'
+  //       badgeContent={<BadgeContentSpan onClick={handleDropdownOpen} />}
+  //       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+  //       className='mis-2'
+  //     >
+  //       <Avatar
+  //         ref={anchorRef}
+  //         alt={session?.user?.name || ''}
+  //         src={session?.user?.image || ''}
+  //         onClick={handleDropdownOpen}
+  //         className='cursor-pointer bs-[38px] is-[38px]'
+  //       />
+  //     </Badge>
+  //     <Popper
+  //       open={open}
+  //       transition
+  //       disablePortal
+  //       placement='bottom-end'
+  //       anchorEl={anchorRef.current}
+  //       className='min-is-[240px] !mbs-3 z-[1]'
+  //     >
+  //       {({ TransitionProps, placement }) => (
+  //         <Fade
+  //           {...TransitionProps}
+  //           style={{
+  //             transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top'
+  //           }}
+  //         >
+  //           <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
+  //             <ClickAwayListener onClickAway={e => handleDropdownClose(e)}>
+  //               <MenuList>
+  //                 <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
+  //                   <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
+  //                   <div className='flex items-start flex-col'>
+  //                     <Typography className='font-medium' color='text.primary'>
+  //                       {session?.user?.name || ''}
+  //                     </Typography>
+  //                     <Typography variant='caption'>{session?.user?.email || ''}</Typography>
+  //                   </div>
+  //                 </div>
+  //                 <Divider className='mlb-1' />
+  //                 <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/user-profile')}>
+  //                   <i className='tabler-user' />
+  //                   <Typography color='text.primary'>My Profile</Typography>
+  //                 </MenuItem>
+  //                 <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/account-settings')}>
+  //                   <i className='tabler-settings' />
+  //                   <Typography color='text.primary'>Settings</Typography>
+  //                 </MenuItem>
+  //                 <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/pricing')}>
+  //                   <i className='tabler-currency-dollar' />
+  //                   <Typography color='text.primary'>Pricing</Typography>
+  //                 </MenuItem>
+  //                 <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/pages/faq')}>
+  //                   <i className='tabler-help-circle' />
+  //                   <Typography color='text.primary'>FAQ</Typography>
+  //                 </MenuItem>
+  //                 <div className='flex items-center plb-2 pli-3'>
+  //                   <Button
+  //                     fullWidth
+  //                     variant='contained'
+  //                     color='error'
+  //                     size='small'
+  //                     endIcon={<i className='tabler-logout' />}
+  //                     onClick={handleUserLogout}
+  //                     sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
+  //                   >
+  //                     Logout
+  //                   </Button>
+  //                 </div>
+  //               </MenuList>
+  //             </ClickAwayListener>
+  //           </Paper>
+  //         </Fade>
+  //       )}
+  //     </Popper>
+  //   </>
+  // )
 }
 
 export default UserDropdown
