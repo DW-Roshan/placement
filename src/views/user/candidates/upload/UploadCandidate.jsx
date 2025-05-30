@@ -66,23 +66,46 @@ const UploadCandidate = () => {
 
       if(acceptedFiles){
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_CV_API}`, {
-            method: 'POST',
-            body: formData
+          // const res = await fetch(`${process.env.NEXT_PUBLIC_CV_API}`, {
+          //   method: 'POST',
+          //   body: formData
+          // });
+
+          // if (!res.ok) {
+          //   throw new Error('Upload failed');
+          // }
+
+          // setFiles(acceptedFiles.map(file => Object.assign(file)))
+
+          // const data = await res.json();
+          // const workStatus = data?.experience ? 'experienced' : 'fresher';
+
+          // setUploadedData(data);
+          // setSelected(workStatus);
+          // console.log('Upload successful:', data);
+
+          const resCV = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parse-cv`, {
+            method: 'post',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData,
           });
 
-          if (!res.ok) {
-            throw new Error('Upload failed');
+          if(!resCV.ok){
+            console.error('CV error:', resCV.statusText);
+            throw new Error('CV parsing failed: ', resCV.statusText);
           }
 
           setFiles(acceptedFiles.map(file => Object.assign(file)))
 
-          const data = await res.json();
+          const data = await resCV.json();
           const workStatus = data?.experience ? 'experienced' : 'fresher';
 
           setUploadedData(data);
           setSelected(workStatus);
           console.log('Upload successful:', data);
+
 
           // You can show a success toast or update state here
 
@@ -171,7 +194,7 @@ const UploadCandidate = () => {
   }, [token]);
 
   const matchedCity = cities ? cities.find(
-    (city) => city?.city_name.toLowerCase() === (uploadedData?.['City'] || '').toLowerCase()
+    (city) => city?.city_name.toLowerCase() === (uploadedData?.city || '').toLowerCase()
   ) : '';
 
   const { control, handleSubmit, watch, reset, setError, setValue, formState: { errors } } = useForm({
@@ -639,7 +662,7 @@ const UploadCandidate = () => {
                         // Allow only digits and one dot for decimal separator
 
                         const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-                        
+
                         field.onChange(sanitizedValue);  // Update value in form
                       }}
                       inputProps={{

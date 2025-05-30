@@ -78,7 +78,7 @@ const AddCandidateForm = ({candidateId}) => {
 
           setCities(jsonData.cities || []);
           setIndustries(jsonData.industries);
-          setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate.industry_id).departments)
+          setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate?.industry_id)?.departments)
           setSelected(jsonData.candidate.work_status || '')
           setCandidateData(jsonData.candidate || null);
 
@@ -142,14 +142,24 @@ const AddCandidateForm = ({candidateId}) => {
       workStatus: candidateData?.work_status || '',
       totalExperience: candidateData?.total_experience || '',
       currentCTC: candidateData?.current_ctc || '',
-      experiences: [
+      experiences: candidateData?.experiences?.length
+      ? candidateData.experiences.map((exp) => ({
+          id: exp.id || null,
+          company: exp.company_name || '',
+          jobTitle: exp.job_title || '',
+          location: exp.location || '',
+          startDate: exp.start_date ? new Date(exp.start_date) : null,
+          endDate: exp.end_date ? new Date(exp.end_date) : null,
+          isCurrent: exp.is_current || false
+        }))
+      : [
         {
           company: '',
           jobTitle: '',
           location: '',
           startDate: null,
           endDate: null,
-          isCurrent: true
+          isCurrent: false
         }
       ],
       createAccount: Boolean(candidateData?.password)
@@ -160,7 +170,7 @@ const AddCandidateForm = ({candidateId}) => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'journeys',
+    name: 'educations',
   });
 
   const { fields: experienceField, append: appendExperience, remove: removeExperience } = useFieldArray({
@@ -171,6 +181,16 @@ const AddCandidateForm = ({candidateId}) => {
   const onSubmit = async (data) => {
 
     console.log("data:", data);
+
+    // Filter out completely blank experiences
+    const filteredExperiences = data.experiences?.filter(exp =>
+      exp.jobTitle || exp.company || exp.location || exp.startDate
+    ) || [];
+
+    const payload = {
+      ...data,
+      experiences: filteredExperiences
+    };
 
     // const token = await getCookie('token');
 
@@ -184,7 +204,7 @@ const AddCandidateForm = ({candidateId}) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(payload)
         });
 
         const result = await res.json();
@@ -257,15 +277,15 @@ const AddCandidateForm = ({candidateId}) => {
     }
   };
 
-    const handleTabChange = (event, newValue) => {
-      setTabValue(newValue)
-    }
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue)
+  }
 
-    const handleChange = (prop) => {
-      setSelected(prop)
+  const handleChange = (prop) => {
+    setSelected(prop)
 
-      console.log("work status", prop)
-    }
+    console.log("work status", prop)
+  }
 
 
 
@@ -313,18 +333,12 @@ const AddCandidateForm = ({candidateId}) => {
                       validate: {
                         validFormat: (value) => {
 
-                          // Remove all non-digit characters to sanitize input
-
                           const cleaned = value.replace(/\D/g, '');
-
-                          // Remove optional prefixes
-
                           const normalized = cleaned.replace(/^(\+91|0)/, '');
 
                           if (!/^[6-9]\d{9}$/.test(normalized)) {
 
                             return 'Please enter a valid 10-digit mobile number';
-
                           }
 
                           return true;
@@ -340,12 +354,11 @@ const AddCandidateForm = ({candidateId}) => {
                         helperText={errors.mobileNo?.message}
                         {...field}
                         onInput={(e) => {
-                          // Allow digits and "+" only, prevent all other characters
                           e.target.value = e.target.value.replace(/[^0-9+]/g, '');
                         }}
                         inputProps={{
-                          maxLength: 13, // Max: +91 + 10 digits = 13 characters
-                          inputMode: 'tel', // best suited for phone numbers on mobile
+                          maxLength: 13,
+                          inputMode: 'tel',
                         }}
                       />
                     )}
@@ -617,7 +630,7 @@ const AddCandidateForm = ({candidateId}) => {
                               // Allow only digits and one dot for decimal separator
 
                               const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-                              
+
                               field.onChange(sanitizedValue);  // Update value in form
                             }}
                             inputProps={{
@@ -683,234 +696,6 @@ const AddCandidateForm = ({candidateId}) => {
                     {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
                   </FormControl>
                 </Grid>
-
-                {/* <Grid size={{ xs: 12 }}>
-                  {fields.map((item, index) => {
-                    const fromStation = watch(`journeys[${index}].fromStation`);
-                    const toStation = watch(`journeys[${index}].toStation`);
-
-                    return (
-                      <div
-                        key={index}
-                        className={classNames('repeater-item flex relative mbe-4 border rounded')}
-                      >
-                        <Grid container spacing={5} className='flex.5m-0 p-5'>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller
-                              name={`journeys[${index}].trainId`}
-                              control={control}
-                              rules={{ required: 'This field is required.' }}
-                              render={({ field }) => (
-                                <CustomTextField
-                                  select
-                                  fullWidth
-                                  label={<>Train No. {<span className='text-error'>*</span> }</>}
-                                  {...field}
-                                  error={Boolean(errors?.journeys?.[index]?.trainId)}
-                                  helperText={errors?.journeys?.[index]?.trainId?.message}
-                                  SelectProps={{ MenuProps }}
-                                >
-                                  {data?.trains && data.trains.length ? data.trains.map((train) => (
-                                    <MenuItem key={train.id} value={train.id}>
-                                      {train.train_no}
-                                    </MenuItem>
-                                  )) :(
-                                    <MenuItem>No records found</MenuItem>
-                                  )}
-                                </CustomTextField>
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller
-                              name={`journeys[${index}].fromStation`}
-                              control={control}
-                              rules={{ required: 'This field is required.' }}
-                              render={({ field }) => (
-                                <CustomTextField
-                                  select
-                                  fullWidth
-                                  label={<>Form Station {<span className='text-error'>*</span> }</>}
-                                  {...field}
-                                  SelectProps={{ MenuProps }}
-                                  helperText={errors?.journeys?.[index]?.fromStation?.message}
-                                  error={Boolean(errors?.journeys?.[index]?.fromStation)}
-                                >
-                                  {data?.stations && data?.stations.length > 0 ? data?.stations.filter((station) => station.id !== toStation).map((station) => (
-                                    <MenuItem key={station.id} value={station.id}>
-                                      <div className='w-full flex justify-between gap.5>
-                                        {station.station_name}
-                                        <Chip label={station.station_code} size='small' variant='tonal' color='success' />
-                                      </div>
-                                    </MenuItem>
-                                  )) : (
-                                    <MenuItem>No records found</MenuItem>
-                                  )}
-                                </CustomTextField>
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller
-                              name={`journeys[${index}].toStation`}
-                              control={control}
-                              rules={{ required: 'This field is required.' }}
-                              render={({ field }) => (
-                                <CustomTextField
-                                  select
-                                  fullWidth
-                                  label={<>To Station {<span className='text-error'>*</span> }</>}
-                                  {...field}
-                                  SelectProps={{ MenuProps }}
-                                  helperText={errors?.journeys?.[index]?.toStation?.message}
-                                  error={Boolean(errors?.journeys?.[index]?.toStation)}
-                                >
-                                  {data?.stations && data?.stations.length > 0 ? data?.stations.filter((station) => station.id !== fromStation).map((station) => (
-                                    <MenuItem key={station.id} value={station.id}>
-                                      <div className='w-full flex justify-between gap.5>
-                                        {station.station_name}
-                                        <Chip label={station.station_code} size='small' variant='tonal' color='success' />
-                                      </div>
-                                    </MenuItem>
-                                  )) : (
-                                    <MenuItem>No records found</MenuItem>
-                                  )}
-                                </CustomTextField>
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller name={`journeys[${index}].departureDate`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                                validate: (_, allValues) => {
-
-                                  if (index === 0) return true; // Skip first item
-
-                                  const currentDeparture = allValues?.journeys?.[index]?.departureDate;
-                                  const currentLeftTime = allValues?.journeys?.[index]?.departureTime;
-
-                                  const prevArrival = allValues?.journeys?.[index - 1]?.arrivedDate;
-                                  const prevArrivedTime = allValues?.journeys?.[index - 1]?.arrivedTime;
-
-                                  if (!currentDeparture || !prevArrival ) return true;
-
-                                  return new Date(currentDeparture) > new Date(prevArrival) || 'Departure Time must be greater then previous Arrival Time.';
-                                }
-                              }}
-                              render={({ field }) => (
-                                <AppReactDatepicker
-                                  selected={field.value} onChange={field.onChange}
-                                  showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
-                                  placeholderText="YYYY/MM/DD HH:mm"
-                                  maxDate={new Date()}
-                                  customInput={
-                                    <CustomTextField
-                                      {...field}
-                                      label={<>Departure Date and Time {<span className='text-error'>*</span> }</>}
-                                      fullWidth
-                                      required
-                                      helperText={errors?.journeys?.[index]?.departureDate?.message}
-                                      error={Boolean(errors?.journeys?.[index]?.departureDate)}
-                                    />
-                                  }
-                                />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller
-                              name={`journeys[${index}].arrivedDate`}
-                              rules={{
-                                required: 'This field is required.',
-                                validate: (_, allValues) => {
-                                  const arrival = allValues?.journeys?.[index]?.arrivedDate;
-                                  const departure = allValues?.journeys?.[index]?.departureDate;
-
-                                  if (!arrival || !departure) return true;
-
-                                  return new Date(arrival) > new Date(departure) || 'Arrival time must be greater then departure time.';
-                                }
-
-                              }}
-                              control={control}
-                              render={({ field }) => {
-
-                                const departureDate = watch(`journeys[${index}].departureDate`);
-
-                                return (
-                                  <AppReactDatepicker
-                                    selected={field.value} onChange={field.onChange}
-                                    showYearDropdown showMonthDropdown showTimeSelect dateFormat="yyyy/MM/dd HH:mm" timeFormat="HH:mm"
-                                    placeholderText="YYYY/MM/DD HH:mm"
-                                    minDate={departureDate || undefined}
-                                    maxDate={new Date()}
-                                    customInput={
-                                      <CustomTextField
-                                        {...field}
-                                        label={<>Arrived Date and Time {<span className='text-error'>*</span> }</>}
-                                        fullWidth
-                                        required
-                                        helperText={errors?.journeys?.[index]?.arrivedDate?.message}
-                                        error={Boolean(errors?.journeys?.[index]?.arrivedDate)}
-                                      />
-                                    }
-                                  />
-                                )
-                              }}
-                            />
-                          </Grid>
-                        </Grid>
-                        {index !== 0 && (
-                          <div className='flex flex-col justify-start border-is'>
-                            <IconButton size='small' color='error' onClick={() => remove(index)}>
-                              <i className='tabler-x text-2xl' />
-                            </IconButton>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </Grid> */}
-                {/* <Grid size={{ xs: 12 }}>
-                  <Button
-                    size='small'
-                    variant="tonal"
-                    color="primary"
-                    onClick={() =>
-                      appendExperience({
-                        jobTitle: '',
-                        company: '',
-                        location: '',
-                        startDate: null,
-                        endDate: null,
-                        isCurrent: false
-                      })
-                    }
-                  >
-                    Add More Experience
-                  </Button>
-                </Grid> */}
-                {/* <Grid size={{ xs: 12 }}>
-                  <Button
-                    size='small'
-                    variant="tonal"
-                    color="primary"
-                    onClick={() =>
-                    append({
-                      departureDate: '',
-                      trainId: '',
-                      departureTime: '',
-                      arrivedDate: '',
-                      arrivedTime: '',
-                      fromStation: '',
-                      toStation: '',
-                    })
-                    }
-                  >
-                    Add More
-                  </Button>
-                </Grid> */}
               </Grid>
             </TabPanel>
             <TabPanel value='experience'>
@@ -920,12 +705,26 @@ const AddCandidateForm = ({candidateId}) => {
                     // const fromStation = watch(`journeys[${index}].fromStation`);
                     // const toStation = watch(`journeys[${index}].toStation`);
 
+                    const isCurrentJob = watch(`experiences[${index}].isCurrent`)
+
+                    console.log("isCurrentJob", isCurrentJob);
+
+                    // Function to handle checkbox selection
+                    const handleCheckboxChange = (index) => {
+                      // Uncheck all checkboxes
+                      experienceField.forEach((_, i) => {
+                        setValue(`experiences[${i}].isCurrent`, false);
+                      });
+                      // Check the selected checkbox
+                      setValue(`experiences[${index}].isCurrent`, true);
+                    };
+
                     return (
                       <div
                         key={index}
                         className={classNames('repeater-item flex relative mbe-4 border rounded')}
                       >
-                        <Grid container spacing={5} className='flex.5m-0 p-5'>
+                        <Grid container spacing={5} className='flex.5m-0 p-5 flex-1'>
                           <Grid size={{ xs: 12, sm: 4 }}>
                             <Controller name={`experiences[${index}].jobTitle`} control={control}
                               rules={{
@@ -984,31 +783,42 @@ const AddCandidateForm = ({candidateId}) => {
                               )}
                             />
                           </Grid>
-                          <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller name={`experiences[${index}].endDate`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <AppReactDatepicker
-                                  selected={field.value} onChange={field.onChange}
-                                  showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
-                                  placeholderText="YYYY/MM/DD"
-                                  maxDate={new Date()}
-                                  customInput={
-                                    <CustomTextField
-                                      {...field}
-                                      label={<>End Date {<span className='text-error'>*</span> }</>}
-                                      fullWidth
-                                      required
-                                      error={Boolean(errors?.experiences?.[index]?.endDate)}
-                                      helperText={errors?.experiences?.[index]?.endDate?.message}
-                                    />
-                                  }
-                                />
-                              )}
-                            />
-                          </Grid>
+                          {!isCurrentJob && (
+                            <Grid size={{ xs: 12, sm: 3 }}>
+                              <Controller
+                                name={`experiences[${index}].endDate`}
+                                control={control}
+                                rules={{
+                                  required: 'This field is required.',
+                                }}
+                                render={({ field }) => (
+                                  <AppReactDatepicker
+                                    selected={field.value}
+                                    onChange={field.onChange}
+                                    showYearDropdown
+                                    showMonthDropdown
+                                    dateFormat="yyyy/MM/dd"
+                                    placeholderText="YYYY/MM/DD"
+                                    maxDate={new Date()}
+                                    customInput={
+                                      <CustomTextField
+                                        {...field}
+                                        label={
+                                          <>
+                                            End Date <span className='text-error'>*</span>
+                                          </>
+                                        }
+                                        fullWidth
+                                        required
+                                        error={Boolean(errors?.experiences?.[index]?.endDate)}
+                                        helperText={errors?.experiences?.[index]?.endDate?.message}
+                                      />
+                                    }
+                                  />
+                                )}
+                              />
+                            </Grid>
+                          )}
                           <Grid size={{ xs: 12 }}>
                             <FormControl error={Boolean(errors.checkbox)}>
                               <Controller
@@ -1016,7 +826,7 @@ const AddCandidateForm = ({candidateId}) => {
                                 control={control}
                                 rules={{ required: false }}
                                 render={({ field }) => (
-                                  <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Currently working in this role' />
+                                  <FormControlLabel control={<Checkbox {...field} checked={field.value} onChange={() => {handleCheckboxChange(index); field.onChange(!field.value); }} />} label='Currently working in this role' />
                                 )}
                               />
                               {errors?.experiences?.[index]?.isCurrent && <FormHelperText error>This field is required.</FormHelperText>}
