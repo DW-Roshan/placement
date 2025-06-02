@@ -231,7 +231,7 @@ const UserListTable = ({ tableData }) => {
           </Typography>
         )
       }),
-      
+
       // columnHelper.accessor('branch', {
       //   header: 'Branch',
       //   cell: ({ row }) => (
@@ -314,13 +314,15 @@ const UserListTable = ({ tableData }) => {
             {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
-            <IconButton>
+            {/* <IconButton> */}
               {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
-                <i className='tabler-eye text-textSecondary' />
+                {/* <i className='tabler-eye text-textSecondary' /> */}
               {/* </Link> */}
-            </IconButton>
+            {/* </IconButton> */}
             <IconButton>
-              <i className='tabler-edit text-textSecondary' />
+              <Link href={getLocalizedUrl(`/admin/branch/${row.original.id}/edit`, locale)} className='flex'>
+                <i className='tabler-edit text-textSecondary' />
+              </Link>
             </IconButton>
             {/* <OptionMenu
               iconButtonProps={{ size: 'medium' }}
@@ -417,7 +419,7 @@ const UserListTable = ({ tableData }) => {
             >
               Export
             </Button>
-            <Link href={getLocalizedUrl('/admin/user/add', locale)}>
+            <Link href={getLocalizedUrl('/admin/branch/add', locale)}>
               <Button
                 variant='contained'
                 startIcon={<i className='tabler-plus' />}

@@ -63,7 +63,7 @@ const defaultValues = {
 
 }
 
-const FormCompanyAdd = ({statesData }) => {
+const FormCompanyAdd = ({statesData, branchId }) => {
   // States
   const [formData, setFormData] = useState({
     username: '',
@@ -101,10 +101,43 @@ const FormCompanyAdd = ({statesData }) => {
   const [states, setStates] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [branchData, setBranchData] = useState();
+
   const router = useRouter();
   const {data: session} = useSession();
   const token = session?.user?.token;
 
+  useEffect(() => {
+
+    if(branchId && token){
+
+      const fetchData = async () => {
+
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/branch/${branchId}/edit`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const jsonData = await response.json();
+
+          // if(response.status === 401) {
+          //   router.push('/not-authorized');
+          // }
+
+          setBranchData(jsonData);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setBranchData(null);
+        }
+      };
+
+      fetchData()
+    }
+
+  }, [token, branchId]);
 
 
   // useEffect(() => {
@@ -182,7 +215,28 @@ const FormCompanyAdd = ({statesData }) => {
     setError,
     watch,
     formState: { errors }
-  } = useForm({ defaultValues })
+  } = useForm({
+    values: {
+      username: branchData?.username || '',
+      email: branchData?.email || '',
+      password: '',
+      password_confirmation: '',
+      loginValidUpto: branchData?.expiry_date ? new Date(branchData.expiry_date) : null,
+      status: branchData?.status || '1',
+      accountType: branchData?.account_type || '',
+      businessName: branchData?.business_name || '',
+      phoneNumber: branchData?.mobile_no || '',
+      websiteUrl: branchData?.website_url || '',
+      state: branchData?.state_id || '',
+      city: branchData?.city_id || '',
+      address: branchData?.address || '',
+      branchSize: '',
+      experience: branchData?.experience || '',
+      industrySpecializedIn: branchData?.industry_specialized_in || '',
+      contractOrNDAfile: null || '',
+      note: branchData?.note || '',
+    }
+   })
 
   const onSubmit = async (data) => {
 

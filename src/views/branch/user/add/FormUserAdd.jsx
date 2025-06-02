@@ -68,7 +68,7 @@ const defaultValues = {
     profileImage: ''
 }
 
-const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
+const FormUserAdd = ({ statesData, departments, reportingManagers, userData }) => {
     // States
     const [formData, setFormData] = useState({
         username: '',
@@ -112,6 +112,10 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
     const router = useRouter();
     const { data: session } = useSession();
     const token = session?.user?.token;
+
+    useEffect(() => {
+
+    }, [userData])
 
 
 
@@ -547,7 +551,7 @@ const FormUserAdd = ({ statesData, departments, reportingManagers }) => {
                                         fullWidth
 
                                         // {...field}
-                                        
+
                                         value={reportingManagers && reportingManagers.find(reporting => reporting.id === field.value) || null}
                                         options={reportingManagers || []}
                                         getOptionKey={option => option.id}
