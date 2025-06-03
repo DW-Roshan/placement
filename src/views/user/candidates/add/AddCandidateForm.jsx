@@ -711,10 +711,12 @@ const AddCandidateForm = ({candidateId}) => {
 
                     // Function to handle checkbox selection
                     const handleCheckboxChange = (index) => {
+
                       // Uncheck all checkboxes
                       experienceField.forEach((_, i) => {
                         setValue(`experiences[${i}].isCurrent`, false);
                       });
+
                       // Check the selected checkbox
                       setValue(`experiences[${index}].isCurrent`, true);
                     };

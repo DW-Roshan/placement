@@ -50,6 +50,8 @@ const UploadCandidate = () => {
   const token = session?.user?.token;
   const router = useRouter();
 
+  const [isLoadingFile, setLoadingFile] = useState(false);
+
   // Hooks
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
@@ -59,6 +61,8 @@ const UploadCandidate = () => {
     },
     onDrop: async (acceptedFiles) => {
       // setFiles(acceptedFiles.map(file => Object.assign(file)))
+
+      setLoadingFile(true)
 
       const formData = new FormData();
 
@@ -97,14 +101,23 @@ const UploadCandidate = () => {
             throw new Error('CV parsing failed: ', resCV.statusText);
           }
 
-          setFiles(acceptedFiles.map(file => Object.assign(file)))
 
           const data = await resCV.json();
-          const workStatus = data?.experience ? 'experienced' : 'fresher';
 
-          setUploadedData(data);
-          setSelected(workStatus);
-          console.log('Upload successful:', data);
+          if(data[0]){
+
+            const workStatus = data[0]?.experience ? 'experienced' : 'fresher';
+
+            setFiles(acceptedFiles.map(file => Object.assign(file)))
+            setUploadedData(data[0]);
+            setSelected(workStatus);
+            console.log('Upload successful:', data[0]);
+            setLoadingFile(false);
+          } else {
+            toast.error('Upload failed. Can not extract data from file.', { autoClose: 3000 });
+
+            setLoadingFile(false);
+          }
 
 
           // You can show a success toast or update state here
@@ -112,6 +125,9 @@ const UploadCandidate = () => {
         } catch (error) {
           console.error('Upload error:', error);
           toast.error('Upload failed. Please try again.', { autoClose: 3000 });
+          setFiles([])
+          setUploadedData([])
+          setLoadingFile(false);
         }
       }
 
@@ -718,6 +734,14 @@ const UploadCandidate = () => {
           <div {...getRootProps({ className: 'dropzone' })}>
             <input {...getInputProps()} />
             <div className='flex items-center flex-col'>
+              {isLoadingFile ? (<>
+              <Avatar variant="rounded" className="bs-12 is-12 mbe-9">
+                <i className="tabler-loader animate-spin" />
+              </Avatar>
+              <Typography variant="h5" className="mbe-2.5">
+                Uploading and parsing CV...
+              </Typography>
+              </>) : (<>
               <Avatar variant='rounded' className='bs-12 is-12 mbe-9'>
                 <i className='tabler-upload' />
               </Avatar>
@@ -726,9 +750,11 @@ const UploadCandidate = () => {
               </Typography>
               <Typography>Allowed *.pdf</Typography>
               <Typography>Only 1 file and max size of 2 MB</Typography>
+              </>
+              )}
             </div>
           </div>
-          {files.length ? (
+          {!isLoadingFile && files.length ? (
             <>
               <List>{fileList}</List>
               {candidateForm()}
