@@ -27,6 +27,8 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 import { useSession } from 'next-auth/react'
 
+import { format, parse } from 'date-fns'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
@@ -40,13 +42,13 @@ import { formatCTC } from '@/utils/formatCTC'
 
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
-const AddCandidateForm = ({candidateId}) => {
+const AddCandidateForm = ({candidateId, candiData}) => {
   // States
   const [data, setData] = useState();
   const [cities, setCities] = useState();
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
-  const [candidateData, setCandidateData] = useState();
+  const [candidateData, setCandidateData] = useState(candiData);
   const { data: session } = useSession()
   const token = session?.user?.token
 
@@ -55,7 +57,372 @@ const AddCandidateForm = ({candidateId}) => {
 
   const [selected, setSelected] = useState('')
 
-  console.log("candidateId:", candidateId);
+  // console.log("candidateId:", candidateId);
+  /* Upcoming changes */
+
+    // const grpIndustry = {
+    //   "BPM": [
+    //     {
+    //       id: "industry_101_BPM",
+    //       name: "Analytics / KPO / Research"
+    //     },
+    //     {
+    //       id: "industry_102_BPM",
+    //       name: "BPM / BPO"
+    //     }
+    //   ],
+    //   "IT Services": [
+    //     {
+    //       id: "industry_109_ITSxPServices",
+    //       name: "IT Services & Consulting"
+    //     }
+    //   ],
+    //   "Technology": [
+    //     {
+    //       id: "industry_103_Technology",
+    //       name: "Electronic Components / Semiconductors"
+    //     },
+    //     {
+    //       id: "industry_104_Technology",
+    //       name: "Electronics Manufacturing"
+    //     },
+    //     {
+    //       id: "industry_1001_Technology",
+    //       name: "Electronic Manufacturing Services (EMS)",
+    //       helpText: "Electronics Manufacturing"
+    //     },
+    //     {
+    //       id: "industry_105_Technology",
+    //       name: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1005_Technology",
+    //       name: "3D Printing",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1009_Technology",
+    //       name: "AI/ML",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1006_Technology",
+    //       name: "AR/VR",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1004_Technology",
+    //       name: "Blockchain",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1002_Technology",
+    //       name: "Cloud",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1007_Technology",
+    //       name: "Cybersecurity",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1008_Technology",
+    //       name: "Drones/Robotics",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1003_Technology",
+    //       name: "IoT",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_1010_Technology",
+    //       name: "Nanotechnology",
+    //       helpText: "Emerging Technologies"
+    //     },
+    //     {
+    //       id: "industry_107_Technology",
+    //       name: "Hardware & Networking"
+    //     },
+    //     {
+    //       id: "industry_108_Technology",
+    //       name: "Internet"
+    //     },
+    //     {
+    //       id: "industry_1011_Technology",
+    //       name: "E-Commerce",
+    //       helpText: "Internet"
+    //     },
+    //     {
+    //       id: "industry_1012_Technology",
+    //       name: "OTT",
+    //       helpText: "Internet"
+    //     },
+    //     {
+    //       id: "industry_110_Technology",
+    //       name: "Software Product"
+    //     }
+    //   ],
+    //   "BFSI": [
+    //     {
+    //       id: "industry_112_BFSI",
+    //       name: "Banking"
+    //     },
+    //     {
+    //       id: "industry_113_BFSI",
+    //       name: "Financial Services"
+    //     },
+    //     {
+    //       id: "industry_1014_BFSI",
+    //       name: "Asset Management",
+    //       helpText: "Financial Services"
+    //     },
+    //     {
+    //       id: "industry_1013_BFSI",
+    //       name: "Broking",
+    //       helpText: "Financial Services"
+    //     },
+    //     {
+    //       id: "industry_114_BFSI",
+    //       name: "FinTech / Payments"
+    //     },
+    //     {
+    //       id: "industry_115_BFSI",
+    //       name: "Insurance"
+    //     },
+    //     {
+    //       id: "industry_116_BFSI",
+    //       name: "Investment Banking / Venture Capital / Private Equity"
+    //     },
+    //     {
+    //       id: "industry_117_BFSI",
+    //       name: "NBFC"
+    //     },
+    //     {
+    //       id: "industry_1015_BFSI",
+    //       name: "Micro Finance",
+    //       helpText: "NBFC"
+    //     }
+    //   ],
+    //   "Education": [
+    //     {
+    //       id: "industry_133_Education",
+    //       name: "Education / Training"
+    //     },
+    //     {
+    //       id: "industry_134_Education",
+    //       name: "E-Learning / EdTech"
+    //     }
+    //   ],
+    //   "Manufacturing & Production": [
+    //     {
+    //       id: "industry_148_ManufacturingSxP&SxPProduction",
+    //       name: "Auto Components"
+    //     },
+    //     {
+    //       id: "industry_1027_ManufacturingSxP&SxPProduction",
+    //       name: "Tyre",
+    //       helpText: "Auto Components"
+    //     },
+    //     {
+    //       id: "industry_149_ManufacturingSxP&SxPProduction",
+    //       name: "Automobile"
+    //     },
+    //     {
+    //       id: "industry_1029_ManufacturingSxP&SxPProduction",
+    //       name: "Automobile Dealers",
+    //       helpText: "Automobile"
+    //     },
+    //     {
+    //       id: "industry_1028_ManufacturingSxP&SxPProduction",
+    //       name: "Electric Vehicle (EV)",
+    //       helpText: "Automobile"
+    //     },
+    //     {
+    //       id: "industry_150_ManufacturingSxP&SxPProduction",
+    //       name: "Building Material"
+    //     },
+    //     {
+    //       id: "industry_1030_ManufacturingSxP&SxPProduction",
+    //       name: "Cement",
+    //       helpText: "Building Material"
+    //     },
+    //     {
+    //       id: "industry_1031_ManufacturingSxP&SxPProduction",
+    //       name: "Ceramic",
+    //       helpText: "Building Material"
+    //     },
+    //     {
+    //       id: "industry_1032_ManufacturingSxP&SxPProduction",
+    //       name: "Glass",
+    //       helpText: "Building Material"
+    //     },
+    //     {
+    //       id: "industry_151_ManufacturingSxP&SxPProduction",
+    //       name: "Chemicals"
+    //     },
+    //     {
+    //       id: "industry_1033_ManufacturingSxP&SxPProduction",
+    //       name: "Paints",
+    //       helpText: "Chemicals"
+    //     },
+    //     {
+    //       id: "industry_152_ManufacturingSxP&SxPProduction",
+    //       name: "Defence & Aerospace"
+    //     },
+    //     {
+    //       id: "industry_153_ManufacturingSxP&SxPProduction",
+    //       name: "Electrical Equipment"
+    //     },
+    //     {
+    //       id: "industry_154_ManufacturingSxP&SxPProduction",
+    //       name: "Fertilizers / Pesticides / Agro chemicals"
+    //     },
+    //     {
+    //       id: "industry_155_ManufacturingSxP&SxPProduction",
+    //       name: "Industrial Automation"
+    //     },
+    //     {
+    //       id: "industry_156_ManufacturingSxP&SxPProduction",
+    //       name: "Industrial Equipment / Machinery"
+    //     },
+    //     {
+    //       id: "industry_1034_ManufacturingSxP&SxPProduction",
+    //       name: "Construction Equipment",
+    //       helpText: "Industrial Equipment / Machinery"
+    //     },
+    //     {
+    //       id: "industry_1035_ManufacturingSxP&SxPProduction",
+    //       name: "Machine Tools",
+    //       helpText: "Industrial Equipment / Machinery"
+    //     },
+    //     {
+    //       id: "industry_157_ManufacturingSxP&SxPProduction",
+    //       name: "Iron & Steel"
+    //     },
+    //     {
+    //       id: "industry_158_ManufacturingSxP&SxPProduction",
+    //       name: "Metals & Mining"
+    //     },
+    //     {
+    //       id: "industry_159_ManufacturingSxP&SxPProduction",
+    //       name: "Packaging & Containers"
+    //     },
+    //     {
+    //       id: "industry_160_ManufacturingSxP&SxPProduction",
+    //       name: "Petrochemical / Plastics / Rubber"
+    //     },
+    //     {
+    //       id: "industry_161_ManufacturingSxP&SxPProduction",
+    //       name: "Pulp & Paper"
+    //     }
+    //   ],
+    //   "Infrastructure, Transport & Real Estate": [
+    //     {
+    //       id: "industry_162_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Aviation"
+    //     },
+    //     {
+    //       id: "industry_163_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Courier / Logistics"
+    //     },
+    //     {
+    //       id: "industry_1036_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Logistics Tech",
+    //       helpText: "Courier / Logistics"
+    //     },
+    //     {
+    //       id: "industry_164_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Engineering & Construction"
+    //     },
+    //     {
+    //       id: "industry_165_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Oil & Gas"
+    //     },
+    //     {
+    //       id: "industry_166_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Ports & Shipping"
+    //     },
+    //     {
+    //       id: "industry_1037_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Shipbuilding",
+    //       helpText: "Ports & Shipping"
+    //     },
+    //     {
+    //       id: "industry_167_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Power"
+    //     },
+    //     {
+    //       id: "industry_1038_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Hydro",
+    //       helpText: "Power"
+    //     },
+    //     {
+    //       id: "industry_1039_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Nuclear",
+    //       helpText: "Power"
+    //     },
+    //     {
+    //       id: "industry_1040_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Solar",
+    //       helpText: "Power"
+    //     },
+    //     {
+    //       id: "industry_1041_Infrastructure,SxPTransportSxP&RealSxPEstate",
+    //       name: "Wind",
+    //       helpText: "Power"
+    //     }
+    //   ]
+    // };
+
+
+  // // Flatten data for Autocomplete, adding the group key
+  // const options = Object.entries(grpIndustry).flatMap(([group, items]) =>
+  //   items.map((item) => ({
+  //     ...item,
+  //     group,
+  //   }))
+  // );
+  /* Upcoming changes */
+
+
+  useEffect(() => {
+    if (candidateData?.experience) {
+      const newStatus = candidateData.experience.length > 0 ? 'experienced' : 'fresher';
+
+      if (candidateData.work_status !== newStatus) {
+        setSelected(newStatus)
+        setCandidateData(prev => ({
+          ...prev,
+          work_status: newStatus
+        }));
+      }
+    }
+  }, [candidateData]);
+
+
+  function parseDateFromString(dateStr) {
+    if (!dateStr) return null;
+
+    const parts = dateStr.split("-");
+
+    // Case 1: "MM-YYYY"
+    if (parts.length === 2) {
+      const [month, year] = parts;
+
+      return new Date(`${year}-${month}-01`);
+    }
+
+    // Case 2: "DD-MM-YYYY"
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+
+      return new Date(`${year}-${month}-${day}`);
+    }
+
+    // Fallback
+    return new Date(dateStr);
+  }
 
   useEffect(() => {
 
@@ -128,6 +495,12 @@ const AddCandidateForm = ({candidateId}) => {
 
   }, [token]);
 
+  const matchedCity = cities ? cities.find(
+    (city) => city?.city_name.toLowerCase() === (candidateData?.city || '').toLowerCase()
+  ) : '';
+
+  // console.log("matchedCity", matchedCity);
+
   const { control, handleSubmit, watch, reset, setValue, setError, formState: { errors } } = useForm({
 
     values: {
@@ -136,13 +509,13 @@ const AddCandidateForm = ({candidateId}) => {
       mobileNo: candidateData?.mobile_no || '',
       industry: candidateData?.industry_id || '',
       department: candidateData?.department_id || '',
-      city: candidateData?.city_id || '',
+      city: candidateData?.city_id || matchedCity?.id || '',
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
-      workStatus: candidateData?.work_status || '',
+      workStatus: candidateData?.work_status || selected || '',
       totalExperience: candidateData?.total_experience || '',
       currentCTC: candidateData?.current_ctc || '',
-      experiences: candidateData?.experiences?.length
+      experiences: candidateData?.experiences?.length > 0
       ? candidateData.experiences.map((exp) => ({
           id: exp.id || null,
           company: exp.company_name || '',
@@ -152,23 +525,63 @@ const AddCandidateForm = ({candidateId}) => {
           endDate: exp.end_date ? new Date(exp.end_date) : null,
           isCurrent: exp.is_current || false
         }))
-      : [
-        {
-          company: '',
-          jobTitle: '',
-          location: '',
-          startDate: null,
-          endDate: null,
-          isCurrent: false
-        }
-      ],
+      : ( candidateData?.experience?.length > 0 ?
+        candidateData?.experience.map((exp) => ({
+          company: exp.company || '',
+          jobTitle: exp.job_title || '',
+          location: exp.location || '',
+          startDate: exp.start_date ? parseDateFromString(exp.start_date) : null,
+          endDate: exp.end_date != 'current_time' ? parseDateFromString(exp.end_date) : null,
+          isCurrent: exp.is_current || false
+        })) :
+        [
+          {
+            company: '',
+            jobTitle: '',
+            location: '',
+            startDate: null,
+            endDate: null,
+            isCurrent: false
+          }
+        ]
+      ),
+      educations: candidateData?.educations?.length > 0
+        ? candidateData.educations.map((edu) => ({
+            id: edu?.id || null,
+            branchOrBoard: edu?.branch_or_board || '',
+            degree: edu?.degree || '',
+            schoolOrInstitute: edu?.school_or_institute || '',
+            gradeType: edu?.grade_type || '',
+            gradeValue: edu?.grade_value || '',
+            passingYear: edu?.passing_year ? parseDateFromString(edu?.passing_year) : null || null,
+          }))
+        : ( candidateData?.education?.length > 0 ?
+          candidateData?.education.map((edu) => ({
+            branchOrBoard: edu?.branch_or_board || '',
+            degree: edu?.degree || '',
+            schoolOrInstitute: edu?.school_or_institute || '',
+            gradeType: edu?.grade_type || '',
+            gradeValue: edu?.grade_value || '',
+            passingYear: edu?.passing_year ? parseDateFromString(edu?.passing_year) : null || null,
+          }))
+        : [
+          {
+            branchOrBoard: '',
+            degree: '',
+            schoolOrInstitute: '',
+            gradeType: '',
+            gradeValue: '',
+            passingYear: null,
+          }
+        ]
+      ),
       createAccount: Boolean(candidateData?.password)
     }
   });
 
   // console.log("candidateData", candidateData);
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: educationField, append: appendEducation, remove:removeEducation } = useFieldArray({
     control,
     name: 'educations',
   });
@@ -287,745 +700,584 @@ const AddCandidateForm = ({candidateId}) => {
     console.log("work status", prop)
   }
 
+  // /* Upcoming changes */
+  // function getAllMonths(start, end) {
+  //   const months = [];
+  //   const startDate = parse(start, 'MM-yyyy', new Date());
+  //   console.log("startDate:", startDate);
+  //   const endDate = end && end != 'current_time' ? parse(end, 'MM-yyyy', new Date()) : new Date();
 
+  //   const date = new Date(startDate);
+  //   while (date <= endDate) {
+  //     months.push(format(date, 'yyyy-MM'));
+  //     date.setMonth(date.getMonth() + 1);
+  //   }
+
+  //   return months;
+  // }
+
+  // const monthSet = new Set();
+
+  // candidateData?.experience.forEach(job => {
+  //   getAllMonths(job.start_date, job.end_date).forEach(m => monthSet.add(m));
+  // });
+
+  // const totalMonths = monthSet.size;
+  // const years = Math.floor(totalMonths / 12);
+  // const months = totalMonths % 12;
+
+  // console.log("total experience:", totalMonths, "years:", years, "months:", months);
+  // /* Upcoming changes */
 
   return (
-    <Card className='overflow-visible'>
-      <TabContext value={value}>
-        <TabList variant='scrollable' onChange={handleTabChange} className='border-be'>
-          <Tab label='Personal Info' value='personal_info' />
-          <Tab label='Experience' value='experience' />
-          <Tab label='Education' value='education' />
-        </TabList>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent>
-            <TabPanel value='personal_info'>
-              <Grid container spacing={5}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller name="fullName" control={control}
-                    rules={{
-                      required: 'This field is required.',
+    <TabContext value={value}>
+      <TabList variant='scrollable' onChange={handleTabChange} className='border-be'>
+        <Tab label='Personal Info' value='personal_info' />
+        <Tab label='Experience' value='experience' />
+        <Tab label='Education' value='education' />
+      </TabList>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent>
+          <TabPanel value='personal_info'>
+            <Grid container spacing={5}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="fullName" control={control}
+                  rules={{
+                    required: 'This field is required.',
 
-                    }}
-                    render={({ field }) => (
-                      <CustomTextField fullWidth label={<>Full Name <span className='text-error'>*</span></>}
-                        required={false}
-                        error={!!errors?.fullName} helperText={errors?.fullName?.message} {...field} />
-                    )} />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller name="email" control={control}
-                    rules={{
-                      required: 'This field is required.',
-                      pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: 'Invalid email' }
-                    }}
-                    render={({ field }) => (
-                      <CustomTextField fullWidth required={false} label={<>Email <span className='text-error'>*</span></>} type="email"
-                        error={!!errors.email} helperText={errors.email?.message} {...field} />
-                    )} />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller
-                    name="mobileNo"
-                    control={control}
-                    rules={{
-                      required: 'This field is required',
-                      validate: {
-                        validFormat: (value) => {
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>Full Name <span className='text-error'>*</span></>}
+                      required={false}
+                      error={!!errors?.fullName} helperText={errors?.fullName?.message} {...field} />
+                  )} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="email" control={control}
+                  rules={{
+                    required: 'This field is required.',
+                    pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: 'Invalid email' }
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth required={false} label={<>Email <span className='text-error'>*</span></>} type="email"
+                      error={!!errors.email} helperText={errors.email?.message} {...field} />
+                  )} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name="mobileNo"
+                  control={control}
+                  rules={{
+                    required: 'This field is required',
+                    validate: {
+                      validFormat: (value) => {
 
-                          const cleaned = value.replace(/\D/g, '');
-                          const normalized = cleaned.replace(/^(\+91|0)/, '');
+                        // Remove non-digit characters
+                        const cleaned = value.replace(/\D/g, '');
 
-                          if (!/^[6-9]\d{9}$/.test(normalized)) {
+                        // If it starts with '91' and has 12 digits, remove the '91'
+                        let normalized = cleaned;
 
-                            return 'Please enter a valid 10-digit mobile number';
-                          }
+                        if (cleaned.length === 12 && cleaned.startsWith('91')) {
+                          normalized = cleaned.slice(2);
+                        } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+                          normalized = cleaned.slice(1);
+                        }
 
-                          return true;
-                        },
-                      }
-                    }}
-                    render={({ field }) => (
-                      <CustomTextField
-                        fullWidth
-                        required={false}
-                        label={<>Mobile No. <span className='text-error'>*</span></>}
-                        error={!!errors.mobileNo}
-                        helperText={errors.mobileNo?.message}
-                        {...field}
-                        onInput={(e) => {
-                          e.target.value = e.target.value.replace(/[^0-9+]/g, '');
-                        }}
-                        inputProps={{
-                          maxLength: 13,
-                          inputMode: 'tel',
-                        }}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller name="city" control={control}
-                    rules={{ required: 'This field is required.' }}
-                    render={({ field }) => (
-                      <Autocomplete
-                        fullWidth
-                        value={cities && cities.length > 0 && cities.find(city => city.id === field.value) || null}
-                        options={cities || []}
-                        getOptionKey={option => option.id}
-                        getOptionLabel={(city) => city.city_name || ''}
-                        onChange={(event, value) => {
-                            field.onChange(value?.id || '')
-                        }}
-                        renderInput={(params) => (
-                          <CustomTextField
-                            {...params}
-                            label={<>Current City <span className='text-error'>*</span></>}
-                            error={!!errors.city}
-                            helperText={errors?.city?.message}
-                          />
-                        )}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller name="industry" control={control}
-                    rules={{ required: 'This field is required.' }}
-                    render={({ field }) => (
-                      <Autocomplete
-                        fullWidth
-                        value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
-                        options={industries || []}
-                        getOptionKey={option => option.id}
-                        getOptionLabel={(industry) => industry.name || ''}
-                        onChange={(event, value) => {
-                            field.onChange(value?.id || '');
-                            setDepartments(value?.departments || null);
-                            setValue('department', '')
-                        }}
-                        renderInput={(params) => (
-                          <CustomTextField
-                            {...params}
-                            label={<>Industry <span className='text-error'>*</span></>}
-                            error={!!errors.industry}
-                            helperText={errors?.industry?.message}
-                          />
-                        )}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller name="department" control={control}
-                    rules={{ required: 'This field is required.' }}
-                    render={({ field }) => (
-                      <Autocomplete
-                        fullWidth
-                        value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
-                        options={departments || []}
-                        getOptionKey={option => option.id}
-                        getOptionLabel={(department) => department.name || ''}
-                        onChange={(event, value) => {
-                            field.onChange(value?.id || '')
-                        }}
-                        renderInput={(params) => (
-                          <CustomTextField
-                            {...params}
-                            label={<>Department <span className='text-error'>*</span></>}
-                            error={!!errors.department}
-                            helperText={errors?.department?.message}
-                          />
-                        )}
-                      />
-                    )}
-                  />
-                </Grid>
-                {/* <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller
-                    name="city"
-                    control={control}
-                    rules={{
-                      required: 'This field is required',
-                    }}
-                    render={({ field }) => (
-                      <CustomTextField
-                        fullWidth
-                        required={false}
-                        label={<>Current City <span className='text-error'>*</span></>}
-                        error={!!errors?.city}
-                        helperText={errors?.city?.message}
-                        {...field}
-                      />
-                    )}
-                  />
-                </Grid> */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller
-                    name="profileTitle"
-                    control={control}
-                    render={({ field }) => (
-                      <CustomTextField
-                        fullWidth
-                        label='Profile Title'
-                        placeholder='PHP | MERN | Full Stack or Student'
-                        error={!!errors?.profileTitle}
-                        helperText={errors?.profileTitle?.message}
-                        {...field}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Controller
-                    name="profileSummary"
-                    control={control}
-                    render={({ field }) => (
-                      <CustomTextField
-                        fullWidth
-                        multiline
-                        maxRows={4}
-                        label='Profile Summary'
-                        error={!!errors?.profileSummary}
-                        helperText={errors?.profileSummary?.message}
-                        {...field}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Work Status <span className='text-error'>*</span></FormLabel>
-                  <Grid container spacing={4}>
-                    <Controller
-                      name="workStatus"
-                      control={control}
-                      rules={{
-                        required: 'This field is required',
+                        if (!/^[6-9]\d{9}$/.test(normalized)) {
+                          return 'Please enter a valid 10-digit mobile number';
+                        }
+
+                        return true;
+                      },
+                    }
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField
+                      fullWidth
+                      required={false}
+                      label={<>Mobile No. <span className='text-error'>*</span></>}
+                      error={!!errors.mobileNo}
+                      helperText={errors.mobileNo?.message}
+                      {...field}
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/[^0-9+]/g, '');
                       }}
-                      render={({ field }) => (
-                        <>
-                        <CustomInputVertical
-                        {...field}
-                          type='radio'
-                          data={{
-                            meta: 'Free',
-                            title: 'Experienced',
-                            content: "Candidate have work experience (excluding internships)",
-                            value: 'experienced'
-                          }}
-                          error={true}
-
-                          // data={{ ...item, asset }}
-
-                          selected={field.value}
-
-                          // handleChange={(e) => console.log("value change:", e)}
-
-                          handleChange={(e) => {handleChange(e); field.onChange(e)}}
-                          gridProps={{ size: { xs: 12, sm: 6 } }}
-                        /></>
-                      )}
+                      inputProps={{
+                        maxLength: 13,
+                        inputMode: 'tel',
+                      }}
                     />
-                    <Controller
-                      name="workStatus"
-                      control={control}
-                      rules={{
-                        required: 'This field is required',
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="city" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      value={cities && cities.length > 0 && cities.find(city => city.id === field.value) || null}
+                      options={cities || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(city) => city.city_name || ''}
+                      onChange={(event, value) => {
+                          field.onChange(value?.id || '')
                       }}
-                      render={({ field }) => (
-                        <CustomInputVertical
-                          type='radio'
-                          data={{
-                            meta: 'Free',
-                            title: 'Fresher',
-                            content: "Candidate is a student/ Haven't worked after graduation",
-                            value: 'fresher'
-                          }}
-
-                          // data={{ ...item, asset }}
-
-                          selected={field.value}
-
-                          // handleChange={(e) => field.onChange(e)}
-
-                          handleChange={(e) => {handleChange(e); field.onChange(e)}}
-                          gridProps={{ size: { xs: 12, sm: 6 } }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label={<>Current City <span className='text-error'>*</span></>}
+                          error={!!errors.city}
+                          helperText={errors?.city?.message}
                         />
                       )}
                     />
-
-                    {errors?.workStatus && <FormHelperText error>{errors?.workStatus?.message}</FormHelperText>}
-                  </Grid>
-                </Grid>
-                {selected === 'experienced' &&
-                  <Grid container spacing={5} size={{ xs: 12, sm: 6 }}>
-                    <Grid size={{ xs: 12 }}>
-                      <Controller
-                        name="totalExperience"
-                        control={control}
-                        rules={{
-                          required: 'This field is required',
-                        }}
-                        render={({ field }) => (
-                          <CustomTextField
-                            select
-                            fullWidth
-                            label={<>Total Experience {<span className='text-error'>*</span> }</>}
-                            {...field}
-                            error={Boolean(errors?.totalExperience)}
-                            helperText={errors?.totalExperience?.message}
-                            SelectProps={{ MenuProps }}
-                          >
-                            {experienceData && experienceData.length > 0 ? experienceData.map((experience, index) => (
-                              <MenuItem key={index} value={experience}>
-                                {experience}
-                              </MenuItem>
-                            )) :(
-                              <MenuItem>No records found</MenuItem>
-                            )}
-                          </CustomTextField>
-                        )}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
-                      <Controller
-                        name="currentCTC"
-                        control={control}
-                        rules={{
-                          required: 'This field is required',
-                          validate: {
-                            isValidCTC: (value) => {
-
-                              // Remove commas from the value for proper numeric validation
-                              const sanitizedValue = value.replace(/,/g, '');
-
-                              // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
-                              if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
-                                return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
-                              }
-
-                              return true;
-                            },
-                          },
-                        }}
-                        render={({ field }) => (
-                          <CustomTextField
-                            fullWidth
-                            label={
-                              <>
-                                Current CTC <span className="text-error">*</span>
-                              </>
-                            }
-                            error={!!errors.currentCTC}
-                            helperText={errors.currentCTC?.message}
-                            {...field}
-
-                            // Set placeholder with default formatted CTC
-
-                            placeholder="4,24,000"
-                            value={formatCTC(field.value)}  // Apply formatting to the value here
-                            onInput={(e) => {
-
-                              // Allow only digits and one dot for decimal separator
-
-                              const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-
-                              field.onChange(sanitizedValue);  // Update value in form
-                            }}
-                            inputProps={{
-                              maxLength: 12,  // Optional: restrict the length of the number
-                              pattern: '[0-9.,]*',  // Allow numbers and one dot for decimal
-                              inputMode: 'decimal',  // Enable numeric keypad with decimal on mobile
-                            }}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    {/* <Grid size={{ xs: 12 }}>
-                      <Controller
-                        name="currentCTC"
-                        control={control}
-                        rules={{
-                          required: 'This field is required',
-                          validate: {
-                            isValidCTC: (value) => {
-                              // Check if the value is a valid number and not negative
-                              if (!/^\d+$/.test(value)) {
-                                return 'Please enter a valid CTC (numeric value)';
-                              }
-                              return true;
-                            },
-                          },
-                        }}
-                        render={({ field }) => (
-                          <CustomTextField
-                            fullWidth
-                            label={<>Current CTC <span className='text-error'>*</span></>}
-                            error={!!errors.currentCTC}
-                            helperText={errors.currentCTC?.message}
-                            {...field}
-                            onInput={(e) => {
-                              // Remove any non-digit characters
-                              e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                              field.onChange(e); // Manually trigger onChange to update the value in the form
-                            }}
-                            inputProps={{
-                              maxLength: 10, // Limit the length to 10 characters (to support up to 10 digits)
-                              pattern: '[0-9]*', // Restrict to numeric input on mobile
-                              inputMode: 'numeric', // Optimize for numeric input on mobile
-                            }}
-                          />
-                        )}
-                      />
-                    </Grid> */}
-                  </Grid>
-
-                }
-
-                <Grid size={{ xs: 12 }}>
-                  <FormControl error={Boolean(errors.checkbox)}>
-                    <Controller
-                      name='createAccount'
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Create Account' />
+                  )}
+                />
+              </Grid>
+              {/* Upcoming changes */}
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="industry" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      options={options}
+                      groupBy={(option) => option.group}
+                      getOptionLabel={(option) => option.name}
+                      // value={value}
+                      // onChange={(event, newValue) => setValue(newValue)}
+                      renderInput={(params) => <CustomTextField {...params} label="Select Industry" variant="outlined" />}
+                      renderOption={(props, option) => (
+                        <li {...props} key={option.id}>
+                          {option.name}
+                        </li>
                       )}
                     />
-                    <FormHelperText>Mobile No. will be default password</FormHelperText>
-                    {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
-                  </FormControl>
+                  )}
+                />
+              </Grid> */}
+              {/* Upcoming changes */}
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="industry" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
+                      options={industries || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(industry) => industry.name || ''}
+                      onChange={(event, value) => {
+                          field.onChange(value?.id || '');
+                          setDepartments(value?.departments || null);
+                          setValue('department', '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label={<>Industry <span className='text-error'>*</span></>}
+                          error={!!errors.industry}
+                          helperText={errors?.industry?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="department" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
+                      options={departments || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(department) => department.name || ''}
+                      onChange={(event, value) => {
+                          field.onChange(value?.id || '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label={<>Department <span className='text-error'>*</span></>}
+                          error={!!errors.department}
+                          helperText={errors?.department?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name="city"
+                  control={control}
+                  rules={{
+                    required: 'This field is required',
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField
+                      fullWidth
+                      required={false}
+                      label={<>Current City <span className='text-error'>*</span></>}
+                      error={!!errors?.city}
+                      helperText={errors?.city?.message}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid> */}
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name="profileTitle"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomTextField
+                      fullWidth
+                      label='Profile Title'
+                      placeholder='PHP | MERN | Full Stack or Student'
+                      error={!!errors?.profileTitle}
+                      helperText={errors?.profileTitle?.message}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name="profileSummary"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomTextField
+                      fullWidth
+                      multiline
+                      maxRows={4}
+                      label='Profile Summary'
+                      error={!!errors?.profileSummary}
+                      helperText={errors?.profileSummary?.message}
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Work Status <span className='text-error'>*</span></FormLabel>
+                <Grid container spacing={4}>
+                  <Controller
+                    name="workStatus"
+                    control={control}
+                    rules={{
+                      required: 'This field is required',
+                    }}
+                    render={({ field }) => (
+                      <>
+                      <CustomInputVertical
+                      {...field}
+                        type='radio'
+                        data={{
+                          meta: 'Free',
+                          title: 'Experienced',
+                          content: "Candidate have work experience (excluding internships)",
+                          value: 'experienced'
+                        }}
+                        error={true}
+
+                        // data={{ ...item, asset }}
+
+                        selected={field.value}
+
+                        // handleChange={(e) => console.log("value change:", e)}
+
+                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        gridProps={{ size: { xs: 12, sm: 6 } }}
+                      /></>
+                    )}
+                  />
+                  <Controller
+                    name="workStatus"
+                    control={control}
+                    rules={{
+                      required: 'This field is required',
+                    }}
+                    render={({ field }) => (
+                      <CustomInputVertical
+                        type='radio'
+                        data={{
+                          meta: 'Free',
+                          title: 'Fresher',
+                          content: "Candidate is a student/ Haven't worked after graduation",
+                          value: 'fresher'
+                        }}
+
+                        // data={{ ...item, asset }}
+
+                        selected={field.value}
+
+                        // handleChange={(e) => field.onChange(e)}
+
+                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        gridProps={{ size: { xs: 12, sm: 6 } }}
+                      />
+                    )}
+                  />
+
+                  {errors?.workStatus && <FormHelperText error>{errors?.workStatus?.message}</FormHelperText>}
                 </Grid>
               </Grid>
-            </TabPanel>
-            <TabPanel value='experience'>
-              <Grid container spacing={6}>
-                <Grid size={{ xs: 12 }}>
-                  {experienceField.map((item, index) => {
-                    // const fromStation = watch(`journeys[${index}].fromStation`);
-                    // const toStation = watch(`journeys[${index}].toStation`);
-
-                    const isCurrentJob = watch(`experiences[${index}].isCurrent`)
-
-                    console.log("isCurrentJob", isCurrentJob);
-
-                    // Function to handle checkbox selection
-                    const handleCheckboxChange = (index) => {
-
-                      // Uncheck all checkboxes
-                      experienceField.forEach((_, i) => {
-                        setValue(`experiences[${i}].isCurrent`, false);
-                      });
-
-                      // Check the selected checkbox
-                      setValue(`experiences[${index}].isCurrent`, true);
-                    };
-
-                    return (
-                      <div
-                        key={index}
-                        className={classNames('repeater-item flex relative mbe-4 border rounded')}
-                      >
-                        <Grid container spacing={5} className='flex.5m-0 p-5 flex-1'>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].jobTitle`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Job Title <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.jobTitle} helperText={errors?.experiences?.[index]?.jobTitle?.message} {...field} />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].company`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Company <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.company} helperText={errors?.experiences?.[index]?.company?.message} {...field} />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].location`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Location <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.location} helperText={errors?.experiences?.[index]?.jobTitle?.location} {...field} />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller name={`experiences[${index}].startDate`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <AppReactDatepicker
-                                  selected={field.value} onChange={field.onChange}
-                                  showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
-                                  placeholderText="YYYY/MM/DD"
-                                  maxDate={new Date()}
-                                  customInput={
-                                    <CustomTextField
-                                      {...field}
-                                      label={<>Start Date {<span className='text-error'>*</span> }</>}
-                                      fullWidth
-                                      required
-                                      error={Boolean(errors?.experiences?.[index]?.startDate)}
-                                      helperText={errors?.experiences?.[index]?.startDate?.message}
-                                    />
-                                  }
-                                />
-                              )}
-                            />
-                          </Grid>
-                          {!isCurrentJob && (
-                            <Grid size={{ xs: 12, sm: 3 }}>
-                              <Controller
-                                name={`experiences[${index}].endDate`}
-                                control={control}
-                                rules={{
-                                  required: 'This field is required.',
-                                }}
-                                render={({ field }) => (
-                                  <AppReactDatepicker
-                                    selected={field.value}
-                                    onChange={field.onChange}
-                                    showYearDropdown
-                                    showMonthDropdown
-                                    dateFormat="yyyy/MM/dd"
-                                    placeholderText="YYYY/MM/DD"
-                                    maxDate={new Date()}
-                                    customInput={
-                                      <CustomTextField
-                                        {...field}
-                                        label={
-                                          <>
-                                            End Date <span className='text-error'>*</span>
-                                          </>
-                                        }
-                                        fullWidth
-                                        required
-                                        error={Boolean(errors?.experiences?.[index]?.endDate)}
-                                        helperText={errors?.experiences?.[index]?.endDate?.message}
-                                      />
-                                    }
-                                  />
-                                )}
-                              />
-                            </Grid>
+              {selected === 'experienced' &&
+                <Grid container spacing={5} size={{ xs: 12, sm: 6 }}>
+                  <Grid size={{ xs: 12 }}>
+                    <Controller
+                      name="totalExperience"
+                      control={control}
+                      rules={{
+                        required: 'This field is required',
+                      }}
+                      render={({ field }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          label={<>Total Experience {<span className='text-error'>*</span> }</>}
+                          {...field}
+                          error={Boolean(errors?.totalExperience)}
+                          helperText={errors?.totalExperience?.message}
+                          SelectProps={{ MenuProps }}
+                        >
+                          {experienceData && experienceData.length > 0 ? experienceData.map((experience, index) => (
+                            <MenuItem key={index} value={experience}>
+                              {experience}
+                            </MenuItem>
+                          )) : (
+                            <MenuItem>No records found</MenuItem>
                           )}
-                          <Grid size={{ xs: 12 }}>
-                            <FormControl error={Boolean(errors.checkbox)}>
-                              <Controller
-                                name={`experiences[${index}].isCurrent`}
-                                control={control}
-                                rules={{ required: false }}
-                                render={({ field }) => (
-                                  <FormControlLabel control={<Checkbox {...field} checked={field.value} onChange={() => {handleCheckboxChange(index); field.onChange(!field.value); }} />} label='Currently working in this role' />
-                                )}
-                              />
-                              {errors?.experiences?.[index]?.isCurrent && <FormHelperText error>This field is required.</FormHelperText>}
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                        {index !== 0 && (
-                          <div className='flex flex-col justify-start border-is'>
-                            <IconButton size='small' color='error' onClick={() => removeExperience(index)}>
-                              <i className='tabler-x text-2xl' />
-                            </IconButton>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Button
-                    size='small'
-                    variant="tonal"
-                    color="primary"
-                    onClick={() =>
-                      appendExperience({
-                        jobTitle: '',
-                        company: '',
-                        location: '',
-                        startDate: null,
-                        endDate: null,
-                        isCurrent: false
-                      })
-                    }
-                  >
-                    Add More Experience
-                  </Button>
-                </Grid>
-                {/* <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Username'
-                    placeholder='johnDoe'
-                    // value={formData.username}
-                    // onChange={e => setFormData({ ...formData, username: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    type='email'
-                    label='Email'
-                    placeholder='johndoe@gmail.com'
-                    // value={formData.email}
-                    // onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </Grid> */}
-                {/* <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Password'
-                    placeholder='············'
-                    id='form-layout-tabs-password'
-                    // type={formData.isPasswordShown ? 'text' : 'password'}
-                    // value={formData.password}
-                    // onChange={e => setFormData({ ...formData, password: e.target.value })}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              edge='end'
-                              onClick={handleClickShowPassword}
-                              onMouseDown={e => e.preventDefault()}
-                              aria-label='toggle password visibility'
-                            >
-                              <i className={formData.isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }
-                    }}
-                  />
-                </Grid> */}
-                {/* <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Confirm Password'
-                    placeholder='············'
-                    id='form-layout-tabs-confirm-password'
-                    type={formData.setIsConfirmPasswordShown ? 'text' : 'password'}
-                    // value={formData.confirmPassword}
-                    // onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              edge='end'
-                              onClick={handleClickShowConfirmPassword}
-                              onMouseDown={e => e.preventDefault()}
-                              aria-label='toggle password visibility'
-                            >
-                              <i className={formData.setIsConfirmPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                            </IconButton>
-                          </InputAdornment>
-                        )
-                      }
-                    }}
-                  />
-                </Grid> */}
-              </Grid>
-            </TabPanel>
-            <TabPanel value='education'>
-              <Grid container spacing={6}>
-                {/* <Grid size={{ xs: 12 }}>
-                  {experienceField.map((item, index) => {
-                    // const fromStation = watch(`journeys[${index}].fromStation`);
-                    // const toStation = watch(`journeys[${index}].toStation`);
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Controller
+                      name="currentCTC"
+                      control={control}
+                      rules={{
+                        required: 'This field is required',
+                        validate: {
+                          isValidCTC: (value) => {
 
-                    return (
-                      <div
-                        key={index}
-                        className={classNames('repeater-item flex relative mbe-4 border rounded')}
-                      >
-                        <Grid container spacing={5} className='flex.5m-0 p-5'>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].jobTitle`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Job Title <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.jobTitle} helperText={errors?.experiences?.[index]?.jobTitle?.message} {...field} />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].company`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Company <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.company} helperText={errors?.experiences?.[index]?.company?.message} {...field} />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 4 }}>
-                            <Controller name={`experiences[${index}].location`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <CustomTextField fullWidth required={false} label={<>Location <span className='text-error'>*</span></>}
-                                  error={!!errors?.experiences?.[index]?.location} helperText={errors?.experiences?.[index]?.jobTitle?.location} {...field} />
-                              )}
-                            />
-                          </Grid>
+                            // Remove commas from the value for proper numeric validation
+                            const sanitizedValue = value.replace(/,/g, '');
+
+                            // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                            if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
+                              return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                            }
+
+                            return true;
+                          },
+                        },
+                      }}
+                      render={({ field }) => (
+                        <CustomTextField
+                          fullWidth
+                          label={
+                            <>
+                              Current CTC <span className="text-error">*</span>
+                            </>
+                          }
+                          error={!!errors.currentCTC}
+                          helperText={errors.currentCTC?.message}
+                          {...field}
+
+                          // Set placeholder with default formatted CTC
+
+                          placeholder="4,24,000"
+                          value={formatCTC(field.value)}  // Apply formatting to the value here
+                          onInput={(e) => {
+
+                            // Allow only digits and one dot for decimal separator
+
+                            const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+
+                            field.onChange(sanitizedValue);  // Update value in form
+                          }}
+                          inputProps={{
+                            maxLength: 12,  // Optional: restrict the length of the number
+                            pattern: '[0-9.,]*',  // Allow numbers and one dot for decimal
+                            inputMode: 'decimal',  // Enable numeric keypad with decimal on mobile
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  {/* <Grid size={{ xs: 12 }}>
+                    <Controller
+                      name="currentCTC"
+                      control={control}
+                      rules={{
+                        required: 'This field is required',
+                        validate: {
+                          isValidCTC: (value) => {
+                            // Check if the value is a valid number and not negative
+                            if (!/^\d+$/.test(value)) {
+                              return 'Please enter a valid CTC (numeric value)';
+                            }
+                            return true;
+                          },
+                        },
+                      }}
+                      render={({ field }) => (
+                        <CustomTextField
+                          fullWidth
+                          label={<>Current CTC <span className='text-error'>*</span></>}
+                          error={!!errors.currentCTC}
+                          helperText={errors.currentCTC?.message}
+                          {...field}
+                          onInput={(e) => {
+                            // Remove any non-digit characters
+                            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                            field.onChange(e); // Manually trigger onChange to update the value in the form
+                          }}
+                          inputProps={{
+                            maxLength: 10, // Limit the length to 10 characters (to support up to 10 digits)
+                            pattern: '[0-9]*', // Restrict to numeric input on mobile
+                            inputMode: 'numeric', // Optimize for numeric input on mobile
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid> */}
+                </Grid>
+
+              }
+
+              <Grid size={{ xs: 12 }}>
+                <FormControl error={Boolean(errors.checkbox)}>
+                  <Controller
+                    name='createAccount'
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Create Account' />
+                    )}
+                  />
+                  <FormHelperText>Mobile No. will be default password</FormHelperText>
+                  {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
+                </FormControl>
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value='experience'>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12 }}>
+                {experienceField.map((item, index) => {
+                  // const fromStation = watch(`journeys[${index}].fromStation`);
+                  // const toStation = watch(`journeys[${index}].toStation`);
+
+                  const isCurrentJob = watch(`experiences[${index}].isCurrent`)
+
+                  // Function to handle checkbox selection
+                  const handleCheckboxChange = (index) => {
+
+                    // Uncheck all checkboxes
+                    experienceField.forEach((_, i) => {
+                      setValue(`experiences[${i}].isCurrent`, false);
+                    });
+
+                    // Check the selected checkbox
+                    setValue(`experiences[${index}].isCurrent`, true);
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      className={classNames('repeater-item flex relative mbe-4 border rounded')}
+                    >
+                      <Grid container spacing={5} className='flex.5m-0 p-5 flex-1'>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`experiences[${index}].jobTitle`} control={control}
+                            rules={{
+                              required: 'This field is required.',
+                            }}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>Job Title <span className='text-error'>*</span></>}
+                                error={!!errors?.experiences?.[index]?.jobTitle} helperText={errors?.experiences?.[index]?.jobTitle?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`experiences[${index}].company`} control={control}
+                            rules={{
+                              required: 'This field is required.',
+                            }}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>Company <span className='text-error'>*</span></>}
+                                error={!!errors?.experiences?.[index]?.company} helperText={errors?.experiences?.[index]?.company?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`experiences[${index}].location`} control={control}
+                            rules={{
+                              required: 'This field is required.',
+                            }}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>Location <span className='text-error'>*</span></>}
+                                error={!!errors?.experiences?.[index]?.location} helperText={errors?.experiences?.[index]?.location?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                          <Controller name={`experiences[${index}].startDate`} control={control}
+                            rules={{
+                              required: 'This field is required.',
+                            }}
+                            render={({ field }) => (
+                              <AppReactDatepicker
+                                selected={field.value} onChange={field.onChange}
+                                showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                                placeholderText="YYYY/MM/DD"
+                                maxDate={new Date()}
+                                customInput={
+                                  <CustomTextField
+                                    {...field}
+                                    label={<>Start Date {<span className='text-error'>*</span> }</>}
+                                    fullWidth
+                                    required
+                                    error={Boolean(errors?.experiences?.[index]?.startDate)}
+                                    helperText={errors?.experiences?.[index]?.startDate?.message}
+                                  />
+                                }
+                              />
+                            )}
+                          />
+                        </Grid>
+                        {!isCurrentJob && (
                           <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller name={`experiences[${index}].startDate`} control={control}
+                            <Controller
+                              name={`experiences[${index}].endDate`}
+                              control={control}
                               rules={{
                                 required: 'This field is required.',
                               }}
                               render={({ field }) => (
                                 <AppReactDatepicker
-                                  selected={field.value} onChange={field.onChange}
-                                  showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                                  selected={field.value}
+                                  onChange={field.onChange}
+                                  showYearDropdown
+                                  showMonthDropdown
+                                  dateFormat="yyyy/MM/dd"
                                   placeholderText="YYYY/MM/DD"
                                   maxDate={new Date()}
                                   customInput={
                                     <CustomTextField
                                       {...field}
-                                      label={<>Start Date {<span className='text-error'>*</span> }</>}
-                                      fullWidth
-                                      required
-                                      error={Boolean(errors?.experiences?.[index]?.startDate)}
-                                      helperText={errors?.experiences?.[index]?.startDate?.message}
-                                    />
-                                  }
-                                />
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 3 }}>
-                            <Controller name={`experiences[${index}].endDate`} control={control}
-                              rules={{
-                                required: 'This field is required.',
-                              }}
-                              render={({ field }) => (
-                                <AppReactDatepicker
-                                  selected={field.value} onChange={field.onChange}
-                                  showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
-                                  placeholderText="YYYY/MM/DD"
-                                  maxDate={new Date()}
-                                  customInput={
-                                    <CustomTextField
-                                      {...field}
-                                      label={<>End Date {<span className='text-error'>*</span> }</>}
+                                      label={
+                                        <>
+                                          End Date <span className='text-error'>*</span>
+                                        </>
+                                      }
                                       fullWidth
                                       required
                                       error={Boolean(errors?.experiences?.[index]?.endDate)}
@@ -1036,121 +1288,263 @@ const AddCandidateForm = ({candidateId}) => {
                               )}
                             />
                           </Grid>
-                          <Grid size={{ xs: 12 }}>
-                            <FormControl error={Boolean(errors.checkbox)}>
-                              <Controller
-                                name={`experiences[${index}].isCurrent`}
-                                control={control}
-                                rules={{ required: false }}
-                                render={({ field }) => (
-                                  <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Currently working in this role' />
-                                )}
-                              />
-                              {errors?.experiences?.[index]?.isCurrent && <FormHelperText error>This field is required.</FormHelperText>}
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-                        {index !== 0 && (
-                          <div className='flex flex-col justify-start border-is'>
-                            <IconButton size='small' color='error' onClick={() => removeExperience(index)}>
-                              <i className='tabler-x text-2xl' />
-                            </IconButton>
-                          </div>
                         )}
-                      </div>
-                    )
-                  })}
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Button
-                    size='small'
-                    variant="tonal"
-                    color="primary"
-                    onClick={() =>
-                      appendExperience({
-                        jobTitle: '',
-                        company: '',
-                        location: '',
-                        startDate: null,
-                        endDate: null,
-                        isCurrent: false
-                      })
-                    }
-                  >
-                    Add More Education
-                  </Button>
-                </Grid> */}
+                        <Grid size={{ xs: 12 }}>
+                          <FormControl error={Boolean(errors.checkbox)}>
+                            <Controller
+                              name={`experiences[${index}].isCurrent`}
+                              control={control}
+                              rules={{ required: false }}
+                              render={({ field }) => (
+                                <FormControlLabel control={<Checkbox {...field} checked={field.value} onChange={() => {handleCheckboxChange(index); field.onChange(!field.value); }} />} label='Currently working in this role' />
+                              )}
+                            />
+                            {errors?.experiences?.[index]?.isCurrent && <FormHelperText error>This field is required.</FormHelperText>}
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                      {index !== 0 && (
+                        <div className='flex flex-col justify-start border-is'>
+                          <IconButton size='small' color='error' onClick={() => removeExperience(index)}>
+                            <i className='tabler-x text-2xl' />
+                          </IconButton>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </Grid>
-              {/* <Grid container spacing={6}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Twitter'
-                    placeholder='https://twitter.com/johndoe'
-                    // value={formData.twitter}
-                    // onChange={e => setFormData({ ...formData, twitter: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Facebook'
-                    placeholder='https://facebook.com/johndoe'
-                    // value={formData.facebook}
-                    // onChange={e => setFormData({ ...formData, facebook: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Google+'
-                    placeholder='https://plus.google.com/johndoe'
-                    // value={formData.google}
-                    // onChange={e => setFormData({ ...formData, google: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='LinkedIn'
-                    placeholder='https://linkedin.com/johndoe'
-                    // value={formData.linkedin}
-                    // onChange={e => setFormData({ ...formData, linkedin: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Instagram'
-                    placeholder='https://instagram.com/johndoe'
-                    // value={formData.instagram}
-                    // onChange={e => setFormData({ ...formData, instagram: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    label='Quora'
-                    placeholder='https://quora.com/johndoe'
-                    // value={formData.quora}
-                    // onChange={e => setFormData({ ...formData, quora: e.target.value })}
-                  />
-                </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Button
+                  size='small'
+                  variant="tonal"
+                  color="primary"
+                  onClick={() =>
+                    appendExperience({
+                      jobTitle: '',
+                      company: '',
+                      location: '',
+                      startDate: null,
+                      endDate: null,
+                      isCurrent: false
+                    })
+                  }
+                >
+                  Add More Experience
+                </Button>
+              </Grid>
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  label='Username'
+                  placeholder='johnDoe'
+                  // value={formData.username}
+                  // onChange={e => setFormData({ ...formData, username: e.target.value })}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  type='email'
+                  label='Email'
+                  placeholder='johndoe@gmail.com'
+                  // value={formData.email}
+                  // onChange={e => setFormData({ ...formData, email: e.target.value })}
+                />
               </Grid> */}
-            </TabPanel>
-          </CardContent>
-          <Divider />
-          <CardActions>
-            <Button type='submit' variant='contained' className='mie-2'>
-              Submit
-            </Button>
-            <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset(); setSelected(candidateData?.work_status || ''); setDepartments(industries.find( industry =>  industry.id === candidateData?.industry_id)?.departments || [])}}>
-              Reset
-            </Button>
-          </CardActions>
-        </form>
-      </TabContext>
-    </Card>
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  label='Password'
+                  placeholder='············'
+                  id='form-layout-tabs-password'
+                  // type={formData.isPasswordShown ? 'text' : 'password'}
+                  // value={formData.password}
+                  // onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onClick={handleClickShowPassword}
+                            onMouseDown={e => e.preventDefault()}
+                            aria-label='toggle password visibility'
+                          >
+                            <i className={formData.isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }
+                  }}
+                />
+              </Grid> */}
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  label='Confirm Password'
+                  placeholder='············'
+                  id='form-layout-tabs-confirm-password'
+                  type={formData.setIsConfirmPasswordShown ? 'text' : 'password'}
+                  // value={formData.confirmPassword}
+                  // onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onClick={handleClickShowConfirmPassword}
+                            onMouseDown={e => e.preventDefault()}
+                            aria-label='toggle password visibility'
+                          >
+                            <i className={formData.setIsConfirmPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }
+                  }}
+                />
+              </Grid> */}
+            </Grid>
+          </TabPanel>
+          <TabPanel value='education'>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12 }}>
+                {educationField.map((item, index) => {
+                  // const fromStation = watch(`journeys[${index}].fromStation`);
+                  // const toStation = watch(`journeys[${index}].toStation`);
+
+                  const isCurrentJob = watch(`experiences[${index}].isCurrent`)
+
+                  // Function to handle checkbox selection
+                  const handleCheckboxChange = (index) => {
+
+                    // Uncheck all checkboxes
+                    experienceField.forEach((_, i) => {
+                      setValue(`experiences[${i}].isCurrent`, false);
+                    });
+
+                    // Check the selected checkbox
+                    setValue(`experiences[${index}].isCurrent`, true);
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      className={classNames('repeater-item flex relative mbe-4 border rounded')}
+                    >
+                      <Grid container spacing={5} className='flex.5m-0 p-5 flex-1'>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].degree`} control={control}
+                            rules={{
+                              required: 'This field is required.',
+                            }}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>Degree <span className='text-error'>*</span></>}
+                                error={!!errors?.educations?.[index]?.degree} helperText={errors?.educations?.[index]?.degree?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].branchOrBoard`} control={control}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>Branch or Board</>}
+                                error={!!errors?.educations?.[index]?.company} helperText={errors?.educations?.[index]?.branchOrBoard?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].schoolOrInstitute`} control={control}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label={<>School or Institute</>}
+                                error={!!errors?.educations?.[index]?.schoolOrInstitute} helperText={errors?.educations?.[index]?.schoolOrInstitute?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].gradeType`} control={control}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label='Grade Type'
+                                error={!!errors?.educations?.[index]?.gradeType} helperText={errors?.educations?.[index]?.gradeType?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].gradeValue`} control={control}
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label='Grade Value'
+                                error={!!errors?.educations?.[index]?.gradeValue} helperText={errors?.educations?.[index]?.gradeValue?.message} {...field} />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 3 }}>
+                          <Controller name={`educations[${index}].passingYear`} control={control}
+                            render={({ field }) => (
+                              <AppReactDatepicker
+                                selected={field.value} onChange={field.onChange}
+                                showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                                placeholderText="YYYY/MM/DD"
+                                maxDate={new Date()}
+                                customInput={
+                                  <CustomTextField
+                                    {...field}
+                                    label='Passing Year'
+                                    fullWidth
+                                    required
+                                    error={Boolean(errors?.educations?.[index]?.passingYear)}
+                                    helperText={errors?.educations?.[index]?.passingYear?.message}
+                                  />
+                                }
+                              />
+                            )}
+                          />
+                        </Grid>
+                      </Grid>
+                      {index !== 0 && (
+                        <div className='flex flex-col justify-start border-is'>
+                          <IconButton size='small' color='error' onClick={() => removeEducation(index)}>
+                            <i className='tabler-x text-2xl' />
+                          </IconButton>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Button
+                  size='small'
+                  variant="tonal"
+                  color="primary"
+                  onClick={() =>
+                    appendEducation({
+                      degree: '',
+                      branchOrBoard: '',
+                      schoolOrInstitute: '',
+                      gradeType: '',
+                      gradeValue: '',
+                      passingYear: null
+                    })
+                  }
+                >
+                  Add More Education
+                </Button>
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </CardContent>
+        <Divider />
+        <CardActions>
+          <Button type='submit' variant='contained' className='mie-2'>
+            Submit
+          </Button>
+          <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset(); setSelected(candidateData?.work_status || ''); setDepartments(industries.find( industry =>  industry.id === candidateData?.industry_id)?.departments || [])}}>
+            Reset
+          </Button>
+        </CardActions>
+      </form>
+    </TabContext>
   )
 
   // return (

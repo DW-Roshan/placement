@@ -1,8 +1,12 @@
+import { Card } from "@mui/material"
+
 import AddCandidateForm from "@/views/user/candidates/add/AddCandidateForm"
 
 const AddPage = async () => {
   return (
-    <AddCandidateForm />
+    <Card className='overflow-visible'>
+      <AddCandidateForm />
+    </Card>
   )
 }
 

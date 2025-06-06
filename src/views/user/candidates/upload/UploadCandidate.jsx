@@ -23,9 +23,13 @@ import Grid from '@mui/material/Grid2'
 
 import { useSession } from 'next-auth/react'
 
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
-import { Autocomplete, Card, CardContent, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem } from '@mui/material'
+import { Autocomplete, Card, CardContent, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, MenuItem, Tab } from '@mui/material'
+
+import { TabContext, TabList, TabPanel } from '@mui/lab'
+
+import classNames from 'classnames'
 
 import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 
@@ -38,10 +42,110 @@ import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
 import { experienceData, MenuProps } from '@/configs/customDataConfig'
 
+import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+import AddCandidateForm from '../add/AddCandidateForm'
+
+
+const demoData = {
+    "full_name": "Abhishek Jaishwal",
+    "email": "Abhishekjaishwal22@gmail.com",
+    "mobile_no": "+918960222573",
+    "date_of_birth": null,
+    "father_name": null,
+    "gender": null,
+    "address": "Jagatpuri Extension, New Delhi, 110093",
+    "city": "New Delhi",
+    "latest_company_name": "Go Digit General Insurance Company Ltd",
+    "industry": "Insurance",
+    "department": "Sales",
+    "key_responsibilities": [
+      "Handling Renewals of all LOB as well as All channel Agency & Retail Brokings",
+      "Approaching Channel Partner for best renewal Ratio over the call and visits",
+      "Handling pricing negotiation and policy processing"
+    ],
+    "profile_title": "Renewal Sales Manager",
+    "education": [
+      {
+        "degree": "Graduation",
+        "branch_or_board": "B.com",
+        "school_or_institute": "Dr. RMLA University",
+        "passing_year": "04-2015",
+        "grade_type": "",
+        "grade_value": ""
+      },
+      {
+        "degree": "Intermediate",
+        "branch_or_board": "PCM",
+        "school_or_institute": "Gov. Jubilee Inter College Gorakhpur, UP",
+        "passing_year": "06-2010",
+        "grade_type": "",
+        "grade_value": ""
+      },
+      {
+        "degree": "High School",
+        "branch_or_board": "",
+        "school_or_institute": "MG Inter College Gorakhpur, UP",
+        "passing_year": "06-2008",
+        "grade_type": "",
+        "grade_value": ""
+      }
+    ],
+    "total_work_experience": null,
+    "current_ctc": null,
+    "experience": [
+      {
+        "job_title": "Branch Renewal Head",
+        "company": "Go Digit General Insurance Company Ltd",
+        "start_date": "10-2019",
+        "end_date": "current_time",
+        "is_current": true,
+        "location": "New Delhi",
+        "total_experience": null
+      },
+      {
+        "job_title": "Agency Sales Manager",
+        "company": "Bajaj Allianz General Insurance Co. Ltd",
+        "start_date": "01-2019",
+        "end_date": "09-2019",
+        "is_current": false,
+        "location": "Noida, Delhi/NCR",
+        "total_experience": null
+      },
+      {
+        "job_title": "Renewal Operations Support",
+        "company": "Bajaj Allianz General Insurance Company Limited",
+        "start_date": "05-2017",
+        "end_date": "12-2019",
+        "is_current": false,
+        "location": "Noida, Delhi/NCR",
+        "total_experience": null
+      }
+    ],
+    "skills": [
+      "Ccc",
+      "Excel",
+      "Microsoft Office",
+      "Ms excel",
+      "Ms word"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "hobbies": [
+      "Adventurous",
+      "Fun and outgoing",
+      "Hollywood movies",
+      "Listening to all types of music",
+      "Sports activity lover"
+    ]
+  };
+
 const UploadCandidate = () => {
   // States
   const [files, setFiles] = useState([])
-  const [uploadedData, setUploadedData] = useState([]);
+  const [uploadedData, setUploadedData] = useState();
+
   const [selected, setSelected] = useState();
   const [cities, setCities] = useState();
   const [industries, setIndustries] = useState();
@@ -49,6 +153,7 @@ const UploadCandidate = () => {
   const { data: session } = useSession();
   const token = session?.user?.token;
   const router = useRouter();
+  const [tabValue, setTabValue] = useState('personal_info')
 
   const [isLoadingFile, setLoadingFile] = useState(false);
 
@@ -362,364 +467,182 @@ const UploadCandidate = () => {
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue)
+  }
+
+  const { fields: experienceField, append: appendExperience, remove: removeExperience } = useFieldArray({
+    control,
+    name: 'experiences',
+  });
+
+  // const candiData =
+  //   {
+  //   "full_name": "Abhishek Jaishwal",
+  //   "email": "Abhishekjaishwal22@gmail.com",
+  //   "mobile_no": "+918960222573",
+  //   "date_of_birth": null,
+  //   "father_name": null,
+  //   "gender": null,
+  //   "address": "Jagatpuri Extension, New Delhi, 110093",
+  //   "city": "New Delhi",
+  //   "latest_company_name": "Go Digit General Insurance Company Ltd",
+  //   "industry": "Insurance",
+  //   "department": "Sales",
+  //   "key_responsibilities": [
+  //     "Handling Renewals of all LOB as well as All channel Agency & Retail Brokings",
+  //     "Approaching Channel Partner for best renewal Ratio over the call and visits",
+  //     "Handling pricing negotiation and policy processing"
+  //   ],
+  //   "profile_title": "Renewal Sales Manager",
+  //   "education": [
+  //     {
+  //       "degree": "Graduation",
+  //       "branch_or_board": "B.com",
+  //       "school_or_institute": "Dr. RMLA University",
+  //       "passing_year": "04-2015",
+  //       "grade_type": "",
+  //       "grade_value": ""
+  //     },
+  //     {
+  //       "degree": "Intermediate",
+  //       "branch_or_board": "PCM",
+  //       "school_or_institute": "Gov. Jubilee Inter College Gorakhpur, UP",
+  //       "passing_year": "06-2010",
+  //       "grade_type": "",
+  //       "grade_value": ""
+  //     },
+  //     {
+  //       "degree": "High School",
+  //       "branch_or_board": "",
+  //       "school_or_institute": "MG Inter College Gorakhpur, UP",
+  //       "passing_year": "06-2008",
+  //       "grade_type": "",
+  //       "grade_value": ""
+  //     }
+  //   ],
+  //   "total_work_experience": null,
+  //   "current_ctc": null,
+  //   "experience": [
+  //     {
+  //       "job_title": "Branch Renewal Head",
+  //       "company": "Go Digit General Insurance Company Ltd",
+  //       "start_date": "10-2019",
+  //       "end_date": "current_time",
+  //       "is_current": true,
+  //       "location": "New Delhi",
+  //       "total_experience": null
+  //     },
+  //     {
+  //       "job_title": "Agency Sales Manager",
+  //       "company": "Bajaj Allianz General Insurance Co. Ltd",
+  //       "start_date": "01-2019",
+  //       "end_date": "09-2019",
+  //       "is_current": false,
+  //       "location": "Noida, Delhi/NCR",
+  //       "total_experience": null
+  //     },
+  //     {
+  //       "job_title": "Renewal Operations Support",
+  //       "company": "Bajaj Allianz General Insurance Company Limited",
+  //       "start_date": "05-2017",
+  //       "end_date": "12-2019",
+  //       "is_current": false,
+  //       "location": "Noida, Delhi/NCR",
+  //       "total_experience": null
+  //     }
+  //   ],
+  //   "skills": [
+  //     "Ccc",
+  //     "Excel",
+  //     "Microsoft Office",
+  //     "Ms excel",
+  //     "Ms word"
+  //   ],
+  //   "languages": [
+  //     "English",
+  //     "Hindi"
+  //   ],
+  //   "hobbies": [
+  //     "Adventurous",
+  //     "Fun and outgoing",
+  //     "Hollywood movies",
+  //     "Listening to all types of music",
+  //     "Sports activity lover"
+  //   ]
+  // }
+
+  // const candiData = {
+  //   "full_name": "Neha Kumari",
+  //   "email": "Nehamandy28@gmail.com",
+  //   "mobile_no": "7740077567",
+  //   "date_of_birth": "29-09-1996",
+  //   "father_name": "Mr. Joginder Singh",
+  //   "gender": "Female",
+  //   "address": "Panchkula, Haryana - 133302",
+  //   "city": "Panchkula",
+  //   "latest_company_name": "Axis Bank Ltd",
+  //   "industry": "Banking",
+  //   "department": "Personal Loan",
+  //   "key_responsibilities": [
+  //     "Generate new leads for Personal Loan through walk-in customers",
+  //     "Generate business through pre-approved data",
+  //     "Cross-sell banking products like Casa, FD, Credit card & insurance",
+  //     "Process physical loan applications and follow up with credit & ops for disbursement",
+  //     "Collect physical documents regarding loans",
+  //     "Complete operational work in customer loan files"
+  //   ],
+  //   "profile_title": "Relationship Executive",
+  //   "education": [
+  //     {
+  //       "degree": "B. Com",
+  //       "branch_or_board": "",
+  //       "school_or_institute": "Jammu University",
+  //       "passing_year": "2019",
+  //       "grade_type": "",
+  //       "grade_value": ""
+  //     }
+  //   ],
+  //   "total_work_experience": null,
+  //   "current_ctc": null,
+  //   "experience": [
+  //     {
+  //       "job_title": "Relationship Executive",
+  //       "company_name": "Axis Bank Ltd",
+  //       "start_date": "01-11-2024",
+  //       "end_date": "current_time",
+  //       "is_current": true,
+  //       "location": "",
+  //       "total_experience": null
+  //     }
+  //   ],
+  //   "skills": [
+  //     "Handling external and internal communication",
+  //     "Use of computer",
+  //     "Proficiency in MS Excel",
+  //     "Proficiency in VLOOKUP"
+  //   ],
+  //   "languages": [
+  //     "English",
+  //     "Hindi",
+  //     "Punjabi"
+  //   ],
+  //   "hobbies": [
+  //     "Cooking",
+  //     "Gardening",
+  //     "Dancing",
+  //     "Singing"
+  //   ]
+  // }
+
+
 
   const candidateForm = () => {
-    return (
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={5} className='mt-6'>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller name="fullName" control={control}
-              rules={{
-                required: 'This field is required.',
-
-              }}
-              render={({ field }) => (
-                <CustomTextField fullWidth label={<>Full Name <span className='text-error'>*</span></>}
-                  required={false}
-                  error={!!errors?.fullName} helperText={errors?.fullName?.message} {...field} />
-              )} />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller name="email" control={control}
-              rules={{
-                required: 'This field is required.',
-                pattern: { value: /^[^@]+@[^@]+\.[^@]+$/, message: 'Invalid email' }
-              }}
-              render={({ field }) => (
-                <CustomTextField fullWidth required={false} label={<>Email <span className='text-error'>*</span></>} type="email"
-                  error={!!errors.email} helperText={errors.email?.message} {...field} />
-              )} />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller
-              name="mobileNo"
-              control={control}
-              rules={{
-                required: 'This field is required',
-                validate: {
-                  validFormat: (value) => {
-
-                    // Remove all non-digit characters to sanitize input
-                    // Remove optional prefixes
-
-                    const cleaned = value.replace(/\D/g, '');
-                    const normalized = cleaned.replace(/^(\+91|0)/, '');
-
-                    if (!/^[6-9]\d{11}$/.test(normalized)) {
-
-                      return 'Please enter a valid 10-digit mobile number';
-                    }
-
-                    return true;
-                  },
-                }
-              }}
-              render={({ field }) => (
-                <CustomTextField
-                  fullWidth
-                  required={false}
-                  label={<>Mobile No. <span className='text-error'>*</span></>}
-                  error={!!errors.mobileNo}
-                  helperText={errors.mobileNo?.message}
-                  {...field}
-                  onInput={(e) => {
-                    // Allow digits and "+" only, prevent all other characters
-                    e.target.value = e.target.value.replace(/[^0-9+]/g, '');
-                  }}
-                  inputProps={{
-                    maxLength: 13, // Max: +91 + 10 digits = 13 characters
-                    inputMode: 'tel', // best suited for phone numbers on mobile
-                  }}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller name="city" control={control}
-              rules={{ required: 'This field is required.' }}
-              render={({ field }) => (
-                <Autocomplete
-                  fullWidth
-                  value={cities && cities.length > 0 && cities.find(city => city.id === field.value) || null}
-                  options={ cities || [] }
-                  getOptionKey={option => option.id}
-                  getOptionLabel={(city) => city.city_name || ''}
-                  onChange={(event, value) => {
-                      field.onChange(value?.id || '')
-                  }}
-                  renderInput={(params) => (
-                    <CustomTextField
-                      {...params}
-                      label={<>Current City <span className='text-error'>*</span></>}
-                      error={!!errors.city}
-                      helperText={errors?.city?.message}
-                    />
-                  )}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller name="industry" control={control}
-              rules={{ required: 'This field is required.' }}
-              render={({ field }) => (
-                <Autocomplete
-                  fullWidth
-                  value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
-                  options={industries || []}
-                  getOptionKey={option => option.id}
-                  getOptionLabel={(industry) => industry.name || ''}
-                  onChange={(event, value) => {
-                      field.onChange(value?.id || '');
-                      setDepartments(value?.departments || null);
-                      setValue('department', '')
-                  }}
-                  renderInput={(params) => (
-                    <CustomTextField
-                      {...params}
-                      label={<>Industry <span className='text-error'>*</span></>}
-                      error={!!errors.industry}
-                      helperText={errors?.industry?.message}
-                    />
-                  )}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller name="department" control={control}
-              rules={{ required: 'This field is required.' }}
-              render={({ field }) => (
-                <Autocomplete
-                  fullWidth
-                  value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
-                  options={departments || []}
-                  getOptionKey={option => option.id}
-                  getOptionLabel={(department) => department.name || ''}
-                  onChange={(event, value) => {
-                      field.onChange(value?.id || '')
-                  }}
-                  renderInput={(params) => (
-                    <CustomTextField
-                      {...params}
-                      label={<>Department <span className='text-error'>*</span></>}
-                      error={!!errors.department}
-                      helperText={errors?.department?.message}
-                    />
-                  )}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller
-              name="profileTitle"
-              control={control}
-              render={({ field }) => (
-                <CustomTextField
-                  fullWidth
-                  label='Profile Title'
-                  placeholder='PHP | MERN | Full Stack or Student'
-                  error={!!errors?.profileTitle}
-                  helperText={errors?.profileTitle?.message}
-                  {...field}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Controller
-              name="profileSummary"
-              control={control}
-              render={({ field }) => (
-                <CustomTextField
-                  fullWidth
-                  multiline
-                  maxRows={4}
-                  label='Profile Summary'
-                  error={!!errors?.profileSummary}
-                  helperText={errors?.profileSummary?.message}
-                  {...field}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Work Status <span className='text-error'>*</span></FormLabel>
-            <Grid container spacing={4}>
-              <Controller
-                name="workStatus"
-                control={control}
-                rules={{
-                  required: 'This field is required',
-                }}
-                render={({ field }) => (
-                  <>
-                  <CustomInputVertical
-                  {...field}
-                    type='radio'
-                    data={{
-                      meta: 'Free',
-                      title: 'Experienced',
-                      content: "Candidate have work experience (excluding internships)",
-                      value: 'experienced'
-                    }}
-                    error={true}
-
-                    // data={{ ...item, asset }}
-                    // handleChange={(e) => console.log("value change:", e)}
-
-                    selected={field.value}
-                    handleChange={(e) => {handleChange(e); field.onChange(e)}}
-                    gridProps={{ size: { xs: 12, sm: 6 } }}
-                  /></>
-                )}
-              />
-              <Controller
-                name="workStatus"
-                control={control}
-                rules={{
-                  required: 'This field is required',
-                }}
-                render={({ field }) => (
-                  <CustomInputVertical
-                    type='radio'
-                    data={{
-                      meta: 'Free',
-                      title: 'Fresher',
-                      content: "Candidate is a student/ Haven't worked after graduation",
-                      value: 'fresher'
-                    }}
-
-                    // data={{ ...item, asset }}
-                    // handleChange={(e) => field.onChange(e)}
-
-                    selected={field.value}
-                    handleChange={(e) => {handleChange(e); field.onChange(e)}}
-                    gridProps={{ size: { xs: 12, sm: 6 } }}
-                  />
-                )}
-              />
-
-              {errors?.workStatus && <FormHelperText error>{errors?.workStatus?.message}</FormHelperText>}
-            </Grid>
-          </Grid>
-          {selected === 'experienced' &&
-            <Grid container spacing={5} size={{ xs: 12, sm: 6 }}>
-              <Grid size={{ xs: 12 }}>
-                <Controller
-                  name="totalExperience"
-                  control={control}
-                  rules={{
-                    required: 'This field is required',
-                  }}
-                  render={({ field }) => (
-                    <CustomTextField
-                      select
-                      fullWidth
-                      label={<>Total Experience {<span className='text-error'>*</span> }</>}
-                      {...field}
-                      error={Boolean(errors?.totalExperience)}
-                      helperText={errors?.totalExperience?.message}
-                      SelectProps={{ MenuProps }}
-                    >
-                      {experienceData && experienceData.length > 0 ? experienceData.map((experience, index) => (
-                        <MenuItem key={index} value={experience}>
-                          {experience}
-                        </MenuItem>
-                      )) :(
-                        <MenuItem>No records found</MenuItem>
-                      )}
-                    </CustomTextField>
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <Controller
-                  name="currentCTC"
-                  control={control}
-                  rules={{
-                    required: 'This field is required',
-                    validate: {
-                      isValidCTC: (value) => {
-
-                        // Remove commas from the value for proper numeric validation
-                        const sanitizedValue = value.replace(/,/g, '');
-
-                        // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
-                        if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
-                          return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
-                        }
-
-                        return true;
-                      },
-                    },
-                  }}
-                  render={({ field }) => (
-                    <CustomTextField
-                      fullWidth
-                      label={
-                        <>
-                          Current CTC <span className="text-error">*</span>
-                        </>
-                      }
-                      error={!!errors.currentCTC}
-                      helperText={errors.currentCTC?.message}
-                      {...field}
-
-                      // Set placeholder with default formatted CTC
-
-                      placeholder="4,24,000"
-                      value={formatCTC(field.value)}  // Apply formatting to the value here
-                      onInput={(e) => {
-
-                        // Allow only digits and one dot for decimal separator
-
-                        const sanitizedValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-
-                        field.onChange(sanitizedValue);  // Update value in form
-                      }}
-                      inputProps={{
-                        maxLength: 12,  // Optional: restrict the length of the number
-                        pattern: '[0-9.,]*',  // Allow numbers and one dot for decimal
-                        inputMode: 'decimal',  // Enable numeric keypad with decimal on mobile
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-            </Grid>
-          }
-
-          <Grid size={{ xs: 12 }}>
-            <FormControl error={Boolean(errors.checkbox)}>
-              <Controller
-                name='createAccount'
-                control={control}
-                render={({ field }) => (
-                  <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Create Account' />
-                )}
-              />
-              <FormHelperText>Mobile No. will be default password</FormHelperText>
-              {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
-            </FormControl>
-          </Grid>
-
-          <Grid size={{ xs: 12 }}>
-            <div className='buttons'>
-              <Button type='submit' variant='contained' className='mie-2'>
-                Upload Candidate
-              </Button>
-              <Button color='error' variant='outlined' onClick={handleRemoveAllFiles}>
-                Remove All
-              </Button>
-            </div>
-          </Grid>
-
-        </Grid>
-      </form>
+    return (<>
+      <Card className='overflow-visible mt-5' variant='outlined'>
+        <AddCandidateForm candiData={uploadedData} />
+      </Card>
+      </>
     )
   }
 
@@ -754,6 +677,7 @@ const UploadCandidate = () => {
               )}
             </div>
           </div>
+          {/* {candidateForm()} */}
           {!isLoadingFile && files.length ? (
             <>
               <List>{fileList}</List>
