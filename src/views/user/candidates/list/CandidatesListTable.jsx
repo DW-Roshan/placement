@@ -56,6 +56,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -267,11 +268,17 @@ const CandidatesListTable = ({ tableData }) => {
       }),
       columnHelper.accessor('total_experience', {
         header: 'Total Experience',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original?.total_experience ? row.original?.total_experience + ' Years' : ''}
-          </Typography>
-        )
+        cell: ({ row }) => {
+          const [years, months] = row.original?.total_experience ? row.original?.total_experience.split('.') : ['0', '0'];
+          const yearsLabel = yearsOpt.find(opt => opt.value === years)?.label || ''
+          const monthsLabel = monthsOpt.find(opt => opt.value === months)?.label || ''
+
+          return (
+            <Typography className='capitalize' color='text.primary'>
+              {row.original?.total_experience ? yearsLabel + ' ' + monthsLabel : ''}
+            </Typography>
+          )
+        }
       }),
       columnHelper.accessor('current_ctc', {
         header: 'Current CTC',

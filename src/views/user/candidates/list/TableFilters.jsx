@@ -49,6 +49,7 @@ const TableFilters = ({ setData, tableData }) => {
         const jsonData = await response.json();
 
         setIndustries(jsonData?.industries || []);
+        setDepartments(jsonData?.departments || []);
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -66,17 +67,11 @@ const TableFilters = ({ setData, tableData }) => {
           <Autocomplete
             fullWidth
             options={industries || []}
+            groupBy={(industry) => industry?.category || ''}
             getOptionLabel={(industry) => industry?.name || ''}
             value={industries && industries.find((opt) => opt.id === industry) || null}
             onChange={(event, value) => {
-              if(value?.id){
-                setIndustry(value?.id || '');
-                setDepartments(value?.departments || null)
-              } else {
-                setIndustry('');
-                setDepartment('');
-                setDepartments(null)
-              }
+              setIndustry(value?.id || '');
             }}
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
