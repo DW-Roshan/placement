@@ -27,7 +27,23 @@ const userVerticalMenuData = dictionary => [
       }
     ]
   },
-  
+  {
+    label: 'Jobs',
+    icon: 'tabler-briefcase',
+    children: [
+      {
+        label: 'List',
+        icon: 'tabler-circle',
+        href: '/jobs/list'
+      },
+      {
+        label: 'Add',
+        icon: 'tabler-circle',
+        href: '/jobs/add'
+      }
+    ]
+  },
+
   // {
   //   label: 'Reports',
   //   icon: 'tabler-report',
