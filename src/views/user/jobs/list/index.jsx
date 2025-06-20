@@ -5,11 +5,11 @@ import Grid from '@mui/material/Grid2'
 // import CandidatesListTable from './CandidatesListTable'
 import JobsListCard from './JobsListCard'
 
-const JobsList = ({candidatesData}) => {
+const JobsList = ({jobsData}) => {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <JobsListCard />
+        <JobsListCard jobs={jobsData} />
       </Grid>
     </Grid>
   )

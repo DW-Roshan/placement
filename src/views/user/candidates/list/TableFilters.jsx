@@ -73,6 +73,7 @@ const TableFilters = ({ setData, tableData }) => {
             onChange={(event, value) => {
               setIndustry(value?.id || '');
             }}
+            size='small'
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
               <TextField label='Select Industry Type' {...params}/>
@@ -88,6 +89,7 @@ const TableFilters = ({ setData, tableData }) => {
             onChange={(event, value) => {
               setDepartment(value?.id || '');
             }}
+            size='small'
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
               <TextField label='Select Department' {...params}/>
@@ -103,6 +105,7 @@ const TableFilters = ({ setData, tableData }) => {
             onChange={(event, value) => {
               setStatus(value?.id || '');
             }}
+            size='small'
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
               <TextField label='Select Status' {...params}/>

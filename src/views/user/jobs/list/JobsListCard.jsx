@@ -8,9 +8,12 @@ import { useSession } from "next-auth/react";
 
 import { Autocomplete, Card, CardContent, TextField } from "@mui/material";
 
+import { toast } from "react-toastify";
+
 import JobCard from "./JobCard";
 
 import { yearsOpt } from "@/configs/customDataConfig";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const JobsListCard = ({ jobs }) => {
 
@@ -62,40 +65,64 @@ const JobsListCard = ({ jobs }) => {
     getIndustry()
   }, [token])
 
+  useEffect(() => {
+
+    // Ensure DOM is painted before showing toasts
+    const runAfterMount = () => {
+      const success = sessionStorage.getItem('success');
+      const error = sessionStorage.getItem('error');
+
+      if (success) {
+        toast.success(success);
+        sessionStorage.removeItem('success');
+      }
+
+      if (error) {
+        toast.error(error);
+        sessionStorage.removeItem('error');
+      }
+    };
+
+    // Run after paint
+    requestAnimationFrame(() => {
+      setTimeout(runAfterMount, 0);
+    });
+  }, []);
+
   const jobData = [
     {
       id: 1,
-      title: "Junior Backend Engineer",
-      company: "Tinvio Digital Services",
-      location: "Bengaluru",
-      experience: "0-2 Yrs",
-      salary: "Not disclosed",
-      description: "We are looking for a highly technical and detail-oriented Engineer (Fresher) to ensure the developing and reliability of our software applications. The ideal candidate should have a strong development knowledge and a keen interest in development.",
-      skills: ["Python", "Golang", "Java", "ChatGPT", "Backend Architecture", "GitHub Copilot", "Github", "Backend"],
-      postedDate: "2025-06-10T12:34:56.000000Z"
+      job_title: "Junior Backend Engineer",
+      company_name: "Tinvio Digital Services",
+      location: "",
+      experience: "",
+      salary: "",
+      description: "<p>We are looking for a highly technical and detail-oriented Engineer (Fresher) to ensure the developing and reliability of our software applications. The ideal candidate should have a strong development knowledge and a keen interest in development.</p>",
+      skills: [],
+      created_at: "2025-06-10T12:34:56.000000Z"
     },
-    {
-      id: 2,
-      title: "Senior Frontend Developer",
-      company: "Tech Innovations Inc.",
-      location: "Noida - Sector 62",
-      experience: "3-5 Yrs",
-      salary: "80,000 - 100,000",
-      description: "Looking for an experienced Frontend Developer with a passion for creating dynamic user interfaces and a strong understanding of modern JavaScript frameworks.",
-      skills: ["React", "Vue.js", "JavaScript", "CSS", "HTML"],
-      postedDate: "2025-06-10T12:34:56.000000Z"
-    },
-    {
-      id: 3,
-      title: "Data Scientist",
-      company: "Data Insights Ltd.",
-      location: "New Delhi - Nehru Place",
-      experience: "2-4 Yrs",
-      salary: "90,000 - 120,000",
-      description: "Seeking a Data Scientist to analyze complex datasets and provide actionable insights to drive business decisions.",
-      skills: ["Python", "R", "Machine Learning", "SQL", "Data Visualization"],
-      postedDate: "2025-06-12T02:34:56.000000Z"
-    }
+    // {
+    //   id: 2,
+    //   job_title: "Senior Frontend Developer",
+    //   company_name: "Tech Innovations Inc.",
+    //   location: "Noida - Sector 62",
+    //   experience: "3-5 Yrs",
+    //   salary: "80,000 - 100,000",
+    //   description: "Looking for an experienced Frontend Developer with a passion for creating dynamic user interfaces and a strong understanding of modern JavaScript frameworks.",
+    //   skills: ["React", "Vue.js", "JavaScript", "CSS", "HTML"],
+    //   created_at: "2025-06-10T12:34:56.000000Z"
+    // },
+    // {
+    //   id: 3,
+    //   job_title: "Data Scientist",
+    //   company_name: "Data Insights Ltd.",
+    //   location: "New Delhi - Nehru Place",
+    //   experience: "2-4 Yrs",
+    //   salary: "90,000 - 120,000",
+    //   description: "Seeking a Data Scientist to analyze complex datasets and provide actionable insights to drive business decisions.",
+    //   skills: ["Python", "R", "Machine Learning", "SQL", "Data Visualization"],
+    //   created_at: "2025-06-12T02:34:56.000000Z"
+    // }
 
     // Add more job objects as needed
 
@@ -103,7 +130,7 @@ const JobsListCard = ({ jobs }) => {
 
   return (
     <Grid container spacing={6}>
-      <Card>
+      <Card style={{ width: '100%' }}>
         <Grid size={{ xs: 12 }}>
           <CardContent>
             <Grid container spacing={6}>
@@ -136,7 +163,7 @@ const JobsListCard = ({ jobs }) => {
         </Grid>
         <Grid size={{ xs: 12 }}>
           <Grid container spacing={6} className='p-6 border-bs'>
-            {jobData?.map((job, index) => (
+            {jobs?.map((job, index) => (
               <Grid key={index} size={{ xs: 12, sm: 12, md: 6, xl: 4 }}>
                 <JobCard job={job} />
               </Grid>
