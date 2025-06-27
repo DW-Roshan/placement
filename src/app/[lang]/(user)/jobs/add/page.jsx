@@ -1,6 +1,8 @@
-import { authOptions } from "@/libs/auth";
-import FormAddEditJob from "@/views/user/jobs/add/FormAddEditJob"
 import { getServerSession } from "next-auth"
+
+import { authOptions } from "@/libs/auth";
+
+import FormAddEditJob from "@/views/user/jobs/add/FormAddEditJob"
 
 const fetchData = async () => {
   try {
@@ -28,11 +30,11 @@ const fetchData = async () => {
 
 const AddPage = async () => {
 
-  const {skills} = await fetchData();
+  const data = await fetchData();
 
   // console.log("stateData", stateData);
 
-  return <FormAddEditJob skillsData={skills}/>
+  return <FormAddEditJob skillsData={data?.skills} industries={data?.industries} departments={data?.departments}/>
 }
 
 export default AddPage

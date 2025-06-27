@@ -79,7 +79,7 @@ const schema = object({
   )
 })
 
-const Login = ({ mode }) => {
+const Login = ({ mode, isCandidate }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState(null)
@@ -88,7 +88,9 @@ const Login = ({ mode }) => {
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
   const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
+  const darkIllustrationCandidate = '/images/illustrations/auth/v2-register-dark.png'
   const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
+  const lightIllustrationCandidate = '/images/illustrations/auth/v2-register-light.png'
   const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
@@ -116,8 +118,8 @@ const Login = ({ mode }) => {
 
   const characterIllustration = useImageVariant(
     mode,
-    lightIllustration,
-    darkIllustration,
+    isCandidate ? lightIllustrationCandidate : lightIllustration,
+    isCandidate ? darkIllustrationCandidate : darkIllustration,
     borderedLightIllustration,
     borderedDarkIllustration
   )
@@ -147,6 +149,7 @@ const Login = ({ mode }) => {
       const res = await signIn('credentials', {
         email: data.username,
         password: data.password,
+        isCandidate: Boolean(isCandidate),
         redirect: false
       })
 
@@ -217,8 +220,8 @@ const Login = ({ mode }) => {
                   autoFocus
                   fullWidth
                   type='text'
-                  label='Login ID'
-                  placeholder='Enter your Login ID'
+                  label={isCandidate ? 'Email ID/ Mobile No.' : 'Login ID'}
+                  placeholder={isCandidate ? 'Enter your Email ID/ Mobile No.' : 'Enter your Login ID'}
                   onChange={e => {
                     field.onChange(e.target.value)
                     errorState !== null && setErrorState(null)

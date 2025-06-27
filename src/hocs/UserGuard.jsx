@@ -18,9 +18,11 @@ export default async function UserGuard({ children, locale }) {
     redirect(getLocalizedUrl(`/admin/dashboard`, locale));
   } else if(userType === 'B') {
     redirect(getLocalizedUrl(`/branch/dashboard`, locale));
+  } else if(userType === 'candidate' ) {
+    redirect(getLocalizedUrl(`/candidate/dashboard`, locale));
   } else if(userType !== 'U') {
     redirect(getLocalizedUrl(`/not-authorized`, locale));
   }
-
+  
   return <>{session ? children : <AuthRedirect lang={locale} />}</>
 }

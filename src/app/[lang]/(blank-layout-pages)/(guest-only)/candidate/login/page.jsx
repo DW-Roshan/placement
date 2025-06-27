@@ -12,9 +12,9 @@ export const metadata = {
 const LoginPage = async () => {
   // Vars
   const mode = await getServerMode()
-  
 
-  return <Login mode={mode} />
+
+  return <Login mode={mode} isCandidate={true} />
 }
 
 export default LoginPage

@@ -13,7 +13,8 @@ import { toast } from "react-toastify";
 import JobCard from "./JobCard";
 
 import { yearsOpt } from "@/configs/customDataConfig";
-import { useRouter, useSearchParams } from "next/navigation";
+
+// import { useRouter, useSearchParams } from "next/navigation";
 
 const JobsListCard = ({ jobs }) => {
 
@@ -101,6 +102,7 @@ const JobsListCard = ({ jobs }) => {
       skills: [],
       created_at: "2025-06-10T12:34:56.000000Z"
     },
+
     // {
     //   id: 2,
     //   job_title: "Senior Frontend Developer",

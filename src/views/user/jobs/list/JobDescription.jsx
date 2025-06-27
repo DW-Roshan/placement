@@ -20,6 +20,7 @@ const parseHtmlToSingleLine = (html) => {
   if (typeof window === 'undefined') return '';
 
   const container = document.createElement('div');
+  
   container.innerHTML = html;
 
   let result = '';

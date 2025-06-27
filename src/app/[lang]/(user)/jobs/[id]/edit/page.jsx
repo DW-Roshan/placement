@@ -1,9 +1,11 @@
+import { redirect } from "next/navigation";
+
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/libs/auth";
 
 import FormAddEditJob from "@/views/user/jobs/add/FormAddEditJob";
-import { redirect } from "next/navigation";
+
 import { getLocalizedUrl } from "@/utils/i18n";
 
 const fetchData = async (id, lang) => {
@@ -35,7 +37,7 @@ const EditJobPage = async (props) => {
   const id = params.id
   const data = await fetchData(id, lang);
 
-  return <FormAddEditJob skillsData={data?.skills} jobData={data?.job} locations={data?.locations}/>
+  return <FormAddEditJob jobId={id} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} jobData={data?.job} locations={data?.locations}/>
 }
 
 export default EditJobPage

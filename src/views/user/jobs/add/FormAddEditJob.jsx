@@ -1,7 +1,11 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 // React Imports
 import { useEffect, useMemo, useState } from 'react'
+
+import { useSession } from 'next-auth/react'
 
 // MUI Imports
 import Grid from '@mui/material/Grid2'
@@ -29,8 +33,7 @@ import CustomIconButton from '@/@core/components/mui/IconButton'
 import { Autocomplete, Checkbox, Chip, FormControl, FormHelperText, ListSubheader, Tooltip } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import { yearsOpt } from '@/configs/customDataConfig'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+
 // import BulletList from '@tiptap/extension-bullet-list'
 
 // Vars
@@ -169,7 +172,7 @@ const EditorToolbar = ({ editor }) => {
   )
 }
 
-const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
+const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, locations, error }) => {
   // Vars
   const initialSelectedOption = data.filter(item => item.isSelected)[data.filter(item => item.isSelected).length - 1]
     .value
@@ -181,6 +184,9 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
 
   const [locationOptions, setLocationOptions] = useState(locations || []);
   const [loading, setLoading] = useState(false);
+
+  // const [industries, setIndustries] = useState(indu);
+  // const [departments, setDepartments] = useState();
 
   // const [jobData, setJobData] = useState(jobData);
 
@@ -224,10 +230,13 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
       companyName: jobData?.company_name || '',
       location: jobData?.locations?.map(loc => loc.id) || [],
       totalPositions: jobData?.total_positions || '',
+      industry: jobData?.industry_id || '',
+      department: jobData?.department_id || '',
       description: jobData?.description || '',
       aboutCompany: jobData?.about_company || '',
-      minExp: yearsOpt?.map(minExp => minExp == jobData?.min_exp) || '',
-      maxExp: jobData?.max_exp || '',
+      education: jobData?.education || [],
+      minExp: yearsOpt?.find(exp => exp?.value == jobData?.min_exp)?.value || '',
+      maxExp: yearsOpt?.find(exp => exp?.value == jobData?.max_exp)?.value || '',
       minCTC: jobData?.min_ctc || '',
       maxCTC: jobData?.max_ctc || '',
       roleAndResponsibility: jobData?.role_responsibility || '',
@@ -311,41 +320,83 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
   const onSubmit = async (data) => {
     console.log("submitted data:", data)
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/store`, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
+    if(jobId){
 
-    const result = await res.json();
-
-    if(res.ok){
-
-      sessionStorage.setItem('success', result.message);
-
-      router.push('/jobs/list');
-
-      reset();
-
-
-    } else if(res.status == 422) {
-
-      // Laravel returns validation errors in the `errors` object
-      Object.entries(result.errors).forEach(([field, messages]) => {
-        setError(field, {
-          type: 'custom',
-          message: messages[0], // Use the first error message for each field
-        });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}`, {
+        method: 'put',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
       });
 
+      const result = await res.json();
+
+      if(res.ok){
+
+        sessionStorage.setItem('success', result.message);
+
+        router.push('/jobs/list');
+
+        reset();
+
+
+      } else if(res.status == 422) {
+
+        // Laravel returns validation errors in the `errors` object
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          setError(field, {
+            type: 'custom',
+            message: messages[0], // Use the first error message for each field
+          });
+        });
+
+      } else {
+        sessionStorage.setItem('error', result.message);
+
+        router.push('/jobs/list');
+
+      }
+
     } else {
-      sessionStorage.setItem('error', result.message);
 
-      router.push('/jobs/list');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/store`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
 
+      const result = await res.json();
+
+      if(res.ok){
+
+        sessionStorage.setItem('success', result.message);
+
+        router.push('/jobs/list');
+
+        reset();
+
+
+      } else if(res.status == 422) {
+
+        // Laravel returns validation errors in the `errors` object
+        Object.entries(result.errors).forEach(([field, messages]) => {
+          setError(field, {
+            type: 'custom',
+            message: messages[0], // Use the first error message for each field
+          });
+        });
+
+      } else {
+        sessionStorage.setItem('error', result.message);
+
+        router.push('/jobs/list');
+
+      }
     }
 
   }
@@ -393,12 +444,14 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
 
     setLoading(true);
     try {
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/locations?search=${searchTerm}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
+
       const data = await response.json();
 
       // const flatCities = data.flatMap((state) =>
@@ -528,6 +581,7 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
 
                     // Check if all group cities selected
                     const isFullySelected = groupCities.every(city => currentIds.includes(city.id));
+
                     const newSelection = isFullySelected
                       ? currentIds.filter(id => !groupIds.includes(id)) // deselect group
                       : Array.from(new Set([...currentIds, ...groupIds])); // select group
@@ -556,6 +610,7 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
                       }}
                       renderGroup={(params) => {
                         const group = params.group;
+
                         const isAllSelected = groupedCities[group]?.every(city =>
                           (field.value || []).includes(city.id)
                         );
@@ -580,6 +635,7 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
                       }}
                       renderOption={(props, option, { selected }) => {
                         const { key, ...rest } = props;
+
                         return (
                           <li key={key} {...rest}>
                             <Checkbox
@@ -628,6 +684,57 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
                 )}
               />
             </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller name="industry" control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <Autocomplete
+                    fullWidth
+                    value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
+                    options={industries || []}
+                    groupBy={option => option.category || ''}
+                    getOptionKey={option => option.id}
+                    getOptionLabel={(industry) => industry.name || ''}
+                    onChange={(event, value) => {
+                      field.onChange(value?.id || '');
+                    }}
+                    renderInput={(params) => (
+                      <CustomTextField
+                        {...params}
+                        label={<>Industry <span className='text-error'>*</span></>}
+                        error={!!errors.industry}
+                        helperText={errors?.industry?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller name="department" control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <Autocomplete
+                    fullWidth
+                    value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
+                    options={departments || []}
+                    getOptionKey={option => option.id}
+                    getOptionLabel={(department) => department.name || ''}
+                    onChange={(event, value) => {
+                        field.onChange(value?.id || '')
+                    }}
+                    renderInput={(params) => (
+                      <CustomTextField
+                        {...params}
+                        label={<>Department <span className='text-error'>*</span></>}
+                        error={!!errors.department}
+                        helperText={errors?.department?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Grid>
             <Grid size={{ xs: 12  }}>
               <FormControl fullWidth>
                 <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Description <span className="text-error">*</span></FormLabel>
@@ -657,6 +764,63 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
                     error={!!errors?.aboutCompany} helperText={errors?.aboutCompany?.message}
                     {...field}
                   />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller
+                control={control}
+                name='education'
+                rules={{ required: 'This field is required' }}
+                render={({ field }) => (
+                  <CustomTextField
+                    fullWidth
+                    select
+                    required={false}
+                    label={<>Education Level <span className='text-error'>*</span></>}
+                    error={!!errors?.education}
+                    helperText={errors?.education?.message}
+                    {...field}
+                    slotProps={{
+                      select: {
+                        multiple: true
+                      }
+                    }}
+                  >
+                    <MenuItem value='10th'>10th</MenuItem>
+                    <MenuItem value='12th'>12th</MenuItem>
+                    <MenuItem value='UG'>UG</MenuItem>
+                    <MenuItem value='PG'>PG</MenuItem>
+                    <MenuItem value='PHD'>PHD</MenuItem>
+                  </CustomTextField>
+
+                  // <Autocomplete
+                  //   fullWidth
+                  //   multiple
+                  //   disableCloseOnSelect
+                  //   options={skillsData || []}
+                  //   value={skillsData?.filter(option => field.value?.includes(option.id)) || []}
+                  //   getOptionLabel={(option) => option.name || ''}
+                  //   onChange={(event, newValue) => {
+                  //     field.onChange(newValue.map(option => option.id));
+                  //   }}
+                  //   isOptionEqualToValue={(option, value) => option.id === value.id}
+                  //   renderTags={(value, getTagProps) =>
+                  //     value.map((option, index) => {
+                  //       const tagProps = getTagProps({ index });
+                  //       const { key, ...rest } = tagProps;
+                  //       return <Chip label={option.name} key={key} {...rest} />;
+                  //     })
+                  //   }
+                  //   renderInput={(params) => (
+                  //     <CustomTextField
+                  //       {...params}
+                  //       error={!!errors?.skills}
+                  //       helperText={errors?.skills?.message}
+                  //       label='Skills'
+                  //     />
+                  //   )}
+                  // />
                 )}
               />
             </Grid>
@@ -885,6 +1049,7 @@ const FormAddEditJob = ({ skillsData, jobData, locations, error }) => {
                       value.map((option, index) => {
                         const tagProps = getTagProps({ index });
                         const { key, ...rest } = tagProps;
+
                         return <Chip label={option.name} key={key} {...rest} />;
                       })
                     }

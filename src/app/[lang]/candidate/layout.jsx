@@ -25,6 +25,7 @@ import { i18n } from '@configs/i18n'
 // Util Imports
 import { getDictionary } from '@/utils/getDictionary'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import CandidateGuard from '@/hocs/CandidateGuard'
 import { authOptions } from '@/libs/auth'
 
 const Layout = async props => {
@@ -42,32 +43,34 @@ const Layout = async props => {
   return (
     <Providers direction={direction}>
       <AuthGuard locale={params.lang}>
-        <LayoutWrapper
-          systemMode={systemMode}
-          verticalLayout={
-            <VerticalLayout
-              navigation={<Navigation dictionary={dictionary} mode={mode} userType={userType} />}
-              navbar={<Navbar />}
-              footer={<VerticalFooter />}
+        <CandidateGuard locale={params.lang}>
+          <LayoutWrapper
+            systemMode={systemMode}
+            verticalLayout={
+              <VerticalLayout
+                navigation={<Navigation dictionary={dictionary} mode={mode} userType={userType} />}
+                navbar={<Navbar />}
+                footer={<VerticalFooter />}
+              >
+                {children}
+              </VerticalLayout>
+            }
+            horizontalLayout={
+              <HorizontalLayout header={<Header dictionary={dictionary} userType={userType} />} footer={<HorizontalFooter />}>
+                {children}
+              </HorizontalLayout>
+            }
+          />
+          <ScrollToTop className='mui-fixed'>
+            <Button
+              variant='contained'
+              className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'
             >
-              {children}
-            </VerticalLayout>
-          }
-          horizontalLayout={
-            <HorizontalLayout header={<Header dictionary={dictionary} userType={userType} />} footer={<HorizontalFooter />}>
-              {children}
-            </HorizontalLayout>
-          }
-        />
-        <ScrollToTop className='mui-fixed'>
-          <Button
-            variant='contained'
-            className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'
-          >
-            <i className='tabler-arrow-up' />
-          </Button>
-        </ScrollToTop>
-        <Customizer dir={direction} />
+              <i className='tabler-arrow-up' />
+            </Button>
+          </ScrollToTop>
+          <Customizer dir={direction} />
+        </CandidateGuard>
       </AuthGuard>
     </Providers>
   )

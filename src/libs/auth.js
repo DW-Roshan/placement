@@ -26,7 +26,9 @@ export const authOptions = {
          * For e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
          * You can also use the `req` object to obtain additional parameters (i.e., the request IP address)
          */
-        const { email, password } = credentials
+        const { email, password, isCandidate } = credentials
+
+        console.log('is Candidate:', isCandidate)
 
         try {
           // ** Login API Call to match the user credentials and receive user data in response along with his role
@@ -35,12 +37,12 @@ export const authOptions = {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username: email, password })
+            body: JSON.stringify({ username: email, password, isCandidate: isCandidate })
           })
 
           const data = await res.json()
 
-          // console.log('data', data);
+          console.log('data', data);
 
           if (res.status === 401) {
             throw new Error(JSON.stringify(data))

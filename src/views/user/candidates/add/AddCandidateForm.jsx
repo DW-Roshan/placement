@@ -357,6 +357,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       educations: candidateData?.educations?.length > 0
         ? candidateData.educations.map((edu) => ({
             id: edu?.id || null,
+            educationLevel: edu?.education_level || '',
             branchOrBoard: edu?.branch_or_board || '',
             degree: edu?.degree || '',
             schoolOrInstitute: edu?.school_or_institute || '',
@@ -366,6 +367,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           }))
         : ( candidateData?.education?.length > 0 ?
           candidateData?.education.map((edu) => ({
+            educationLevel: edu?.education_level || '',
             branchOrBoard: edu?.branch_or_board || '',
             degree: edu?.degree || '',
             schoolOrInstitute: edu?.school_or_institute || '',
@@ -375,6 +377,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           }))
         : [
           {
+            educationLevel: '',
             branchOrBoard: '',
             degree: '',
             schoolOrInstitute: '',
@@ -384,7 +387,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           }
         ]
       ),
-      createAccount: Boolean(candidateData?.password)
+      createAccount: candidateData?.is_account === '1' ? true : false
     }
   });
 
@@ -1081,12 +1084,34 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                     >
                       <Grid container spacing={5} className='flex.5m-0 p-5 flex-1'>
                         <Grid size={{ xs: 12, sm: 4 }}>
-                          <Controller name={`educations[${index}].degree`} control={control}
+                          <Controller name={`educations[${index}].educationLevel`} control={control}
                             rules={{
                               required: 'This field is required.',
                             }}
                             render={({ field }) => (
-                              <CustomTextField fullWidth required={false} label={<>Degree <span className='text-error'>*</span></>}
+                              <CustomTextField
+                                fullWidth
+                                select
+                                required={false}
+                                label={<>Education Level <span className='text-error'>*</span></>}
+                                error={!!errors?.educations?.[index]?.educationLevel}
+                                helperText={errors?.educations?.[index]?.educationLevel?.message}
+                                {...field}
+                              >
+                                <MenuItem value='10th'>10th</MenuItem>
+                                <MenuItem value='12th'>12th</MenuItem>
+                                <MenuItem value='UG'>UG</MenuItem>
+                                <MenuItem value='PG'>PG</MenuItem>
+                                <MenuItem value='PHD'>PHD</MenuItem>
+                              </CustomTextField>
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                          <Controller name={`educations[${index}].degree`} control={control}
+
+                            render={({ field }) => (
+                              <CustomTextField fullWidth required={false} label='Degree'
                                 error={!!errors?.educations?.[index]?.degree} helperText={errors?.educations?.[index]?.degree?.message} {...field} />
                             )}
                           />
@@ -1164,6 +1189,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                   color="primary"
                   onClick={() =>
                     appendEducation({
+                      educationLevel: '',
                       degree: '',
                       branchOrBoard: '',
                       schoolOrInstitute: '',

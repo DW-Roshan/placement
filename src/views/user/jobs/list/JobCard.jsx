@@ -1,7 +1,12 @@
 'use client'
 
+import Link from 'next/link'
+
+import { useState } from 'react'
+
+import { useParams } from 'next/navigation'
+
 // MUI Imports
-import Grid from '@mui/material/Grid2'
 
 import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
 
@@ -9,15 +14,19 @@ import { formatDistanceToNow } from 'date-fns'
 
 import { useKeenSlider } from 'keen-slider/react'
 
-import CustomChip from '@/@core/components/mui/Chip'
 
 import { getInitials } from '@/utils/getInitials'
 
 import CustomIconButton from '@/@core/components/mui/IconButton'
 import dynamic from 'next/dynamic'
+
 import { getLocalizedUrl } from '@/utils/i18n'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+
+import MatchedCandidateDialog from '../MatchedCandidateDialog'
+
+import Grid from '@mui/material/Grid2'
+
+import CustomChip from '@/@core/components/mui/Chip'
 
 const JobCard = ({job}) => {
 
@@ -30,6 +39,9 @@ const JobCard = ({job}) => {
       spacing: 6
     }
   })
+
+  const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
+  const [tabOpen, setTabOpen] = useState(null);
 
   const { lang: locale } = useParams()
   const JobDescription = dynamic(() => import('./JobDescription'), { ssr: false });
@@ -80,13 +92,28 @@ const JobCard = ({job}) => {
         </Grid>
       </CardContent>
       <CardActions className='justify-between'>
-        <Typography variant='body2' >{formatDistanceToNow(job?.created_at, {addSuffix: true})}</Typography>
-        <div className='flex gap-2'>
-          <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
-          <CustomIconButton variant='tonal' color='error' size='small'><i className='tabler-trash' /></CustomIconButton>
-          {/* <Button variant='contained' color='primary' size='small'>Apply</Button> */}
-        </div>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12 }}>
+            <Typography variant='h6'>Matched Candidates</Typography>
+            <div className='flex gap-2'>
+              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
+              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='tonal' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
+              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='tonal' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
+              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
+            </div>
+          </Grid>
+          <Grid size={{ xs: 12 }} className='flex justify-between items-center'>
+            <Typography variant='body2' >{formatDistanceToNow(job?.created_at, {addSuffix: true})}</Typography>
+            <div className='flex gap-2'>
+              <Link href={getLocalizedUrl(`/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+              <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+              <CustomIconButton variant='tonal' color='error' size='small' className='m-0'><i className='tabler-trash' /></CustomIconButton>
+              {/* <Button variant='contained' color='primary' size='small'>Apply</Button> */}
+            </div>
+          </Grid>
+        </Grid>
       </CardActions>
+      <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} selectValue={tabOpen} />
     </Card>
   )
 }
