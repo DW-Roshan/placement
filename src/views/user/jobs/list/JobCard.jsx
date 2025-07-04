@@ -1,34 +1,38 @@
 'use client'
 
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-import { useState } from 'react'
+import Link from 'next/link'
 
 import { useParams } from 'next/navigation'
 
-// MUI Imports
+import dynamic from 'next/dynamic'
 
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
+// MUI Imports
+import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
 import { useKeenSlider } from 'keen-slider/react'
 
 
-import { getInitials } from '@/utils/getInitials'
-
-import CustomIconButton from '@/@core/components/mui/IconButton'
-import dynamic from 'next/dynamic'
-
-import { getLocalizedUrl } from '@/utils/i18n'
-
-import MatchedCandidateDialog from '../MatchedCandidateDialog'
+import { useSession } from 'next-auth/react'
 
 import Grid from '@mui/material/Grid2'
 
-import CustomChip from '@/@core/components/mui/Chip'
+import { getLocalizedUrl } from '@/utils/i18n'
 
-const JobCard = ({job}) => {
+import { getInitials } from '@/utils/getInitials'
+
+import MatchedCandidateDialog from '../MatchedCandidateDialog'
+
+
+import CustomIconButton from '@/@core/components/mui/IconButton'
+
+import CustomChip from '@/@core/components/mui/Chip'
+import DialogsConfirmation from '../DialogConfirmation'
+
+const JobCard = ({job, isCandidate}) => {
 
   const [skillRef] = useKeenSlider({
     slides: {
@@ -40,11 +44,25 @@ const JobCard = ({job}) => {
     }
   })
 
+  const [applied, setApplied] = useState(false);
+
+  const {data:session, status} = useSession();
+  const token = session?.user?.token;
+  const userId = session?.user?.id;
+
   const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
+  const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
+  const [openApply, setOpenApply] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
 
   const { lang: locale } = useParams()
   const JobDescription = dynamic(() => import('./JobDescription'), { ssr: false });
+
+  useEffect(() => {
+    if(userId && job){
+      setApplied(job?.candidates?.some((cnd) => cnd?.id === userId))
+    }
+  }, [userId, job])
 
   return (
     <Card variant='outlined'>
@@ -92,28 +110,43 @@ const JobCard = ({job}) => {
         </Grid>
       </CardContent>
       <CardActions className='justify-between'>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant='h6'>Matched Candidates</Typography>
-            <div className='flex gap-2'>
-              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
-              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='tonal' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
-              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='tonal' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
-              <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
-            </div>
-          </Grid>
+        <Grid container spacing={2} className='flex-1'>
+          {!isCandidate && <>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant='h6'>Matched Candidates</Typography>
+              <div className='flex gap-2'>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='tonal' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='tonal' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
+              </div>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
+            </Grid></>
+          }
           <Grid size={{ xs: 12 }} className='flex justify-between items-center'>
             <Typography variant='body2' >{formatDistanceToNow(job?.created_at, {addSuffix: true})}</Typography>
-            <div className='flex gap-2'>
-              <Link href={getLocalizedUrl(`/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-              <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
-              <CustomIconButton variant='tonal' color='error' size='small' className='m-0'><i className='tabler-trash' /></CustomIconButton>
-              {/* <Button variant='contained' color='primary' size='small'>Apply</Button> */}
-            </div>
+
+            {isCandidate ?
+              <div className='flex gap-2'>
+                <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                {applied || <Button onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
+                  {applied ? 'Applied' : 'Apply'}
+                </Button>}
+              </div>
+             :
+              <div className='flex gap-2'>
+                <Link href={getLocalizedUrl(`/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+              </div>
+            }
           </Grid>
         </Grid>
       </CardActions>
       <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} selectValue={tabOpen} />
+      <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true} />
+      <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
     </Card>
   )
 }

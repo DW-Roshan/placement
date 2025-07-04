@@ -1,16 +1,15 @@
+import { useEffect, useMemo, useState } from "react";
+
 import { useParams } from "next/navigation";
 
 import Link from "next/link";
 
 import IconButton from '@mui/material/IconButton'
 
-import DialogCloseButton from "@/components/dialogs/DialogCloseButton";
-
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 import { Button, Checkbox, Chip, Dialog, DialogContent, DialogTitle, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
 
-import { useEffect, useMemo, useState } from "react";
 
 import { rankItem } from '@tanstack/match-sorter-utils'
 
@@ -27,17 +26,25 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 
-import tableStyles from '@core/styles/table.module.css'
 import classnames from "classnames";
+
+import tableStyles from '@core/styles/table.module.css'
+
 import TablePaginationComponent from "@/components/TablePaginationComponent";
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
+import DialogCloseButton from "@/components/dialogs/DialogCloseButton";
+
 import { formatToLacOrCr } from '@/utils/formatCTC'
+
 import { getInitials } from '@/utils/getInitials'
+
 import { getLocalizedUrl } from '@/utils/i18n'
 
 // import tableStyles from '@core/styles/table.module.css'
 import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
+
 import CustomTextField from "@/@core/components/mui/TextField";
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
@@ -84,7 +91,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const MatchedCandidateDialog = ({open, handleClose, candidateData, selectValue}) => {
+const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue}) => {
 
   const [value, setValue] = useState(selectValue || '30%')
   const [rowSelection, setRowSelection] = useState({})
@@ -106,7 +113,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, selectValue})
 
   const { lang: locale } = useParams()
 
-  console.log("matched candidates", candidateData?.['30%'], selectValue)
+  // console.log("matched candidates", candidateData?.['30%'], selectValue)
 
   const columns = useMemo(
     () => [
@@ -242,11 +249,11 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, selectValue})
             {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
-            {/* <IconButton> */}
-              {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
-                {/* <i className='tabler-eye text-textSecondary' /> */}
-              {/* </Link> */}
-            {/* </IconButton> */}
+            <IconButton>
+              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+                <i className='tabler-eye text-textSecondary' />
+              </Link>
+            </IconButton>
             <IconButton>
               <Link href={getLocalizedUrl(`/candidates/${row.original.id}/edit`, locale)} className='flex'>
                 <i className='tabler-edit text-textSecondary' />
@@ -278,7 +285,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, selectValue})
   )
 
   const table = useReactTable({
-    data: candidateData?.[value] || [],
+    data: appliedCandidates ? candidateData : candidateData?.[value] || [],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -327,16 +334,18 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, selectValue})
         <i className='tabler-x' />
       </DialogCloseButton>
       <DialogTitle>
-        Matched Candidates
+        {appliedCandidates ? 'Applied Candidates' : 'Matched Candidates'}
+        {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
         <TabContext value={value}>
+          {appliedCandidates ||
           <TabList variant='fullWidth' onChange={handleChange} aria-label='full width tabs example'>
             <Tab value='100%' label='100%' />
             <Tab value='70%' label='70%' />
             <Tab value='50%' label='50%' />
             <Tab value='30%' label='30%' />
-          </TabList>
+          </TabList> }
           <TabPanel value={value} className='pbs-0'>
 
             <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>

@@ -309,11 +309,11 @@ const CandidatesListTable = ({ tableData }) => {
             {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
-            {/* <IconButton> */}
-              {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
-                {/* <i className='tabler-eye text-textSecondary' /> */}
-              {/* </Link> */}
-            {/* </IconButton> */}
+            <IconButton>
+              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+                <i className='tabler-eye text-textSecondary' />
+              </Link>
+            </IconButton>
             <IconButton>
               <Link href={getLocalizedUrl(`/candidates/${row.original.id}/edit`, locale)} className='flex'>
                 <i className='tabler-edit text-textSecondary' />

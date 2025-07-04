@@ -240,7 +240,7 @@ const FormCompanyAdd = ({statesData, branchId }) => {
 
   const onSubmit = async (data) => {
 
-    console.log('form data', data);
+    // console.log('form data', data);
 
     const formData = new FormData();
 

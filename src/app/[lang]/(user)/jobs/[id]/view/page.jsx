@@ -24,7 +24,7 @@ const fetchData = async (id, lang) => {
 
   const data = await res.json();
 
-  console.log("api data", data);
+  // console.log("api data", data);
 
   if (!res.ok) {
 
@@ -41,13 +41,10 @@ const ViewJobPage = async (props) => {
   const id = params.id
   const data = await fetchData(id, lang);
 
-  console.log("data:", data);
+  // console.log("data:", data);
 
   return <JobView job={data?.job} />
 
-  return data?.job?.job_title;
-
-  // return <FormAddEditJob jobId={id} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} jobData={data?.job} locations={data?.locations}/>
 }
 
 export default ViewJobPage

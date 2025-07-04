@@ -261,7 +261,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
             ) : '';
           }
 
-          console.log("matched Industry:", matched, industries)
+          // console.log("matched Industry:", matched, industries)
 
           if(!matched && candidateData?.industry?.trim()) {
             addIndustry(candidateData?.industry?.trim());
@@ -387,7 +387,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           }
         ]
       ),
-      createAccount: candidateData?.is_account === '1' ? true : false
+      createAccount: candidateData?.is_account === 1 ? true : false
     }
   });
 
@@ -405,7 +405,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
   const onSubmit = async (data) => {
 
-    console.log("data:", data);
+    // console.log("data:", data);
 
     // Filter out completely blank experiences
     const filteredExperiences = data.experiences?.filter(exp =>
@@ -509,7 +509,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   const handleChange = (prop) => {
     setSelected(prop)
 
-    console.log("work status", prop)
+    // console.log("work status", prop)
   }
 
   const selectedYears = watch('years');

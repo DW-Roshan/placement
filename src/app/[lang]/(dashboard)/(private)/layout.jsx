@@ -37,7 +37,7 @@ const Layout = async props => {
   const mode = await getMode()
   const systemMode = await getSystemMode()
   const session = await getServerSession(authOptions)
-  const userType = session.user.userType;
+  const userType = session?.user?.userType;
 
   return (
     <Providers direction={direction}>

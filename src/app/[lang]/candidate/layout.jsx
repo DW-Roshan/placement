@@ -10,11 +10,11 @@ import HorizontalLayout from '@layouts/HorizontalLayout'
 
 // Component Imports
 import Providers from '@components/Providers'
-import Navigation from '@components/layout/vertical/Navigation'
-import Header from '@components/layout/horizontal/Header'
-import Navbar from '@components/layout/vertical/Navbar'
-import VerticalFooter from '@components/layout/vertical/Footer'
-import HorizontalFooter from '@components/layout/horizontal/Footer'
+import Navigation from '@components/candidate-layout/vertical/Navigation'
+import Header from '@components/candidate-layout/horizontal/Header'
+import Navbar from '@components/candidate-layout/vertical/Navbar'
+import VerticalFooter from '@components/candidate-layout/vertical/Footer'
+import HorizontalFooter from '@components/candidate-layout/horizontal/Footer'
 import Customizer from '@core/components/customizer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import AuthGuard from '@/hocs/AuthGuard'
@@ -38,7 +38,7 @@ const Layout = async props => {
   const mode = await getMode()
   const systemMode = await getSystemMode()
   const session = await getServerSession(authOptions)
-  const userType = session.user.userType;
+  const userType = session?.user?.userType;
 
   return (
     <Providers direction={direction}>

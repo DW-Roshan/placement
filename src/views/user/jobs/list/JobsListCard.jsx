@@ -6,18 +6,20 @@ import Grid from "@mui/material/Grid2";
 
 import { useSession } from "next-auth/react";
 
-import { Autocomplete, Card, CardContent, TextField } from "@mui/material";
+import { Autocomplete, Button, Card, CardContent, TextField } from "@mui/material";
 
 import { toast } from "react-toastify";
 
 import JobCard from "./JobCard";
 
 import { yearsOpt } from "@/configs/customDataConfig";
+import JobSearchForm from "../JobSearchForm";
 
 // import { useRouter, useSearchParams } from "next/navigation";
 
-const JobsListCard = ({ jobs }) => {
+const JobsListCard = ({ jobs, isCandidate }) => {
 
+  const [jobsData, setJobsData] = useState(jobs || []);
   const [industry, setIndustry] = useState('')
   const [experience, setExperience] = useState('')
   const [status, setStatus] = useState('')
@@ -135,7 +137,8 @@ const JobsListCard = ({ jobs }) => {
       <Card style={{ width: '100%' }}>
         <Grid size={{ xs: 12 }}>
           <CardContent>
-            <Grid container spacing={6}>
+            <JobSearchForm yearsOpt={yearsOpt} setJobsData={setJobsData} />
+            {/* <Grid container spacing={6}>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <TextField fullWidth label='Enter keyword / designation / companies' size='small'/>
               </Grid>
@@ -160,14 +163,17 @@ const JobsListCard = ({ jobs }) => {
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <TextField fullWidth label='Enter location' size='small' />
               </Grid>
-            </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} className='flex justify-end'>
+                <Button variant='tonal'>Search</Button>
+              </Grid>
+            </Grid> */}
           </CardContent>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <Grid container spacing={6} className='p-6 border-bs'>
-            {jobs?.map((job, index) => (
+            {jobsData?.map((job, index) => (
               <Grid key={index} size={{ xs: 12, sm: 12, md: 6, xl: 4 }}>
-                <JobCard job={job} />
+                <JobCard job={job} isCandidate={isCandidate} />
               </Grid>
             ))}
           </Grid>

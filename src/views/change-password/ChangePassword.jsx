@@ -95,7 +95,6 @@ const ChangePassword = () => {
 
     }
 
-    console.log(data); // Optionally log the data for debugging
   };
 
   return (

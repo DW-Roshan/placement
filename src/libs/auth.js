@@ -28,8 +28,6 @@ export const authOptions = {
          */
         const { email, password, isCandidate } = credentials
 
-        console.log('is Candidate:', isCandidate)
-
         try {
           // ** Login API Call to match the user credentials and receive user data in response along with his role
           const res = await fetch(`${process.env.API_URL}/login`, {
@@ -41,8 +39,6 @@ export const authOptions = {
           })
 
           const data = await res.json()
-
-          console.log('data', data);
 
           if (res.status === 401) {
             throw new Error(JSON.stringify(data))
@@ -59,6 +55,7 @@ export const authOptions = {
              * the session which will be accessible all over the app.
              */
             return {
+              id: data.id,
               name: data.name,
               email: data.email,
               first_name: data.first_name,
@@ -120,6 +117,7 @@ export const authOptions = {
          * For adding custom parameters to user in session, we first need to add those parameters
          * in token which then will be available in the `session()` callback
          */
+        token.id = user.id;
         token.name = user.name;
         token.email = user.email;
         token.firstName = user.first_name;
@@ -150,6 +148,7 @@ export const authOptions = {
 
       if (session.user) {
         // ** Add custom params to user in session which are added in `jwt()` callback via `token` parameter
+        session.user.id = token.id;
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.firstName = token.firstName;

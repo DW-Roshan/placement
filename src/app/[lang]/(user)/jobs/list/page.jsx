@@ -15,7 +15,7 @@ const getJobsData = async () => {
     if(token){
 
       const res = await fetch(`${process.env.API_URL}/jobs`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -48,7 +48,7 @@ const ListPage = async () => {
   const jobsData = await getJobsData()
 
   return (
-    <JobsList jobsData={jobsData} />
+    <JobsList jobsData={jobsData.data} />
   )
 }
 

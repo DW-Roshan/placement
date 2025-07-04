@@ -15,7 +15,7 @@ const getJobsData = async () => {
     if(token){
 
       const res = await fetch(`${process.env.API_URL}/candidate/jobs`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -47,10 +47,10 @@ const ListPage = async () => {
 
   const jobsData = await getJobsData()
 
-  console.log("json data of jobs", jobsData);
+  // console.log("json data of jobs", jobsData);
 
   return (
-    <JobsList jobsData={jobsData} />
+    <JobsList jobsData={jobsData.data} isCandidate={true} />
   )
 }
 

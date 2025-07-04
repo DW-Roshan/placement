@@ -1,9 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 // React Imports
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import { useRouter } from 'next/navigation'
 
 import { useSession } from 'next-auth/react'
 
@@ -21,20 +21,29 @@ import Typography from '@mui/material/Typography'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 
-// Component Imports
-import CustomInputHorizontal from '@core/components/custom-inputs/Horizontal'
-import CustomTextField from '@core/components/mui/TextField'
-import { useEditor, EditorContent } from '@tiptap/react'
-import { StarterKit } from '@tiptap/starter-kit'
-import { Underline } from '@tiptap/extension-underline'
-import { Placeholder } from '@tiptap/extension-placeholder'
-import { TextAlign } from '@tiptap/extension-text-align'
-import CustomIconButton from '@/@core/components/mui/IconButton'
-import { Autocomplete, Checkbox, Chip, FormControl, FormHelperText, ListSubheader, Tooltip } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
-import { yearsOpt } from '@/configs/customDataConfig'
 
-// import BulletList from '@tiptap/extension-bullet-list'
+// Component Imports
+import { Autocomplete, Checkbox, Chip, FormControl, FormHelperText, ListSubheader, Tooltip } from '@mui/material'
+
+
+import { useEditor, EditorContent } from '@tiptap/react'
+
+import { StarterKit } from '@tiptap/starter-kit'
+
+import { Underline } from '@tiptap/extension-underline'
+
+import { Placeholder } from '@tiptap/extension-placeholder'
+
+import { TextAlign } from '@tiptap/extension-text-align'
+
+import CustomTextField from '@core/components/mui/TextField'
+
+
+import CustomIconButton from '@/@core/components/mui/IconButton'
+
+import { yearsOpt } from '@/configs/customDataConfig'
+import LocationAutocomplete from './LocationAutoComplete'
 
 // Vars
 const data = [
@@ -190,8 +199,8 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
   // const [jobData, setJobData] = useState(jobData);
 
-  const content = this.props?.content || null;
-  const roleResContent = this.props?.rContent || null;
+  // const content = this.props?.content || null;
+  // const roleResContent = this.props?.rContent || null;
 
   const router = useRouter();
   const {data: session} = useSession();
@@ -244,6 +253,15 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
       gender: jobData?.gender || 'all',
     }
   });
+
+  // Debounced input handler
+  const debouncedInputHandler = useCallback((e, value) => {
+    console.log("Debounced input value:", value);
+
+    // Implement your input change handling logic here
+    // For example, you can make an API call to fetch filtered options based on `value`
+
+  }, []);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -318,7 +336,8 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
 
   const onSubmit = async (data) => {
-    console.log("submitted data:", data)
+
+    // console.log("submitted data:", data)
 
     if(jobId){
 
@@ -443,6 +462,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
     if(!token) return null;
 
     setLoading(true);
+
     try {
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/locations?search=${searchTerm}`, {
@@ -475,6 +495,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
       fetchCities();
     }
+
   }, [token, locations]);
 
   const handleInputChange = (event, value) => {
@@ -524,7 +545,16 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <LocationAutocomplete
+              control={control}
+              errors={errors}
+              locationOptions={locationOptions} // array of { id, city_name, state_name }
+              fallbackSelected={fallbackSelected} // array
+              setFallbackSelected={setFallbackSelected} // setState from parent
+              loading={loading}
+              handleInputChange={handleInputChange}
+            />
+            {/* <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}
                 name="location"
@@ -659,7 +689,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
                   );
                 }}
               />
-            </Grid>
+            </Grid> */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}

@@ -74,7 +74,9 @@ const UploadCandidate = () => {
 
             setFiles(acceptedFiles.map(file => Object.assign(file)))
             setUploadedData(data[0]);
-            console.log('Upload successful:', data[0]);
+
+            // console.log('Upload successful:', data[0]);
+            
             setLoadingFile(false);
           } else {
             toast.error('Upload failed. Can not extract data from file.', { autoClose: 3000 });
@@ -104,7 +106,7 @@ const UploadCandidate = () => {
 
       return <i className='tabler-file-type-pdf' style={{ fontSize: 38 }} />
     } else {
-    
+
       return <i className='tabler-alert-circle' style={{ fontSize: 38, color: 'red' }} />
     }
   }
