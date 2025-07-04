@@ -53,7 +53,7 @@ const CandidatesPage = async () => {
   // Vars
   const candidatesData = await getCandidatesData()
 
-  return <CandidatesList candidatesData={candidatesData} />
+  return <CandidatesList candidatesData={candidatesData?.data || []} />
 }
 
 export default CandidatesPage
