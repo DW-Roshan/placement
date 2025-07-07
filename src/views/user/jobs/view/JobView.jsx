@@ -21,6 +21,8 @@ const JobView = ({ job, isCandidate }) => {
 
   const [applied, setApplied] = useState(false);
   const [openApply, setOpenApply] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [openSave, setOpenSave] = useState(false);
 
   const {data: session, status} = useSession();
   const token = session?.user?.token;
@@ -29,6 +31,10 @@ const JobView = ({ job, isCandidate }) => {
   useEffect(() => {
     if(userId && job){
       setApplied(job?.candidates?.some((cnd) => cnd?.id === userId))
+    }
+
+    if(userId && job){
+      setSaved(job?.saved_candidates?.some((cnd) => cnd?.id === userId))
     }
   }, [userId, job])
 
@@ -72,11 +78,17 @@ const JobView = ({ job, isCandidate }) => {
                   <Typography>{job?.locations?.map(loc => loc?.city_name).join(', ')}</Typography>
                 </div>
               </div>
-              {isCandidate &&
-                <Button color='primary' className='gap-2' variant='contained' onClick={() => setOpenApply(true)} disabled={status === 'loading' || applied}>
+              {isCandidate && <div className='flex gap-2'>
+                {!applied &&
+                  <Button color='primary' size='small' className='gap-2' variant='outlined' onClick={() => setOpenSave(true)} disabled={status === 'loading' || saved}>
+                    {/* {loading && <CircularProgress size={20} color='inherit' />} */}
+                    {saved ? 'Saved' : 'Save'}
+                  </Button>
+                }
+                <Button color='primary' size='small' className='gap-2' variant='contained' onClick={() => setOpenApply(true)} disabled={status === 'loading' || applied}>
                   {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                   {applied ? 'Applied' : 'Apply'}
-                </Button>
+                </Button> </div>
               }
             </Grid>
             <Grid size={{ xs:12 }}>
@@ -137,6 +149,7 @@ const JobView = ({ job, isCandidate }) => {
         }
       </CardContent>
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
+      <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
     </Card>
   )
 }

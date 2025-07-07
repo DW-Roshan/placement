@@ -21,6 +21,11 @@ const customVerticalMenuData = dictionary => [
         href: '/branch/user/add'
       }
     ]
+  },
+  {
+    label: 'Jobs',
+    icon: 'tabler-briefcase',
+    href: '/branch/jobs'
   }
 ]
 

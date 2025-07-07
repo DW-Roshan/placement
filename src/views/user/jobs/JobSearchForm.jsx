@@ -8,7 +8,7 @@ import Grid from "@mui/material/Grid2";
 
 import { useSession } from 'next-auth/react';
 
-const JobSearchForm = ({ yearsOpt, setJobsData }) => {
+const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       keyword: '',
@@ -107,11 +107,11 @@ const JobSearchForm = ({ yearsOpt, setJobsData }) => {
     console.log('Form data:', data);
 
     if(!token) return;
-    
+
 
     if(token){
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs`, {
+      const res = await fetch(isCandidate ? `${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs` : `${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -19,7 +19,7 @@ const TableFilters = ({ setData, tableData }) => {
     const filteredData = tableData?.filter(user => {
       if (role && user.role !== role) return false
       if (plan && user.currentPlan !== plan) return false
-      if (status && user.status !== status) return false
+      if (status && user.status !== Number(status)) return false
 
       return true
     })
@@ -30,7 +30,7 @@ const TableFilters = ({ setData, tableData }) => {
   return (
     <CardContent>
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 4 }}>
+        {/* <Grid size={{ xs: 12, sm: 4 }}>
           <CustomTextField
             select
             fullWidth
@@ -66,7 +66,7 @@ const TableFilters = ({ setData, tableData }) => {
             <MenuItem value='enterprise'>Enterprise</MenuItem>
             <MenuItem value='team'>Team</MenuItem>
           </CustomTextField>
-        </Grid>
+        </Grid> */}
         <Grid size={{ xs: 12, sm: 4 }}>
           <CustomTextField
             select
@@ -79,9 +79,8 @@ const TableFilters = ({ setData, tableData }) => {
             }}
           >
             <MenuItem value=''>Select Status</MenuItem>
-            <MenuItem value='pending'>Pending</MenuItem>
-            <MenuItem value='active'>Active</MenuItem>
-            <MenuItem value='inactive'>Inactive</MenuItem>
+            <MenuItem value='1'>Active</MenuItem>
+            <MenuItem value='0'>Inactive</MenuItem>
           </CustomTextField>
         </Grid>
       </Grid>

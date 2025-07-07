@@ -3,7 +3,7 @@
 
 // import AcademyDashboard from "../../(dashboard)/(private)/apps/academy/dashboard/page"
 
-const BranchDashboard = async () => {
+const BranchDashboard = () => {
 
   return "Branch Dashboard";
 

@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 // MUI Imports
-import { Avatar, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
@@ -45,14 +45,17 @@ const JobCard = ({job, isCandidate}) => {
   })
 
   const [applied, setApplied] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const {data:session, status} = useSession();
   const token = session?.user?.token;
+  const authUser = session?.user;
   const userId = session?.user?.id;
 
   const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
   const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
   const [openApply, setOpenApply] = useState(false);
+  const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
 
   const { lang: locale } = useParams()
@@ -61,6 +64,10 @@ const JobCard = ({job, isCandidate}) => {
   useEffect(() => {
     if(userId && job){
       setApplied(job?.candidates?.some((cnd) => cnd?.id === userId))
+    }
+    
+    if(userId && job){
+      setSaved(job?.saved_candidates?.some((cnd) => cnd?.id === userId))
     }
   }, [userId, job])
 
@@ -125,20 +132,25 @@ const JobCard = ({job, isCandidate}) => {
               <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
             </Grid></>
           }
-          <Grid size={{ xs: 12 }} className='flex justify-between items-center'>
+          <Grid size={{ xs: 12 }} className='flex justify-between items-center gap-2 flex-wrap'>
             <Typography variant='body2' >{formatDistanceToNow(job?.created_at, {addSuffix: true})}</Typography>
 
             {isCandidate ?
-              <div className='flex gap-2'>
+              <div className='flex gap-2 flex-wrap'>
                 <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <Button onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
+                {applied || <Button onClick={() => setOpenSave(true)} variant='outlined' color='primary' size='small' disabled={status === 'loading' || saved}>
+                  {saved ? 'Saved' : 'Save'}
+                </Button>}
+                {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
                   {applied ? 'Applied' : 'Apply'}
                 </Button>}
               </div>
              :
               <div className='flex gap-2'>
-                <Link href={getLocalizedUrl(`/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                {authUser?.userType !== 'B' &&
+                  <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                }
               </div>
             }
           </Grid>
@@ -147,6 +159,7 @@ const JobCard = ({job, isCandidate}) => {
       <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} selectValue={tabOpen} />
       <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true} />
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
+      <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
     </Card>
   )
 }

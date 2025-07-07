@@ -52,7 +52,7 @@ const UserListApp = async () => {
   // Vars
   const userData = await getUserData()
 
-  console.log("userData", userData);
+  // console.log("userData", userData);
 
   return <UserList userData={userData} />
 }

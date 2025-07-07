@@ -14,7 +14,7 @@ const getJobsData = async () => {
 
     if(token){
 
-      const res = await fetch(`${process.env.API_URL}/candidate/jobs`, {
+      const res = await fetch(`${process.env.API_URL}/jobs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,15 +43,13 @@ const getJobsData = async () => {
   }
 }
 
-const ListPage = async () => {
+const JobsListPage = async () => {
 
   const jobsData = await getJobsData()
 
-  // console.log("json data of jobs", jobsData);
-
   return (
-    <JobsList jobsData={jobsData.data} isCandidate={true} hideSearch={false} />
+    <JobsList jobsData={jobsData.data} />
   )
 }
 
-export default ListPage
+export default JobsListPage

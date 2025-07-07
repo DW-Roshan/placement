@@ -17,7 +17,7 @@ import JobSearchForm from "../JobSearchForm";
 
 // import { useRouter, useSearchParams } from "next/navigation";
 
-const JobsListCard = ({ jobs, isCandidate }) => {
+const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
 
   const [jobsData, setJobsData] = useState(jobs || []);
   const [industry, setIndustry] = useState('')
@@ -137,7 +137,9 @@ const JobsListCard = ({ jobs, isCandidate }) => {
       <Card style={{ width: '100%' }}>
         <Grid size={{ xs: 12 }}>
           <CardContent>
-            <JobSearchForm yearsOpt={yearsOpt} setJobsData={setJobsData} />
+            {!hideSearch &&
+              <JobSearchForm yearsOpt={yearsOpt} setJobsData={setJobsData} isCandidate={isCandidate} />
+            }
             {/* <Grid container spacing={6}>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <TextField fullWidth label='Enter keyword / designation / companies' size='small'/>
