@@ -7,7 +7,7 @@ const customVerticalMenuData = dictionary => [
     href: '/branch/dashboard'
   },
   {
-    label: dictionary['navigation'].user,
+    label: 'Users',
     icon: 'tabler-user',
     children: [
       {

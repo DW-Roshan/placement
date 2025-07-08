@@ -65,7 +65,7 @@ const JobCard = ({job, isCandidate}) => {
     if(userId && job){
       setApplied(job?.candidates?.some((cnd) => cnd?.id === userId))
     }
-    
+
     if(userId && job){
       setSaved(job?.saved_candidates?.some((cnd) => cnd?.id === userId))
     }
@@ -138,9 +138,9 @@ const JobCard = ({job, isCandidate}) => {
             {isCandidate ?
               <div className='flex gap-2 flex-wrap'>
                 <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <Button onClick={() => setOpenSave(true)} variant='outlined' color='primary' size='small' disabled={status === 'loading' || saved}>
-                  {saved ? 'Saved' : 'Save'}
-                </Button>}
+                {applied || <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                  {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
+                </CustomIconButton>}
                 {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
                   {applied ? 'Applied' : 'Apply'}
                 </Button>}

@@ -16,6 +16,7 @@ import { getInitials } from "@/utils/getInitials"
 
 import CustomChip from "@/@core/components/mui/Chip";
 import DialogsConfirmation from "../DialogConfirmation";
+import CustomIconButton from "@/@core/components/mui/IconButton";
 
 const JobView = ({ job, isCandidate }) => {
 
@@ -74,16 +75,21 @@ const JobView = ({ job, isCandidate }) => {
                   </div>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <i className='tabler-map-pin text-[20px]' />
+                  <i className='tabler-map-pin text-[20px] max-w-[20px] w-full' />
                   <Typography>{job?.locations?.map(loc => loc?.city_name).join(', ')}</Typography>
                 </div>
               </div>
               {isCandidate && <div className='flex gap-2'>
                 {!applied &&
-                  <Button color='primary' size='small' className='gap-2' variant='outlined' onClick={() => setOpenSave(true)} disabled={status === 'loading' || saved}>
-                    {/* {loading && <CircularProgress size={20} color='inherit' />} */}
-                    {saved ? 'Saved' : 'Save'}
-                  </Button>
+                  <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                    {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
+                  </CustomIconButton>
+
+                  // <Button color='primary' size='small' className='gap-2' variant='outlined' onClick={() => setOpenSave(true)} disabled={status === 'loading' || saved}>
+                  //   {loading && <CircularProgress size={20} color='inherit' />}
+                  //   {saved ? 'Saved' : 'Save'}
+                  // </Button>
+                  
                 }
                 <Button color='primary' size='small' className='gap-2' variant='contained' onClick={() => setOpenApply(true)} disabled={status === 'loading' || applied}>
                   {/* {loading && <CircularProgress size={20} color='inherit' />} */}
