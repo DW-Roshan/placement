@@ -27,7 +27,7 @@ const Education = ({ data, setOpenEduForm }) => {
               <th className='leading-6 plb-4 pli-2'>School or Institute</th>
               <th className='leading-6 plb-4 pli-2'>Grade Type</th>
               <th className='leading-6 plb-4 pli-2'>Grade Value</th>
-              <th className='leading-6 plb-4 pli-2 text-right'>Passing Year</th>
+              <th className='leading-6 plb-4 pie-6 pli-2 text-right'>Passing Year</th>
             </tr>
           </thead>
           <tbody>
