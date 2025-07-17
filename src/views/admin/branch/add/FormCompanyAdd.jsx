@@ -259,40 +259,81 @@ const FormCompanyAdd = ({statesData, branchId }) => {
 
     if(token){
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/branch/store`, {
-        method: 'post',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
+      if(branchId) {
 
-      const result = await res.json();
-
-      if(res.ok){
-
-        sessionStorage.setItem('success', result.message);
-
-        router.push('/admin/branch/list');
-
-        reset();
-
-
-      } else if(res.status == 422) {
-
-        // Laravel returns validation errors in the `errors` object
-        Object.entries(result.errors).forEach(([field, messages]) => {
-          setError(field, {
-            type: 'manual',
-            message: messages[0], // Use the first error message for each field
-          });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/branch/${branchId}/update`, {
+          method: 'post',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
         });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/admin/branch/list');
+
+          reset();
+
+
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'manual',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/admin/branch/list');
+
+        }
+
       } else {
-        sessionStorage.setItem('error', result.message);
 
-        router.push('/admin/branch/list');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/branch/store`, {
+          method: 'post',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
 
+        const result = await res.json();
+
+        if(res.ok){
+
+          sessionStorage.setItem('success', result.message);
+
+          router.push('/admin/branch/list');
+
+          reset();
+
+
+        } else if(res.status == 422) {
+
+          // Laravel returns validation errors in the `errors` object
+          Object.entries(result.errors).forEach(([field, messages]) => {
+            setError(field, {
+              type: 'manual',
+              message: messages[0], // Use the first error message for each field
+            });
+          });
+
+        } else {
+          sessionStorage.setItem('error', result.message);
+
+          router.push('/admin/branch/list');
+
+        }
       }
     }
   }
@@ -341,7 +382,7 @@ const FormCompanyAdd = ({statesData, branchId }) => {
 
   return (
     <Card>
-      <CardHeader title='Add Branch' />
+      <CardHeader title={branchId ? 'Edit Branch' : 'Add Branch'} />
       <Divider />
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
@@ -382,50 +423,52 @@ const FormCompanyAdd = ({statesData, branchId }) => {
                 )} />
             </Grid>
 
-            {/* Password */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="password" control={control}
-                rules={{ required: 'This field is required.' }}
-                render={({ field }) => (
-                  <CustomTextField fullWidth label={<>Password <span className='text-error'>*</span></>} required={false} placeholder="••••••••"
-                    type={showPassword ? 'text' : 'password'}
-                    error={!!errors.password} helperText={errors.password?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword(p => !p)}>
-                            <i className={showPassword ? 'tabler-eye-off' : 'tabler-eye'} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    {...field} />
-                )} />
-            </Grid>
+            {!branchId && <>
 
-            {/* Confirm Password */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="password_confirmation" control={control}
-                rules={{
-                  required: 'This field is required.',
-                  validate: value => value === password || 'Passwords do not match'
-                }}
-                render={({ field }) => (
-                  <CustomTextField fullWidth label={<>Confirm Password <span className='text-error'>*</span></>} placeholder="••••••••"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    error={!!errors.password_confirmation} helperText={errors.password_confirmation?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword(p => !p)}>
-                            <i className={showConfirmPassword ? 'tabler-eye-off' : 'tabler-eye'} />
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    {...field} />
-                )} />
-            </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="password" control={control}
+                  rules={{ required: 'This field is required.' }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>Password <span className='text-error'>*</span></>} required={false} placeholder="••••••••"
+                      type={showPassword ? 'text' : 'password'}
+                      error={!!errors.password} helperText={errors.password?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(p => !p)}>
+                              <i className={showPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                      {...field} />
+                  )} />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="password_confirmation" control={control}
+                  rules={{
+                    required: 'This field is required.',
+                    validate: value => value === password || 'Passwords do not match'
+                  }}
+                  render={({ field }) => (
+                    <CustomTextField fullWidth label={<>Confirm Password <span className='text-error'>*</span></>} placeholder="••••••••"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      error={!!errors.password_confirmation} helperText={errors.password_confirmation?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowConfirmPassword(p => !p)}>
+                              <i className={showConfirmPassword ? 'tabler-eye-off' : 'tabler-eye'} />
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                      {...field} />
+                  )} />
+              </Grid>
+              </>
+            }
 
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller name="loginValidUpto" control={control}

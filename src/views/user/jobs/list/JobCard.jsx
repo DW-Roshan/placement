@@ -156,8 +156,8 @@ const JobCard = ({job, isCandidate}) => {
           </Grid>
         </Grid>
       </CardActions>
-      <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} selectValue={tabOpen} />
-      <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true} />
+      <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} jobId={job?.id} selectValue={tabOpen} />
+      <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
     </Card>

@@ -68,6 +68,26 @@ const Header = ({ mode }) => {
               <CustomIconButton
                 component={Link}
                 variant='contained'
+                href='/candidate/login'
+                color='primary'
+              >
+                <i className='tabler-login text-xl' />
+              </CustomIconButton>
+            ) : (
+              <Button
+                component={Link}
+                variant='contained'
+                href='/candidate/login'
+                startIcon={<i className='tabler-login text-xl' />}
+                className='whitespace-nowrap'
+              >
+                Login
+              </Button>
+            )}
+            {/* {isBelowLgScreen ? (
+              <CustomIconButton
+                component={Link}
+                variant='contained'
                 href='https://1.envato.market/vuexy_admin'
                 color='primary'
                 target='_blank'
@@ -85,7 +105,7 @@ const Header = ({ mode }) => {
               >
                 Purchase Now
               </Button>
-            )}
+            )} */}
           </div>
         </div>
       </div>

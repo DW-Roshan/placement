@@ -17,6 +17,7 @@ import { getInitials } from "@/utils/getInitials"
 import CustomChip from "@/@core/components/mui/Chip";
 import DialogsConfirmation from "../DialogConfirmation";
 import CustomIconButton from "@/@core/components/mui/IconButton";
+import { getLocalizedUrl } from "@/utils/i18n";
 
 const JobView = ({ job, isCandidate }) => {
 
@@ -80,7 +81,7 @@ const JobView = ({ job, isCandidate }) => {
                 </div>
               </div>
               {isCandidate && <div className='flex gap-2'>
-                {!applied &&
+                {!applied && token &&
                   <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
                     {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
                   </CustomIconButton>
@@ -89,12 +90,19 @@ const JobView = ({ job, isCandidate }) => {
                   //   {loading && <CircularProgress size={20} color='inherit' />}
                   //   {saved ? 'Saved' : 'Save'}
                   // </Button>
-                  
+
                 }
+                {token ?
                 <Button color='primary' size='small' className='gap-2' variant='contained' onClick={() => setOpenApply(true)} disabled={status === 'loading' || applied}>
                   {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                   {applied ? 'Applied' : 'Apply'}
-                </Button> </div>
+                </Button>
+                :
+                <Button color='primary' className='gap-2' variant='contained' href={getLocalizedUrl(`/candidate/login`, 'en')}>
+                  {/* {loading && <CircularProgress size={20} color='inherit' />} */}
+                  {applied ? 'Applied' : 'Login to apply'}
+                </Button>}
+                </div>
               }
             </Grid>
             <Grid size={{ xs:12 }}>

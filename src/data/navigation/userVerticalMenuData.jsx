@@ -43,6 +43,11 @@ const userVerticalMenuData = dictionary => [
       }
     ]
   },
+  {
+    label: 'Email Templates',
+    icon: 'tabler-mail',
+    href: '/job-email-templates'
+  },
 
   // {
   //   label: 'Reports',

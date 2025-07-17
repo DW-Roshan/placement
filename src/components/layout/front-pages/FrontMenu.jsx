@@ -70,7 +70,7 @@ const FrontMenu = props => {
 
   return (
     <Wrapper isBelowLgScreen={isBelowLgScreen} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen}>
-      <Typography
+      {/* <Typography
         color='text.primary'
         component={Link}
         href='/front-pages/landing-page'
@@ -130,7 +130,7 @@ const FrontMenu = props => {
         isBelowLgScreen={isBelowLgScreen}
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
-      />
+      /> */}
       <Typography
         component={Link}
         color='text.primary'

@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
-import { Button, Checkbox, Chip, Dialog, DialogContent, DialogTitle, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
+import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
 
 
 import { rankItem } from '@tanstack/match-sorter-utils'
@@ -27,6 +27,10 @@ import {
 } from '@tanstack/react-table'
 
 import classnames from "classnames";
+
+import { useSession } from "next-auth/react";
+
+import { toast } from "react-toastify";
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -91,13 +95,19 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue}) => {
+const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue, jobId}) => {
 
   const [value, setValue] = useState(selectValue || '30%')
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
+  const [loading, setLoading] = useState(false);
+
+  const { data: session } = useSession()
+  const token = session?.user?.token
+
+  console.log("job id", jobId);
 
   useEffect(() => {
 
@@ -313,6 +323,60 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
     getFacetedMinMaxValues: getFacetedMinMaxValues()
   })
 
+  const selectedIds = useMemo(
+    () => table.getSelectedRowModel().rows.map(r => r.original.id),
+    [table.getSelectedRowModel()]
+  );
+
+  // console.log("selected id:", selectedIds);
+
+  const handleInviteSend = async () => {
+
+    // setRowSelection({});
+
+    if(!token) return
+
+    setLoading(true);
+
+    try {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/invite`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          selectedIds : selectedIds
+        })
+      });
+
+      if(res.ok) {
+
+        const data = await res.json();
+
+        toast.success(data?.message || 'Mail sent successfully!')
+
+        console.log("data from invite sent:", data);
+      }
+
+    } catch (error) {
+
+      toast.error('Something went wrong.');
+
+      console.log("error:", error);
+
+
+    } finally {
+      setLoading(false);
+      handleClose();
+      setRowSelection({});
+    }
+
+
+
+  }
+
   const getAvatar = params => {
     const { avatar, fullName } = params
 
@@ -330,7 +394,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
       maxWidth='xl'
       sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
     >
-      <DialogCloseButton onClick={handleClose}>
+      <DialogCloseButton onClick={() => {handleClose(); setRowSelection({});}}>
         <i className='tabler-x' />
       </DialogCloseButton>
       <DialogTitle>
@@ -373,6 +437,16 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
                   className='max-sm:is-full'
                 >
                   Export
+                </Button>
+                <Button
+                  color='primary'
+                  variant='contained'
+                  startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-send' />}
+                  className='max-sm:is-full'
+                  disabled={selectedIds.length <= 0 || loading}
+                  onClick={handleInviteSend}
+                >
+                  {loading ? 'Inviting...' : 'Invite'}
                 </Button>
                 {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
                   <Button

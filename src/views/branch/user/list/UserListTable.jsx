@@ -283,14 +283,14 @@ const UserListTable = ({userData}) => {
             {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
-            <IconButton>
+            {/* <IconButton> */}
               {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
                 <i className='tabler-eye text-textSecondary' />
               {/* </Link> */}
-            </IconButton>
-            <IconButton>
+            {/* </IconButton> */}
+            {/* <IconButton>
               <i className='tabler-edit text-textSecondary' />
-            </IconButton>
+            </IconButton> */}
             {/* <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
