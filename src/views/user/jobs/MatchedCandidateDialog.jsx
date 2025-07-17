@@ -107,8 +107,6 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   const { data: session } = useSession()
   const token = session?.user?.token
 
-  console.log("job id", jobId);
-
   useEffect(() => {
 
     if(selectValue){
