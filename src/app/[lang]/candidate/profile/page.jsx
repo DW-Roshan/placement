@@ -12,12 +12,16 @@ const getProfileData = async () => {
   const session = await getServerSession(authOptions);
   const token = session?.user?.token;
 
-  const res = await fetch(`${process.env.API_URL}/candidate/profile`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/profile`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     }
   })
+
+  const data = res.json()
+
+  console.log("data of profile get:", data)
 
   if (!res.ok) {
     console.error('profile data fetch failed')
@@ -25,7 +29,7 @@ const getProfileData = async () => {
     return [];
   }
 
-  return res.json()
+  return data
 }
 
 const ProfilePage = async () => {
