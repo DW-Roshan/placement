@@ -67,7 +67,7 @@ const getData = async () => {
 
     return {
       states: statesData.states || [],
-      departments: allData?.departments || [],
+      designations: allData?.designations || [],
       reportingManagers: allData?.reportingManagers || []
     };
   } catch (error) {
@@ -81,12 +81,12 @@ const AddUser = async () => {
 
   // const data = await getData();
 
-  const { states, departments, reportingManagers } = await getData();
+  const { states, designations, reportingManagers } = await getData();
 
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
-        <FormUserAdd statesData={states} departments={departments} reportingManagers={reportingManagers} />
+        <FormUserAdd statesData={states} designations={designations} reportingManagers={reportingManagers} />
       </Grid>
     </Grid>
   )

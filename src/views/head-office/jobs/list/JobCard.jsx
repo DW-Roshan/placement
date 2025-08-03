@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 // MUI Imports
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Switch, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
@@ -19,6 +19,8 @@ import { useKeenSlider } from 'keen-slider/react'
 import { useSession } from 'next-auth/react'
 
 import Grid from '@mui/material/Grid2'
+
+import { toast } from 'react-toastify'
 
 import { getLocalizedUrl } from '@/utils/i18n'
 
@@ -32,7 +34,9 @@ import CustomIconButton from '@/@core/components/mui/IconButton'
 import CustomChip from '@/@core/components/mui/Chip'
 import DialogsConfirmation from '../DialogConfirmation'
 
-const JobCard = ({job, isCandidate}) => {
+import AssignBranchDialog from '@/views/head-office/jobs/AssignBranchDialog'
+
+const JobCard = ({job, branchData, isCandidate}) => {
 
   const [skillRef] = useKeenSlider({
     slides: {
@@ -54,6 +58,7 @@ const JobCard = ({job, isCandidate}) => {
 
   const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
   const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
+  const [openAssignBranch, setOpenAssignBranch] = useState(false);
   const [openApply, setOpenApply] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
@@ -71,6 +76,25 @@ const JobCard = ({job, isCandidate}) => {
     }
   }, [userId, job])
 
+  const handleChange = async () => {
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${job?.id}/toggle`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const result = await res.json();
+
+    if(res?.ok){
+      toast.success(result?.message || 'Status Changed');
+    } else {
+      toast.error(result?.message || 'Something went wrong');
+    }
+  }
+
   return (
     <Card variant='outlined'>
       <CardHeader title={job?.job_title}
@@ -78,7 +102,10 @@ const JobCard = ({job, isCandidate}) => {
           <Typography variant='h6'>{job?.company_name}</Typography>
         }
         action={
-          <Avatar variant='square' sx={{ width: 50, height: 50}} alt={job?.company_name} src={''} >{getInitials(job?.company_name)}</Avatar>
+          <>
+            <Switch id='status-switch' onChange={handleChange} defaultChecked={job?.status} color='success' />
+            <Avatar variant='square' sx={{ width: 50, height: 50}} alt={job?.company_name} src={''} >{getInitials(job?.company_name)}</Avatar>
+          </>
         }
       />
       <CardContent>
@@ -128,8 +155,11 @@ const JobCard = ({job, isCandidate}) => {
                 <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
               </div>
             </Grid>
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12 }} className='flex gap-2'>
               <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
+              {authUser?.userType === 'HO' &&
+                <Button onClick={() => {setOpenAssignBranch(true)}} variant='tonal' color='info' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Assign to Branch</Button>
+              }
             </Grid></>
           }
           <Grid size={{ xs: 12 }} className='flex justify-between items-center gap-2 flex-wrap'>
@@ -147,10 +177,10 @@ const JobCard = ({job, isCandidate}) => {
               </div>
              :
               <div className='flex gap-2'>
-                <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {/* {authUser?.userType !== 'B' &&
-                  <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
-                } */}
+                <Link href={getLocalizedUrl(`${authUser?.userType === 'HO' ? `/head-office/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                {authUser?.userType === 'HO' &&
+                  <Link href={getLocalizedUrl(`/head-office/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                }
               </div>
             }
           </Grid>
@@ -158,6 +188,7 @@ const JobCard = ({job, isCandidate}) => {
       </CardActions>
       <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} jobId={job?.id} selectValue={tabOpen} />
       <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />
+      <AssignBranchDialog open={openAssignBranch} jobId={job?.id} handleClose={() => {setOpenAssignBranch(!openAssignBranch); }} branchData={branchData}  />
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
     </Card>

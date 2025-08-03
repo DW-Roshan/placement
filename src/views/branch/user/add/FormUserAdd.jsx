@@ -68,7 +68,7 @@ const defaultValues = {
     profileImage: ''
 }
 
-const FormUserAdd = ({ statesData, departments, reportingManagers, userData }) => {
+const FormUserAdd = ({ statesData, designations, reportingManagers, userData }) => {
     // States
     const [formData, setFormData] = useState({
         username: '',
@@ -582,7 +582,7 @@ const FormUserAdd = ({ statesData, departments, reportingManagers, userData }) =
 
                                 )} />
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        {/* <Grid size={{ xs: 12, sm: 6 }}>
                             <Controller name="department" control={control}
                                 rules={{ required: 'This field is required.' }}
                                 render={({ field }) => (
@@ -609,17 +609,17 @@ const FormUserAdd = ({ statesData, departments, reportingManagers, userData }) =
                                     />
                                 )}
                             />
-                        </Grid>
+                        </Grid> */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Controller name="designation" control={control}
                                 rules={{ required: 'This field is required.' }}
                                 render={({ field }) => (
                                     <Autocomplete
                                         fullWidth
-                                        options={departments && departments.find(department => department.id === selectedDepartment)?.designations || []}
+                                        options={designations && designations || []}
                                         getOptionLabel={(designation) => designation.name || ''}
                                         getOptionKey={option => option.id}
-                                        value={departments && departments.find(department => department.id === selectedDepartment)?.designations.find((d) => d.id === field.value) || null}
+                                        value={designations && designations.find((d) => d.id === field.value) || null}
                                         onChange={(event, value) => field.onChange(value?.id || '')}
                                         renderInput={(params) => (
                                             <CustomTextField

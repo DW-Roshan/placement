@@ -359,7 +359,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
         sessionStorage.setItem('success', result.message);
 
-        router.push(getLocalizedUrl('/jobs/list', locale));
+        router.push(getLocalizedUrl('/head-office/jobs/list', locale));
 
         reset();
 
@@ -377,7 +377,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
       } else {
         sessionStorage.setItem('error', result.message);
 
-        router.push(getLocalizedUrl('/jobs/list', locale));
+        router.push(getLocalizedUrl('/head-office/jobs/list', locale));
 
       }
 
@@ -398,7 +398,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
         sessionStorage.setItem('success', result.message);
 
-        router.push(getLocalizedUrl('/jobs/list', locale));
+        router.push(getLocalizedUrl('/head-office/jobs/list', locale));
 
         reset();
 
@@ -416,7 +416,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
       } else {
         sessionStorage.setItem('error', result.message);
 
-        router.push(getLocalizedUrl('/jobs/list', locale));
+        router.push(getLocalizedUrl('/head-office/jobs/list', locale));
 
       }
     }

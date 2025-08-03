@@ -26,6 +26,7 @@ import customVerticalMenuData from '@/data/navigation/customVerticalMenuData'
 import adminMenuData from '@/data/navigation/adminMenuData'
 import candidateMenuData from '@/data/navigation/candidateMenuData'
 import userVerticalMenuData from '@/data/navigation/userVerticalMenuData'
+import hoMenuData from '@/data/navigation/hoMenuData'
 
 const RenderExpandIcon = ({ open, transitionDuration }) => (
   <StyledVerticalNavExpandIcon open={open} transitionDuration={transitionDuration}>
@@ -67,7 +68,7 @@ const CustomVerticalMenu = ({ dictionary, scrollMenu, userType }) => {
           renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
           menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
         >
-          <GenerateVerticalMenu menuData={userType && userType === 'A' ? adminMenuData(dictionary) : (userType === 'B' ? customVerticalMenuData(dictionary) : (userType === 'U' ? userVerticalMenuData(dictionary) : ( userType === 'candidate' ? candidateMenuData(dictionary) : customVerticalMenuData(dictionary) ))) } />
+          <GenerateVerticalMenu menuData={userType && userType === 'A' ? adminMenuData(dictionary) : (userType === 'HO' ? hoMenuData(dictionary) : ( userType === 'B' ? customVerticalMenuData(dictionary) : (userType === 'U' ? userVerticalMenuData(dictionary) : ( userType === 'candidate' ? candidateMenuData(dictionary) : customVerticalMenuData(dictionary) )) )) } />
         </Menu>
     </ScrollWrapper>
   )

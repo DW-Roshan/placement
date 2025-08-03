@@ -25,7 +25,7 @@ import { i18n } from '@configs/i18n'
 // Util Imports
 import { getDictionary } from '@/utils/getDictionary'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
-import AdminGuard from '@/hocs/AdminGuard'
+import HOGuard from '@/hocs/HOGuard'
 import { authOptions } from '@/libs/auth'
 
 const Layout = async props => {
@@ -43,7 +43,7 @@ const Layout = async props => {
   return (
     <Providers direction={direction}>
       <AuthGuard locale={params.lang}>
-        <AdminGuard locale={params.lang}>
+        <HOGuard locale={params.lang}>
           <LayoutWrapper
             systemMode={systemMode}
             verticalLayout={
@@ -70,7 +70,7 @@ const Layout = async props => {
             </Button>
           </ScrollToTop>
           <Customizer dir={direction} />
-        </AdminGuard>
+        </HOGuard>
       </AuthGuard>
     </Providers>
   )

@@ -27,6 +27,7 @@ import adminMenuData from '@/data/navigation/adminMenuData'
 import customVerticalMenuData from '@/data/navigation/customVerticalMenuData'
 import { GenerateHorizontalMenu } from '@/components/GenerateMenu'
 import candidateMenuData from '@/data/navigation/candidateMenuData'
+import userVerticalMenuData from '@/data/navigation/userVerticalMenuData'
 
 const RenderExpandIcon = ({ level }) => (
   <StyledHorizontalNavExpandIcon level={level}>
@@ -421,7 +422,7 @@ const HorizontalMenu = ({ dictionary, userType }) => {
           menuSectionStyles: verticalMenuSectionStyles(verticalNavOptions, theme)
         }}
       >
-        <GenerateHorizontalMenu menuData={userType && userType === 'A' ? adminMenuData(dictionary) : ( userType === 'candidate' ? candidateMenuData(dictionary) : customVerticalMenuData(dictionary) )} />
+        <GenerateHorizontalMenu menuData={userType && userType === 'A' ? adminMenuData(dictionary) : (userType === 'B' ? customVerticalMenuData(dictionary) : (userType === 'U' ? userVerticalMenuData(dictionary) : ( userType === 'candidate' ? candidateMenuData(dictionary) : customVerticalMenuData(dictionary) ))) } />
       </Menu>
     </HorizontalNav>
   )

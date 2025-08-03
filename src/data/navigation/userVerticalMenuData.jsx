@@ -36,11 +36,13 @@ const userVerticalMenuData = dictionary => [
         icon: 'tabler-circle',
         href: '/jobs/list'
       },
-      {
-        label: 'Add',
-        icon: 'tabler-circle',
-        href: '/jobs/add'
-      }
+
+      // {
+      //   label: 'Add',
+      //   icon: 'tabler-circle',
+      //   href: '/jobs/add'
+      // }
+      
     ]
   },
   {
