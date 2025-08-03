@@ -167,7 +167,7 @@ const HOListTable = ({ tableData }) => {
         )
       },
       columnHelper.accessor('business_name', {
-        header: 'Branch',
+        header: 'HO',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
             {getAvatar({ avatar: row.original?.profile_image, branchName: row.original?.business_name })}
