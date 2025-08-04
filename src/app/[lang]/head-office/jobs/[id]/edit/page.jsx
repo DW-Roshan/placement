@@ -46,7 +46,7 @@ const EditJobPage = async (props) => {
   const id = params.id
   const data = await fetchData(id, lang);
 
-  return <FormAddEditJob jobId={id} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} jobData={data?.job} locations={data?.locations}/>
+  return <FormAddEditJob branchData={data?.branches} jobId={id} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} jobData={data?.job} locations={data?.locations}/>
 }
 
 export default EditJobPage

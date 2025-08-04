@@ -157,9 +157,9 @@ const JobCard = ({job, branchData, isCandidate}) => {
             </Grid>
             <Grid size={{ xs: 12 }} className='flex gap-2'>
               <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
-              {authUser?.userType === 'HO' &&
-                <Button onClick={() => {setOpenAssignBranch(true)}} variant='tonal' color='info' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Assign to Branch</Button>
-              }
+              {/* {authUser?.userType === 'HO' &&
+                <Button onClick={() => {setOpenAssignBranch(true)}} variant='tonal' color='info' size='small' className='m-0'>Assign to Branch</Button>
+              } */}
             </Grid></>
           }
           <Grid size={{ xs: 12 }} className='flex justify-between items-center gap-2 flex-wrap'>

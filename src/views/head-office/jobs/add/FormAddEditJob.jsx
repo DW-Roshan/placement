@@ -183,7 +183,7 @@ const EditorToolbar = ({ editor }) => {
   )
 }
 
-const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, locations, error }) => {
+const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments, jobData, locations, error }) => {
   // Vars
   const initialSelectedOption = data.filter(item => item.isSelected)[data.filter(item => item.isSelected).length - 1]
     .value
@@ -340,7 +340,7 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
 
   const onSubmit = async (data) => {
 
-    // console.log("submitted data:", data)
+    console.log("submitted data:", data)
 
     if(jobId){
 
@@ -500,6 +500,19 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
     }
 
   }, [token, locations]);
+  
+  useEffect(() => {
+    if (branchData.length && jobId) {
+      const matchingIds = branchData
+        .filter(branch =>
+          Array.isArray(branch.assigned_jobs) &&
+          branch.assigned_jobs.some(job => String(job.id) === String(jobId))
+        )
+        .map(branch => branch.id);
+
+      setValue('selectedBranchIds', matchingIds);
+    }
+  }, [branchData, jobId, setValue]);
 
   const handleInputChange = (event, value) => {
     if (value.length >= 3) {
@@ -1123,12 +1136,77 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
         <AccordionDetails className='flex gap-4 pbs-6'>
         </AccordionDetails>
       </Accordion>
-          <Button type='submit' variant='contained'>
-            Submit
-          </Button>
-          <Button type='reset' variant='tonal' color='secondary' onClick={() => reset()}>
-            Reset
-          </Button>
+      <Accordion>
+        <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
+          <Typography>Assign to Branches</Typography>
+        </AccordionSummary>
+        <Divider />
+        <AccordionDetails className='!pbs-6'>
+          <Grid container spacing={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller
+                control={control}
+                name='selectedBranchIds'
+                render={({ field }) => (
+                  <Autocomplete
+                    fullWidth
+                    multiple
+                    disableCloseOnSelect
+                    options={branchData || []}
+                    value={branchData?.filter(option => field.value?.includes(option.id)) || []}
+                    getOptionLabel={(option) => option?.business_name || ''}
+                    onChange={(event, newValue) => {
+                      field.onChange(newValue.map(option => option?.id));
+                    }}
+                    isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                    renderTags={(value, getTagProps) =>
+                      value.map((option, index) => {
+                        const tagProps = getTagProps({ index });
+                        const { key, ...rest } = tagProps;
+
+                        return <Chip label={option?.business_name} key={key} {...rest} />;
+                      })
+                    }
+                    renderOption={(props, option, { selected }) => {
+                      const { key, ...rest } = props;
+      
+                      return (
+                        <li key={key} {...rest}>
+                          <Checkbox
+                            size="small"
+                            checked={selected}
+                            
+                            // onClick={(e) => e.stopPropagation()}
+                            style={{ marginRight: 8 }}
+                          />
+                          {option?.business_name} {option?.assignedJobs?.job_title}
+                        </li>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <CustomTextField
+                        {...params}
+                        error={!!errors?.selectedBranchIds}
+                        helperText={errors?.selectedBranchIds?.message}
+                        label='Select Branches'
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+        <Divider />
+        <AccordionDetails className='flex gap-4 pbs-6'>
+        </AccordionDetails>
+      </Accordion>
+      <Button type='submit' variant='contained'>
+        Submit
+      </Button>
+      <Button type='reset' variant='tonal' color='secondary' onClick={() => reset()}>
+        Reset
+      </Button>
     </form>
   )
 }

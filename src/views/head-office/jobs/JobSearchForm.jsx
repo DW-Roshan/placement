@@ -159,7 +159,7 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
               <TextField
                 {...field}
                 fullWidth
-                label="Enter keyword / designation / companies"
+                label="Job Title/Job Search"
                 size="small"
                 {...(errors.keyword && { error: true, helperText: errors.keyword.message })}
               />

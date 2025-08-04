@@ -632,6 +632,10 @@ const FormUserAdd = ({ statesData, designations, reportingManagers, userData }) 
                                     />
                                 )} />
                         </Grid>
+                        <Grid size={{ xs: 12 }}><Divider /></Grid>
+                        <Grid size={{ xs: 12 }}>
+                            <Typography variant="body2" className="font-medium">3. Address Info</Typography>
+                        </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Controller name="state" control={control}
                                 rules={{ required: 'This field is required.' }}
