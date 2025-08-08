@@ -37,6 +37,8 @@ import {
 
 import { toast } from 'react-toastify'
 
+import { useSession } from 'next-auth/react'
+
 // Component Imports
 import TableFilters from './TableFilters'
 import OptionMenu from '@core/components/option-menu'
@@ -51,6 +53,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+
 import AddLocationDialog from './AddLocationDialog'
 
 // Styled Components
@@ -108,7 +111,7 @@ const userStatusObj = {
 // Column Definitions
 const columnHelper = createColumnHelper()
 
-const LocationListTable = ({ tableData, stateData }) => {
+const LocationListTable = ({ tableData, stateData, isAdmin }) => {
   // States
   const [openLocation, setOpenLocation] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
@@ -118,6 +121,9 @@ const LocationListTable = ({ tableData, stateData }) => {
 
   // Hooks
   const { lang: locale } = useParams()
+
+  const {data: session} = useSession();
+  const token = session?.user?.token;
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts
@@ -141,6 +147,43 @@ const LocationListTable = ({ tableData, stateData }) => {
       setTimeout(runAfterMount, 0);
     });
   }, []);
+
+  const handleChangeStatus = async (id) => {
+
+    if(!token) return
+
+    if(!isAdmin){
+      return
+    }
+    
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/locations/${id}/changeStatus`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const result = await res.json();
+
+    if(res?.ok){
+    
+      toast.success(result?.message, {
+        autoClose: 3000,
+        hideProgressBar: false
+      })
+
+      setData(result?.locations)
+
+    } else {
+
+      toast.error(result?.message, {
+        autoClose: 3000,
+        hideProgressBar: false
+      })
+
+    }
+  }
 
   const columns = useMemo(
     () => [
@@ -192,6 +235,7 @@ const LocationListTable = ({ tableData, stateData }) => {
               size='small'
               color={userStatusObj[row.original?.status]}
               className='capitalize'
+              onClick={() => handleChangeStatus(row.original?.id)}
             />
           </div>
         )
@@ -253,14 +297,16 @@ const LocationListTable = ({ tableData, stateData }) => {
               placeholder='Search Location'
               className='max-sm:is-full'
             />
-            <Button
-              variant='contained'
-              startIcon={<i className='tabler-plus' />}
-              className='max-sm:is-full'
-              onClick={() => setOpenLocation(true)}
-            >
-              Add Location
-            </Button>
+            {isAdmin ||
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-plus' />}
+                className='max-sm:is-full'
+                onClick={() => setOpenLocation(true)}
+              >
+                Add Location
+              </Button>
+            }
           </div>
         </div>
         <div className='overflow-x-auto'>

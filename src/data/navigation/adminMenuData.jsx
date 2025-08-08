@@ -37,6 +37,11 @@ const adminMenuData = dictionary => [
         href: '/admin/ho/add'
       }
     ]
+  },
+  {
+    label: 'Locations',
+    icon: 'tabler-map',
+    href: '/admin/locations'
   }
 ]
 
