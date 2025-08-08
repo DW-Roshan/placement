@@ -8,6 +8,8 @@ import Grid from "@mui/material/Grid2";
 
 import { useSession } from 'next-auth/react';
 
+import DateFilterWithPicker from '@/components/DateFilterWithPicker';
+
 const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
@@ -149,8 +151,9 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={6} className='items-start'>
+        <DateFilterWithPicker control={control} errors={errors} setValue={setValue} />
         {/* Keyword / Designation / Companies */}
-        <Grid size={{ xs:12, sm:6, md:3 }}>
+        <Grid size={{ xs:12, sm:6, md:2 }}>
           <Controller
             name='keyword'
             control={control}
@@ -315,7 +318,7 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
         </Grid>
 
         {/* Submit Button */}
-        <Grid size={{ xs:12, sm:6, md:2 }} className="flex justify-end">
+        <Grid size={{ xs:12 }} className="flex justify-end">
           <Button variant="contained" type="submit">
             Search
           </Button>

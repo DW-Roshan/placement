@@ -8,7 +8,7 @@ import FormAddEditJob from "@/views/user/jobs/add/FormAddEditJob";
 
 import { getLocalizedUrl } from "@/utils/i18n";
 
-import JobView from "@/views/user/jobs/view/JobView";
+import JobView from "@/views/head-office/jobs/view/JobView";
 
 const fetchData = async (id, lang) => {
 

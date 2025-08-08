@@ -21,7 +21,12 @@ const hoMenuData = dictionary => [
         href: '/head-office/jobs/add'
       }
     ]
-  }
+  },
+  {
+    label: 'Locations',
+    icon: 'tabler-map',
+    href: '/head-office/locations'
+  },
 ]
 
 export default hoMenuData

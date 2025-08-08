@@ -157,7 +157,8 @@ const JobView = ({ job, isCandidate }) => {
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant='h5'>About Company</Typography>
-              <Typography>{job?.about_company}</Typography>
+              <JobDescription html={job?.about_company} full></JobDescription>
+              {/* <Typography>{job?.about_company}</Typography> */}
             </Grid>
           </Grid>
         }

@@ -17,6 +17,7 @@ import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 // Util Imports
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { getLocalizedUrl } from '@/utils/i18n'
+import WelcomeUser from './WelcomeUser'
 
 // Vars
 
@@ -37,6 +38,7 @@ const NavbarContent = () => {
             <Logo />
           </Link>
         )}
+        <WelcomeUser />
       </div>
 
       <div className='flex items-center'>

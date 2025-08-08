@@ -21,6 +21,7 @@ import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 // Util Imports
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { getLocalizedUrl } from '@/utils/i18n'
+import WelcomeUser from './WelcomeUser'
 
 // Vars
 const shortcuts = [
@@ -127,14 +128,15 @@ const NavbarContent = () => {
             <Logo />
           </Link>
         )}
+        <WelcomeUser />
       </div>
 
       <div className='flex items-center'>
-        <NavSearch />
-        <LanguageDropdown />
+        {/* <NavSearch /> */}
+        {/* <LanguageDropdown /> */}
         <ModeDropdown />
-        <ShortcutsDropdown shortcuts={shortcuts} />
-        <NotificationsDropdown notifications={notifications} />
+        {/* <ShortcutsDropdown shortcuts={shortcuts} />
+        <NotificationsDropdown notifications={notifications} /> */}
         <UserDropdown />
         {/* Language Dropdown, Notification Dropdown, quick access menu dropdown, user dropdown will be placed here */}
       </div>

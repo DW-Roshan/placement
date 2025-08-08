@@ -4,6 +4,8 @@ import {
   Autocomplete,
   Checkbox,
   ListSubheader,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 
 import Grid from '@mui/material/Grid2'
@@ -11,6 +13,7 @@ import Grid from '@mui/material/Grid2'
 import { Controller, useWatch } from 'react-hook-form';
 
 import CustomTextField from '@/@core/components/mui/TextField';
+import CustomAvatar from '@/@core/components/mui/Avatar';
 
 const LocationAutocomplete = ({
   control,
@@ -139,7 +142,17 @@ const LocationAutocomplete = ({
               renderInput={(params) => (
                 <CustomTextField
                   {...params}
-                  label={<>Location <span className="text-error">*</span></>}
+                  label={<>Location <span className="text-error">*</span>
+                  <Tooltip
+                    title={
+                      <Typography variant='body2' component='span' className='text-inherit'>
+                        If a specific city or location is not listed, please select the nearest available option or contact the administrator. (You can also add it and wait for approve before using it.)
+                      </Typography>
+                    }
+                  >
+                    <i className='tabler-info-circle text-sm cursor-pointer' />
+                  </Tooltip>
+                  </>}
                   error={!!errors?.location}
                   helperText={errors?.location?.message}
                 />

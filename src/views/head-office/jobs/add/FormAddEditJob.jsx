@@ -301,6 +301,41 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
   })
 
+  const aboutCompanyEditor = useEditor({
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: 'outline-none'
+      }
+    },
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      }),
+      Underline,
+    ],
+
+    content: jobData?.about_company ?? ``,
+    onUpdate: ({ editor }) => {
+      setValue('aboutCompany', editor.getHTML())
+    }
+  })
+
   const rolesResponseEditor = useEditor({
     immediatelyRender: false,
     editorProps: {
@@ -539,7 +574,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 render={({field}) => (
                   <CustomTextField
                     fullWidth
-                    label={<>Job Title <span className='text-error'>*</span></>}
+                    label={<>Job Title/Search <span className='text-error'>*</span></>}
                     error={!!errors?.jobTitle} helperText={errors?.jobTitle?.message}
                     {...field}
                   />
@@ -783,7 +818,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
             </Grid>
             <Grid size={{ xs: 12  }}>
               <FormControl fullWidth>
-                <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Description <span className="text-error">*</span></FormLabel>
+                <FormLabel className={`${errors?.description ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.description}>Description <span className="text-error">*</span></FormLabel>
                 <Controller
                   control={control}
                   name='description'
@@ -799,7 +834,24 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 {errors?.description && <FormHelperText error>{errors?.description?.message}</FormHelperText>}
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12  }}>
+              <FormControl fullWidth>
+                <FormLabel className={`${errors?.aboutCompany ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.aboutCompany}>About Company</FormLabel>
+                <Controller
+                  control={control}
+                  name='aboutCompany'
+                  render={({field}) => (
+                    <div className={`border rounded-md ${errors?.aboutCompany && 'border-error'}`}>
+                      <EditorToolbar editor={aboutCompanyEditor} />
+                      <Divider className={errors?.aboutCompany && 'border-error'} />
+                      <EditorContent {...field} editor={aboutCompanyEditor} className='overflow-y-auto p-3' />
+                    </div>
+                  )}
+                />
+                {errors?.aboutCompany && <FormHelperText error>{errors?.aboutCompany?.message}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            {/* <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}
                 name='aboutCompany'
@@ -812,7 +864,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   />
                 )}
               />
-            </Grid>
+            </Grid> */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}

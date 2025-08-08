@@ -1,3 +1,5 @@
+import { useRouter } from 'next/navigation'
+
 // MUI Imports
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
@@ -10,6 +12,8 @@ import { Avatar, IconButton } from '@mui/material'
 import { format } from 'date-fns'
 
 const UserProfileHeader = ({ data, setOpenBasicForm }) => {
+
+  const router = useRouter();
 
   return (
     <Card>
@@ -41,10 +45,14 @@ const UserProfileHeader = ({ data, setOpenBasicForm }) => {
               </div>
             </div>
           </div>
-          {/* <Button variant='contained' className='flex gap-2'>
-            <i className='tabler-user-check !text-base'></i>
-            <span>Connected</span>
-          </Button> */}
+          <div className='flex gap-2'>
+            <Button variant='tonal' className='flex gap-2' startIcon={<i className='tabler-download'/>} disabled>
+              Resume
+            </Button>
+            <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
+              Go Back
+            </Button>
+          </div>
         </div>
       </CardContent>
 

@@ -456,7 +456,47 @@ const FormUserAdd = ({ statesData, designations, reportingManagers, userData }) 
                         <Grid size={{ xs: 12 }}>
                             <Typography variant="body2" className="font-medium">2. User Info</Typography>
                         </Grid>
+                        
 
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Controller name="reportingManager" control={control}
+                                rules={{ required: 'This field is required.' }}
+                                render={({ field }) => (
+                                    <Autocomplete
+                                        fullWidth
+
+                                        // {...field}
+
+                                        value={reportingManagers && reportingManagers.find(reporting => reporting.id === field.value) || null}
+                                        options={reportingManagers || []}
+                                        getOptionKey={option => option.id}
+                                        getOptionLabel={(reporting) => reporting.first_name + " " + reporting.last_name  || ''}
+                                        onChange={(event, value) => {
+                                            field.onChange(value?.id || '')
+                                        }}
+                                        renderInput={(params) => (
+                                            <CustomTextField
+                                                {...params}
+                                                label={<>Reporting Manager <span className='text-error'>*</span></>}
+                                                error={!!errors.reportingManager}
+                                                helperText={errors?.reportingManager?.message}
+                                            />
+                                        )}
+                                    />
+
+                                    // <CustomTextField select fullWidth label={<>Reporting Manager <span className='text-error'>*</span></>}
+                                    //     SelectProps={{ MenuProps }}
+                                    //     error={!!errors.reportingManager} helperText={errors?.reportingManager?.message} {...field}>
+                                    //         {reportingManagers && reportingManagers.length > 0 reportingManagers.map}
+                                    //     <MenuItem value="">Select Size</MenuItem>
+                                    //     <MenuItem value="0-10">0-10</MenuItem>
+                                    //     <MenuItem value="10-50">10-50</MenuItem>
+                                    //     <MenuItem value="50-100">50-100</MenuItem>
+                                    //     <MenuItem value="100+">100+</MenuItem>
+                                    // </CustomTextField>
+
+                                )} />
+                        </Grid>
 
                         {/* First & Last Name */}
                         {[
@@ -540,46 +580,6 @@ const FormUserAdd = ({ statesData, designations, reportingManagers, userData }) 
                                 render={({ field }) => (
                                     <CustomTextField fullWidth required={false} label='Alternate Phone' type="number"
                                         error={!!errors.alternatePhone} helperText={errors.alternatePhone?.message} {...field} />
-                                )} />
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Controller name="reportingManager" control={control}
-                                rules={{ required: 'This field is required.' }}
-                                render={({ field }) => (
-                                    <Autocomplete
-                                        fullWidth
-
-                                        // {...field}
-
-                                        value={reportingManagers && reportingManagers.find(reporting => reporting.id === field.value) || null}
-                                        options={reportingManagers || []}
-                                        getOptionKey={option => option.id}
-                                        getOptionLabel={(reporting) => reporting.first_name + " " + reporting.last_name  || ''}
-                                        onChange={(event, value) => {
-                                            field.onChange(value?.id || '')
-                                        }}
-                                        renderInput={(params) => (
-                                            <CustomTextField
-                                                {...params}
-                                                label={<>Reporting Manager <span className='text-error'>*</span></>}
-                                                error={!!errors.reportingManager}
-                                                helperText={errors?.reportingManager?.message}
-                                            />
-                                        )}
-                                    />
-
-                                    // <CustomTextField select fullWidth label={<>Reporting Manager <span className='text-error'>*</span></>}
-                                    //     SelectProps={{ MenuProps }}
-                                    //     error={!!errors.reportingManager} helperText={errors?.reportingManager?.message} {...field}>
-                                    //         {reportingManagers && reportingManagers.length > 0 reportingManagers.map}
-                                    //     <MenuItem value="">Select Size</MenuItem>
-                                    //     <MenuItem value="0-10">0-10</MenuItem>
-                                    //     <MenuItem value="10-50">10-50</MenuItem>
-                                    //     <MenuItem value="50-100">50-100</MenuItem>
-                                    //     <MenuItem value="100+">100+</MenuItem>
-                                    // </CustomTextField>
-
                                 )} />
                         </Grid>
                         {/* <Grid size={{ xs: 12, sm: 6 }}>
