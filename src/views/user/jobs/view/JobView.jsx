@@ -67,7 +67,11 @@ const JobView = ({ job, isCandidate }) => {
                 <div className='flex gap-5'>
                   <div className='flex gap-2 items-center'>
                     <i className='tabler-briefcase text-[20px]' />
+                    {job?.min_exp === 0 && job?.max_exp === 0 ?
+                    <Typography>Fresher</Typography>
+                  :
                     <Typography>{job?.min_exp}-{job?.max_exp} Years</Typography>
+                  }
                   </div>
                   <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
                   <div className="flex gap-2 items-center">

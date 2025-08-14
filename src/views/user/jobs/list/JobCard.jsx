@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 // MUI Imports
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Tooltip, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
@@ -31,6 +31,7 @@ import CustomIconButton from '@/@core/components/mui/IconButton'
 
 import CustomChip from '@/@core/components/mui/Chip'
 import DialogsConfirmation from '../DialogConfirmation'
+import InviteCandidateDialog from '../InviteCandidateDialog'
 
 const JobCard = ({job, isCandidate}) => {
 
@@ -54,6 +55,7 @@ const JobCard = ({job, isCandidate}) => {
 
   const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
   const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
+  const [openInviteCandidate, setOpenInviteCandidate] = useState(false);
   const [openApply, setOpenApply] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
@@ -84,7 +86,7 @@ const JobCard = ({job, isCandidate}) => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }} className='flex flex-wrap gap-2'>
-            {job?.min_exp && job?.max_exp ? <Chip label={job?.min_exp && job?.max_exp ? `${job?.min_exp}-${job?.max_exp} Yrs ` : '' } color='primary' variant='tonal' icon={ <i className='tabler-briefcase' /> } /> : ''}
+            {job?.min_exp && job?.max_exp ? <Chip label={job?.min_exp && job?.max_exp ? `${job?.min_exp}-${job?.max_exp} Yrs ` : '' } color='primary' variant='tonal' icon={ <i className='tabler-briefcase' /> } /> : <Chip label='Fresher' color='primary' variant='tonal' icon={ <i className='tabler-briefcase' /> } />}
             <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='tonal' icon={ <i className='tabler-currency-rupee' /> } />
             <Chip
               label={
@@ -138,16 +140,23 @@ const JobCard = ({job, isCandidate}) => {
             {isCandidate ?
               <div className='flex gap-2 flex-wrap'>
                 <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                {applied || <Tooltip title="Save Job"><CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
                   {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
-                </CustomIconButton>}
+                </CustomIconButton></Tooltip>}
                 {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
                   {applied ? 'Applied' : 'Apply'}
                 </Button>}
               </div>
              :
               <div className='flex gap-2'>
-                <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                <Tooltip title="Invite Candidate">
+                  <CustomIconButton onClick={() => setOpenInviteCandidate(true)} variant='outlined' color='primary' size='small'><i className='tabler-send' /></CustomIconButton>
+                </Tooltip>
+                <Tooltip title="View Job">
+                  <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}>
+                    <CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton>
+                  </Link>
+                </Tooltip>
                 {/* {authUser?.userType !== 'B' &&
                   <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
                 } */}
@@ -160,6 +169,7 @@ const JobCard = ({job, isCandidate}) => {
       <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
+      <InviteCandidateDialog open={openInviteCandidate} handleClose={() => setOpenInviteCandidate(!openInviteCandidate)} jobId={job?.id} />
     </Card>
   )
 }
