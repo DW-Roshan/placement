@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
-import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
 
 import {
   Button,
@@ -19,6 +18,8 @@ import {
 } from '@mui/material';
 
 import Grid from '@mui/material/Grid2';
+
+import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
 
 const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
   const {
