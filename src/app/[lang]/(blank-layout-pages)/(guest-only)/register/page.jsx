@@ -1,5 +1,5 @@
 // Component Imports
-import Register from '@views/Register'
+import CandidateRegister from '@/views/CandidateRegister'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
@@ -13,7 +13,11 @@ const RegisterPage = async () => {
   // Vars
   const mode = await getServerMode()
 
-  return <Register mode={mode} />
+  return (
+    <div className='flex flex-col justify-center items-center min-bs-[100dvh] p-6'>
+      <CandidateRegister mode={mode} />
+    </div>
+  )
 }
 
 export default RegisterPage

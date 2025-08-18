@@ -73,11 +73,13 @@ const JobView = ({ job, isCandidate }) => {
                     <Typography>{job?.min_exp}-{job?.max_exp} Years</Typography>
                   }
                   </div>
-                  <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
-                  <div className="flex gap-2 items-center">
-                    <i className='tabler-currency-rupee text-[20px]' />
-                    <Typography>{job?.min_ctc}-{job?.max_ctc} Lacs P.A.</Typography>
-                  </div>
+                  {!isCandidate && <>
+                    <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
+                    <div className="flex gap-2 items-center">
+                      <i className='tabler-currency-rupee text-[20px]' />
+                      <Typography>{job?.min_ctc}-{job?.max_ctc} Lacs P.A.</Typography>
+                    </div></>
+                  }
                 </div>
                 <div className='flex items-center gap-2'>
                   <i className='tabler-map-pin text-[20px] max-w-[20px] w-full' />
@@ -101,11 +103,17 @@ const JobView = ({ job, isCandidate }) => {
                   {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                   {applied ? 'Applied' : 'Apply'}
                 </Button>
-                :
-                <Button color='primary' className='gap-2' variant='contained' href={getLocalizedUrl(`/candidate/login`, 'en')}>
-                  {/* {loading && <CircularProgress size={20} color='inherit' />} */}
-                  {applied ? 'Applied' : 'Login to apply'}
-                </Button>}
+                : <>
+                  <Button color='primary' className='gap-2' variant='tonal' href={getLocalizedUrl(`/candidate/login`, 'en')}>
+                    {/* {loading && <CircularProgress size={20} color='inherit' />} */}
+                    {applied ? 'Applied' : 'Login to apply'}
+                  </Button>
+                  <Button color='primary' className='gap-2' variant='contained'>
+                    {/* {loading && <CircularProgress size={20} color='inherit' />} */}
+                    Register to apply
+                  </Button>
+                </>
+                }
                 </div>
               }
             </Grid>
@@ -115,10 +123,12 @@ const JobView = ({ job, isCandidate }) => {
             <Grid size={{ xs: 12 }}>
               <div className='flex gap-5 items-center'>
                 <Typography variant='h6' className='flex gap-2'>Posted: <div className='text-[var(--mui-palette-text-primary)]'>{job?.created_at && formatDistanceToNow(job?.created_at, {addSuffix: true})}</div></Typography>
-                <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
-                <Typography variant="h6" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
-                <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
-                <Typography variant="h6" className='flex gap-2'>Applicants: <div className='text-[var(--mui-palette-text-primary)]'>{job?.candidates?.length > 100 ? '100+' : job?.candidates?.length || 0}</div></Typography>
+                {!isCandidate && <>
+                  <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
+                  <Typography variant="h6" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
+                  <Divider orientation='vertical' variant="middle" sx={{ height: '18px' }} />
+                  <Typography variant="h6" className='flex gap-2'>Applicants: <div className='text-[var(--mui-palette-text-primary)]'>{job?.candidates?.length > 100 ? '100+' : job?.candidates?.length || 0}</div></Typography>
+                </>}
               </div>
             </Grid>
             <Grid size={{ xs: 12 }}>

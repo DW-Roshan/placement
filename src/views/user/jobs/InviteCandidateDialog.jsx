@@ -20,8 +20,14 @@ import {
 import Grid from '@mui/material/Grid2';
 
 import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
+import { useSession } from 'next-auth/react';
+import { toast } from 'react-toastify';
 
 const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
+
+  const {data:session} = useSession();
+  const token = session?.user?.token;
+
   const {
     handleSubmit,
     control,
@@ -29,6 +35,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
     formState: { errors, isValid },
     reset,
     trigger,
+    setError,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -49,13 +56,42 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
     trigger(['email', 'mobile']); // re-validate when email/mobile changes
   }, [email, mobile, trigger]);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+
+    if(!token) return null;
+
     if (!data.email && !data.mobile) return;
 
     console.log({
       jobId,
       ...data,
     });
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invite-job/${jobId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data)
+    })
+
+    const result = await res.json();
+
+    if (res.ok) {
+      toast.success(result?.message || 'Candidate invited successfully');
+    } else if (res.status === 422) {
+      Object.entries(result.errors).forEach(([field, messages]) => {
+        setError(field, {
+          type: 'custom',
+          message: messages[0], // Use the first error message for each field
+        });
+      });
+      return
+    } else {
+      toast.error(result?.message || 'Failed to invite candidate');
+      console.log('Error inviting candidate:', result);
+    }
 
     reset();
 

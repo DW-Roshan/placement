@@ -32,7 +32,7 @@ const userVerticalMenuData = dictionary => [
     icon: 'tabler-briefcase',
     children: [
       {
-        label: 'List',
+        label: 'View',
         icon: 'tabler-circle',
         href: '/jobs/list'
       },
@@ -42,7 +42,7 @@ const userVerticalMenuData = dictionary => [
       //   icon: 'tabler-circle',
       //   href: '/jobs/add'
       // }
-      
+
     ]
   },
   {

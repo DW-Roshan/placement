@@ -14,7 +14,7 @@ const fetchData = async (id) => {
 
   const session = await getServerSession(authOptions);
   const token = session?.user?.token;
-  const isCandidate = session?.user?.userType === 'candidate';
+  const isCandidate = !session || session?.user?.userType === 'candidate';
 
   try {
 
@@ -48,6 +48,8 @@ const ViewJobPage = async (props) => {
   const lang = params.lang;
   const id = params.id
   const data = await fetchData(id, lang);
+
+  console.log('invite view:', data);
 
   if (!data?.job) {
     redirect('/not-found')
