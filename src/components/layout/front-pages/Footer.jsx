@@ -41,14 +41,14 @@ const Footer = ({ mode }) => {
           <Grid container rowSpacing={10} columnSpacing={12}>
             <Grid size={{ xs: 12, lg: 5 }}>
               <div className='flex flex-col items-start gap-6'>
-                <Link href='/front-pages/landing-page'>
+                <Link href='/candidate/login'>
                   <Logo color='var(--mui-palette-common-white)' />
                 </Link>
-                <Typography color='white' className='md:max-is-[390px] opacity-[0.78]'>
+                {/* <Typography color='white' className='md:max-is-[390px] opacity-[0.78]'>
                   Most Powerful & Comprehensive 🤩 React NextJS Admin Template with Elegant Material Design & Unique
                   Layouts.
-                </Typography>
-                <div className='flex items-end'>
+                </Typography> */}
+                {/* <div className='flex items-end'>
                   <CustomTextField
                     size='small'
                     className={styles.inputBorder}
@@ -77,10 +77,10 @@ const Footer = ({ mode }) => {
                   >
                     Subscribe
                   </Button>
-                </div>
+                </div> */}
               </div>
             </Grid>
-            <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
+            {/* <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
               <Typography color='white' className='font-medium mbe-6 opacity-[0.92]'>
                 Pages
               </Typography>
@@ -158,7 +158,7 @@ const Footer = ({ mode }) => {
                   </div>
                 </Link>
               </div>
-            </Grid>
+            </Grid> */}
           </Grid>
         </div>
       </div>

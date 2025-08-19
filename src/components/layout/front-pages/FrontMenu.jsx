@@ -131,7 +131,7 @@ const FrontMenu = props => {
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
       /> */}
-      <Typography
+      {/* <Typography
         component={Link}
         color='text.primary'
         href='/'
@@ -139,7 +139,7 @@ const FrontMenu = props => {
         className='font-medium plb-3 pli-1.5 hover:text-primary'
       >
         Admin
-      </Typography>
+      </Typography> */}
     </Wrapper>
   )
 }

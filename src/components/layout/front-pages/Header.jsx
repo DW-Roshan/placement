@@ -64,17 +64,7 @@ const Header = ({ mode }) => {
           )}
           <div className='flex items-center gap-2 sm:gap-4'>
             <ModeDropdown />
-            <Button
-              component={Link}
-              variant='tonal'
-              href='/register'
-              className='whitespace-nowrap'
-              size='small'
-              color='success'
-            >
-              Register
-            </Button>
-            {isBelowLgScreen ? (
+            {/* {isBelowLgScreen ? (
               <CustomIconButton
                 component={Link}
                 variant='contained'
@@ -94,7 +84,7 @@ const Header = ({ mode }) => {
               >
                 Login
               </Button>
-            )}
+            )} */}
             {/* {isBelowLgScreen ? (
               <CustomIconButton
                 component={Link}

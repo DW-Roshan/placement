@@ -25,7 +25,7 @@ import classNames from 'classnames'
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 
-import { useSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 
 import { format, parse } from 'date-fns'
 
@@ -44,7 +44,7 @@ import { formatCTC } from '@/utils/formatCTC'
 
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
-const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleClose}) => {
+const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleClose, setAppliedSuccess}) => {
   // States
   const [data, setData] = useState();
   const [cities, setCities] = useState();
@@ -433,7 +433,28 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
       // router.push('/candidates/list');
 
-      toast.success(result?.message || 'Registered successfully.')
+
+      const res = await signIn('credentials', {
+        email: data.mobileNo,
+        password: data.mobileNo,
+        isCandidate: true,
+        redirect: false
+      })
+
+      if (res && res.ok && res.error === null) {
+
+        toast.success(result?.message || 'Registered successfully.')
+
+        setAppliedSuccess(true)
+
+        // Vars
+        // const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
+
+        // router.replace(getLocalizedUrl(redirectURL, locale))
+        
+      } else {
+        toast.error("Registered Login failed!")
+      }
 
       reset();
 
@@ -1158,7 +1179,7 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
         <Divider />
         <CardActions>
           <Button type='submit' variant='contained' className='mie-2'>
-            Submit
+            Submit & Apply
           </Button>
           <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset();}}>
             Reset

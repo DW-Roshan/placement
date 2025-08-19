@@ -25,7 +25,7 @@ import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 import AddCandidateForm from './AddCandidateForm'
 import DialogCloseButton from '@/components/dialogs/DialogCloseButton'
 
-const RegisterCandidate = ({ open, handleClose, jobId, jobUuid }) => {
+const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSuccess }) => {
   // States
   const [files, setFiles] = useState([])
   const [uploadedData, setUploadedData] = useState();
@@ -142,7 +142,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid }) => {
   const candidateForm = () => {
     return (<>
       <Card className='overflow-visible mt-5' variant='outlined'>
-        <AddCandidateForm candiData={uploadedData} self={true} jobId={jobId} jobUuid={jobUuid} handleClose={handleClose} />
+        <AddCandidateForm candiData={uploadedData} self={true} jobId={jobId} jobUuid={jobUuid} handleClose={handleClose} setAppliedSuccess={setAppliedSuccess} />
       </Card>
       </>
     )

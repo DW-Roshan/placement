@@ -20,7 +20,7 @@ import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
 import RegisterCandidate from "@/views/RegisterCandidate";
 
-const JobView = ({ job, isCandidate, jobUuid }) => {
+const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess }) => {
 
   const [applied, setApplied] = useState(false);
   const [openApply, setOpenApply] = useState(false);
@@ -181,7 +181,7 @@ const JobView = ({ job, isCandidate, jobUuid }) => {
       </CardContent>
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
-      <RegisterCandidate open={openRegister} handleClose={() => setOpenRegister(false)} jobId={job?.id} jobUuid={jobUuid} />
+      <RegisterCandidate open={openRegister} handleClose={() => setOpenRegister(false)} jobId={job?.id} jobUuid={jobUuid} setAppliedSuccess={setAppliedSuccess} />
     </Card>
   )
 }
