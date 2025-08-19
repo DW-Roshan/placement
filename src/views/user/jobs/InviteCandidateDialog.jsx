@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useForm, Controller } from 'react-hook-form';
 
@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -26,6 +27,8 @@ import { useSession } from 'next-auth/react';
 import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
 
 const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
+
+  const [loading, setLoading] = useState(false)
 
   const {data:session} = useSession();
   const token = session?.user?.token;
@@ -51,18 +54,21 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
 
   const email = watch('email');
   const mobile = watch('mobile');
+  const sendSMS = watch('sendSMS');
   const sendEmail = watch('sendEmail');
 
   // Watch email and mobile to dynamically enable/disable checkboxes
   useEffect(() => {
     trigger(['email', 'mobile']); // re-validate when email/mobile changes
-  }, [email, mobile, trigger]);
+  }, [sendSMS, sendEmail, trigger]);
 
   const onSubmit = async (data) => {
 
     if(!token) return null;
 
     if (!data.email && !data.mobile) return;
+
+    setLoading(true)
 
     console.log({
       jobId,
@@ -90,16 +96,14 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
         });
       });
 
-      return
-
     } else {
       toast.error(result?.message || 'Failed to invite candidate');
-      console.log('Error inviting candidate:', result);
     }
 
     reset();
 
     handleClose();
+    setLoading(false)
   };
 
   // useEffect(() => {
@@ -142,16 +146,12 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
               <Controller
                 name="name"
                 control={control}
-                rules={{
-                  required: 'Name is required'
-                }}
                 render={({ field }) => (
                   <TextField
                     {...field}
                     fullWidth
                     size="small"
                     label="Name"
-                    required
                     placeholder="John Doe"
                     error={!!errors.name}
                     helperText={errors.name?.message}
@@ -164,9 +164,9 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                 name="mobile"
                 control={control}
                 rules={{
+                  required: sendSMS ? 'This field is required' : false,
                   validate: (value) => {
 
-                    if (!value && !email) return 'Email or mobile is required';
                     if (value && !/^\d{10}$/.test(value)) return 'Mobile must be 10 digits';
 
                     return true;
@@ -178,6 +178,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                     fullWidth
                     size="small"
                     label="Mobile No."
+                    required={sendSMS}
                     placeholder="9876543210"
                     error={!!errors.mobile}
                     helperText={errors.mobile?.message}
@@ -192,9 +193,9 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                   name="email"
                   control={control}
                   rules={{
+                    required: sendEmail ? 'This field is required' : false,
                     validate: (value) => {
 
-                      if (!value && !mobile) return 'Email or mobile is required';
                       if (value && !/^\S+@\S+\.\S+$/.test(value)) return 'Invalid email format';
                       if (value && value.length < 5) return 'Email is too short';
                       if (value && value.length > 100) return 'Email is too long';
@@ -206,6 +207,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                     <TextField
                       {...field}
                       fullWidth
+                      required={sendEmail}
                       size="small"
                       label="Email ID"
                       placeholder="user@example.com"
@@ -229,8 +231,6 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                           {...field}
                           checked={field.value}
                           onChange={(e) => field.onChange(e.target.checked)}
-
-                          // disabled={!mobile}
 
                         />
                       }
@@ -259,10 +259,9 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
               <Button
                 variant="contained"
                 type="submit"
-
-                // disabled={!email && !mobile || !isValid}
-
+                disabled={!sendSMS && !sendEmail || loading}
               >
+                {loading && <CircularProgress size={20} color='inherit' />}
                 Invite
               </Button>
             </Grid>

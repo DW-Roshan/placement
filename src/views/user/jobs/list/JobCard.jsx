@@ -158,9 +158,11 @@ const JobCard = ({job, isCandidate}) => {
               </div>
              :
               <div className='flex gap-2'>
-                <Tooltip title="Invite Candidate">
-                  <CustomIconButton onClick={() => setOpenInviteCandidate(true)} variant='outlined' color='primary' size='small'><i className='tabler-send' /></CustomIconButton>
-                </Tooltip>
+                {authUser?.userType === 'U' &&
+                  <Tooltip title="Invite Candidate">
+                    <CustomIconButton onClick={() => setOpenInviteCandidate(true)} variant='outlined' color='primary' size='small'><i className='tabler-send' /></CustomIconButton>
+                  </Tooltip>
+                }
                 <Tooltip title="View Job">
                   <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}>
                     <CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton>
