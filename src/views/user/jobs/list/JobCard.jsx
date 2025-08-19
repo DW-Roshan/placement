@@ -86,7 +86,16 @@ const JobCard = ({job, isCandidate}) => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }} className='flex flex-wrap gap-2'>
-            {job?.min_exp && job?.max_exp ? <Chip label={job?.min_exp && job?.max_exp ? `${job?.min_exp}-${job?.max_exp} Yrs ` : '' } color='primary' variant='tonal' icon={ <i className='tabler-briefcase' /> } /> : <Chip label='Fresher' color='primary' variant='tonal' icon={ <i className='tabler-briefcase' /> } />}
+            <Chip
+              label={
+                job?.min_exp === 0 && job?.max_exp === 0
+                  ? 'Fresher'
+                  : `${job?.min_exp ?? 0}-${job?.max_exp ?? 0} Yrs`
+              }
+              color='primary'
+              variant='tonal'
+              icon={<i className='tabler-briefcase' />}
+            />
             <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='tonal' icon={ <i className='tabler-currency-rupee' /> } />
             <Chip
               label={

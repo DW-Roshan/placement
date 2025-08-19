@@ -57,7 +57,7 @@ const ViewJobPage = async (props) => {
 
   return (
     <section className={classNames('md:plb-[100px] plb-6', frontCommonStyles.layoutSpacing)}>
-      <JobView job={data?.job} isCandidate={data?.isCandidate} />
+      <JobView job={data?.job} isCandidate={data?.isCandidate} jobUuid={id} />
     </section>
   )
 

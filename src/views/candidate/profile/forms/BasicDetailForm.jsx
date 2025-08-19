@@ -46,7 +46,8 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
 
   // console.log('industry:', data)
 
-  const [selected, setSelected] = useState(data?.work_status || '')
+  // const [selected, setSelected] = useState(data?.work_status || '')
+
   const { data: session } = useSession()
   const token = session?.user?.token
   const router = useRouter();
@@ -77,9 +78,9 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
     return months;
   }
 
-  const handleChange = (prop) => {
-    setSelected(prop)
-  }
+  // const handleChange = (prop) => {
+  //   setSelected(prop)
+  // }
 
   const monthSet = new Set();
 
@@ -108,7 +109,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
       city: data?.city_id || '',
       profileTitle: data?.profile_title || '',
       profileSummary: data?.profile_summary || '',
-      workStatus: data?.work_status || selected || '',
+      workStatus: data?.work_status || '',
       totalExperience: data?.total_experience || '',
       years: years.toString() ||'',
       months: months.toString() ||'',
@@ -181,6 +182,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
 
   const selectedYears = watch('years');
   const selectedMonths = watch('months');
+  const workStatus = watch('workStatus');
 
   return (
     <Dialog
@@ -405,7 +407,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
                       }}
                       error={true}
                       selected={field.value}
-                      handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                      handleChange={(e) => {field.onChange(e)}}
                       gridProps={{ size: { xs: 12, sm: 6 } }}
                     /></>
                   )}
@@ -426,7 +428,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
                         value: 'fresher'
                       }}
                       selected={field.value}
-                      handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                      handleChange={(e) => {field.onChange(e)}}
                       gridProps={{ size: { xs: 12, sm: 6 } }}
                     />
                   )}
@@ -435,7 +437,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
                 {errors?.workStatus && <FormHelperText error>{errors?.workStatus?.message}</FormHelperText>}
               </Grid>
             </Grid>
-            {selected === 'experienced' &&
+            {workStatus === 'experienced' &&
               <Grid container spacing={5} size={{ xs: 12, sm: 6 }}>
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth error={Boolean(errors?.years || errors?.months)}>
@@ -575,7 +577,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
           <Button type='submit' variant='contained' className='mie-2'>
             Submit
           </Button>
-          <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset(); setSelected(data?.work_status || ''); }}>
+          <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset();}}>
             Reset
           </Button>
         </CardActions>

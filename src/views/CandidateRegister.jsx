@@ -19,6 +19,12 @@ import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Divider from '@mui/material/Divider'
 
+import { toast } from 'react-toastify'
+
+import { Autocomplete, FormControl, FormHelperText, FormLabel, Tab } from '@mui/material'
+
+import { Controller, useForm } from 'react-hook-form'
+
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
@@ -28,19 +34,21 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
-import { Controller, useForm } from 'react-hook-form'
-import { Autocomplete, FormControl, FormHelperText, FormLabel, Tab } from '@mui/material'
+
+
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
+
 import { experienceData, MenuProps, monthsOpt, yearsOpt } from '@/configs/customDataConfig'
 
 import { formatCTC } from '@/utils/formatCTC'
-import { toast } from 'react-toastify'
 
 const CandidateRegister = () => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
-  const [selected, setSelected] = useState('')
+
+  // const [selected, setSelected] = useState('')
+
   const [cities, setCities] = useState();
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
@@ -62,7 +70,7 @@ const CandidateRegister = () => {
       city: '',
       profileTitle: '',
       profileSummary: '',
-      workStatus: selected || '',
+      workStatus: '',
       totalExperience: '',
       years: '',
       months: '',
@@ -71,15 +79,16 @@ const CandidateRegister = () => {
     }
   })
 
-  const handleChange = (prop) => {
-    setSelected(prop)
+  // const handleChange = (prop) => {
+  //   setSelected(prop)
 
-    // console.log("work status", prop)
-  }
+  //   // console.log("work status", prop)
+  // }
 
   const selectedYears = watch('years');
   const selectedMonths = watch('months');
   const password = watch('password');
+  const workStatus = watch('workStatus');
 
   const onSubmit = async (data) => {
 
@@ -419,14 +428,13 @@ const CandidateRegister = () => {
                     render={({ field }) => {
                       const onChange = (e) => {
                         field.onChange(e);
-                        handleChange?.(e); // Call your custom change handler if provided
                       };
 
                       return (
                         <>
                           <CustomInputVertical
                             {...field}
-                            // type="radio"
+                            type="radio"
                             data={{
                               meta: 'Free',
                               title: 'Experienced',
@@ -441,7 +449,7 @@ const CandidateRegister = () => {
 
                           <CustomInputVertical
                             {...field}
-                            // type="radio"
+                            type="radio"
                             data={{
                               meta: 'Free',
                               title: 'Fresher',
@@ -465,7 +473,7 @@ const CandidateRegister = () => {
                   )}
                 </Grid>
               </Grid>
-              {selected === 'experienced' &&
+              {workStatus === 'experienced' &&
                 <Grid container spacing={5} size={{ xs: 12 }}>
                   <Grid size={{ xs: 12 }}>
                     <FormControl fullWidth error={Boolean(errors?.years || errors?.months)}>

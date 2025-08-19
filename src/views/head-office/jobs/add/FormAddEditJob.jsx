@@ -535,7 +535,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
 
   }, [token, locations]);
-  
+
   useEffect(() => {
     if (branchData.length && jobId) {
       const matchingIds = branchData
@@ -887,6 +887,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   >
                     <MenuItem value='10th'>10th</MenuItem>
                     <MenuItem value='12th'>12th</MenuItem>
+                    <MenuItem value='Diploma'>Diploma</MenuItem>
+                    <MenuItem value='Graduate'>Graduate</MenuItem>
                     <MenuItem value='UG'>UG</MenuItem>
                     <MenuItem value='PG'>PG</MenuItem>
                     <MenuItem value='PHD'>PHD</MenuItem>
@@ -1221,13 +1223,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     }
                     renderOption={(props, option, { selected }) => {
                       const { key, ...rest } = props;
-      
+
                       return (
                         <li key={key} {...rest}>
                           <Checkbox
                             size="small"
                             checked={selected}
-                            
+
                             // onClick={(e) => e.stopPropagation()}
                             style={{ marginRight: 8 }}
                           />

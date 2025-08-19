@@ -822,6 +822,8 @@ const FormAddEditJob = ({ jobId, skillsData, industries, departments, jobData, l
                   >
                     <MenuItem value='10th'>10th</MenuItem>
                     <MenuItem value='12th'>12th</MenuItem>
+                    <MenuItem value='Diploma'>Diploma</MenuItem>
+                    <MenuItem value='Graduate'>Graduate</MenuItem>
                     <MenuItem value='UG'>UG</MenuItem>
                     <MenuItem value='PG'>PG</MenuItem>
                     <MenuItem value='PHD'>PHD</MenuItem>

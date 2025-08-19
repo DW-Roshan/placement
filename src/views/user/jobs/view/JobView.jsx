@@ -18,13 +18,15 @@ import CustomChip from "@/@core/components/mui/Chip";
 import DialogsConfirmation from "../DialogConfirmation";
 import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
+import RegisterCandidate from "@/views/RegisterCandidate";
 
-const JobView = ({ job, isCandidate }) => {
+const JobView = ({ job, isCandidate, jobUuid }) => {
 
   const [applied, setApplied] = useState(false);
   const [openApply, setOpenApply] = useState(false);
   const [saved, setSaved] = useState(false);
   const [openSave, setOpenSave] = useState(false);
+  const [openRegister, setOpenRegister] = useState(false);
 
   const {data: session, status} = useSession();
   const token = session?.user?.token;
@@ -108,7 +110,7 @@ const JobView = ({ job, isCandidate }) => {
                     {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                     {applied ? 'Applied' : 'Login to apply'}
                   </Button>
-                  <Button color='primary' className='gap-2' variant='contained'>
+                  <Button color='primary' className='gap-2' variant='contained' onClick={() => setOpenRegister(true)}>
                     {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                     Register to apply
                   </Button>
@@ -179,6 +181,7 @@ const JobView = ({ job, isCandidate }) => {
       </CardContent>
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
+      <RegisterCandidate open={openRegister} handleClose={() => setOpenRegister(false)} jobId={job?.id} jobUuid={jobUuid} />
     </Card>
   )
 }

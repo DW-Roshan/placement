@@ -19,9 +19,11 @@ import {
 
 import Grid from '@mui/material/Grid2';
 
-import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
-import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
+
+import { useSession } from 'next-auth/react';
+
+import DialogCloseButton from '@/components/dialogs/DialogCloseButton';
 
 const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
 
@@ -87,7 +89,9 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
           message: messages[0], // Use the first error message for each field
         });
       });
+
       return
+
     } else {
       toast.error(result?.message || 'Failed to invite candidate');
       console.log('Error inviting candidate:', result);

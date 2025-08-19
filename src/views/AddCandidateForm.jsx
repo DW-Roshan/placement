@@ -29,6 +29,8 @@ import { useSession } from 'next-auth/react'
 
 import { format, parse } from 'date-fns'
 
+import { toast } from 'react-toastify'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
@@ -42,7 +44,7 @@ import { formatCTC } from '@/utils/formatCTC'
 
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
-const AddCandidateForm = ({candidateId, candiData}) => {
+const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleClose}) => {
   // States
   const [data, setData] = useState();
   const [cities, setCities] = useState();
@@ -55,7 +57,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   const router = useRouter();
   const [value, setTabValue] = useState('personal_info')
 
-  const [selected, setSelected] = useState('')
+  // const [selected, setSelected] = useState('')
 
   const [matchedIndustry, setMatchedIndustry] = useState(null);
   const [matchedDepartment, setMatchedDepartment] = useState(null);
@@ -106,6 +108,9 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       const newStatus = candidateData.experience.length > 0 ? 'experienced' : 'fresher';
 
       if (candidateData.work_status !== newStatus) {
+
+        // setSelected(newStatus)
+
         setCandidateData(prev => ({
           ...prev,
           work_status: newStatus
@@ -160,6 +165,9 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           setCities(jsonData.cities || []);
           setIndustries(jsonData.industries);
           setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate?.industry_id)?.departments)
+
+          // setSelected(jsonData.candidate.work_status || '')
+
           setCandidateData(jsonData.candidate || null);
 
           // setData(jsonData);
@@ -210,40 +218,40 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   }, [token]);
 
   useEffect(() => {
+    if(self){
+      console.log("self candidate upload")
 
-    const addIndustry = async (industryName) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/industry/store`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        method: 'post',
-        body: JSON.stringify({
-          name: industryName,
-        })
-      });
+      const fetchData = async () => {
 
-      if(res.ok){
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/industry`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        // const token = await getCookie('token');
 
-        const data = await response.json();
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate-register`, {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
 
-        const matched = data?.industries ? data?.industries.find(
-          (industry) => industry?.name?.toLowerCase() === (candidateData?.industry || '')?.toLowerCase()
-        ) : '';
+          const jsonData = await response.json();
 
-        setMatchedIndustry(matched || null);
+          setCities(jsonData.cities || []);
+          setIndustries(jsonData.industries);
 
-        setIndustries(data?.industries || []);
-      }
+          setDepartments(jsonData.industryDepartments || null);
+
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setCities(null);
+          setIndustries(null);
+          setDepartments(null);
+        }
+      };
+
+      fetchData();
     }
+  }, [self])
 
-    if(token){
+  useEffect(() => {
 
       if(candidateData) {
 
@@ -259,14 +267,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
             ) : '';
           }
 
-          // console.log("matched Industry:", matched, industries)
-
-          if(!matched && candidateData?.industry?.trim()) {
-            addIndustry(candidateData?.industry?.trim());
-          } else {
-
-            setMatchedIndustry(matched || null);
-          }
+          setMatchedIndustry(matched || null);
 
         }
 
@@ -302,7 +303,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
       }
 
-    }
+    // }
 
   }, [candidateData, token, industries, departments, cities]);
 
@@ -385,11 +386,9 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           }
         ]
       ),
-      createAccount: candidateData?.is_account === 1 ? true : false
+      createAccount: true
     }
   });
-
-  // console.log("candidateData", candidateData);
 
   const { fields: educationField, append: appendEducation, remove:removeEducation } = useFieldArray({
     control,
@@ -412,97 +411,62 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
     const payload = {
       ...data,
-      experiences: filteredExperiences
+      experiences: filteredExperiences,
+      jobId: jobId,
+      jobUuid: jobUuid
     };
 
-    // const token = await getCookie('token');
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/register`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
 
-    if(token){
+    const result = await res.json();
 
-      if(candidateId){
+    if(res.ok){
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/${candidateId}`, {
-          method: 'put',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
+      // sessionStorage.setItem('success', result.message);
+
+      // router.push('/candidates/list');
+
+      toast.success(result?.message || 'Registered successfully.')
+
+      reset();
+
+      handleClose()
+
+
+    } else if(res.status == 422) {
+
+      toast.error(result?.message || 'Error in Validation')
+
+      // Laravel returns validation errors in the `errors` object
+      Object.entries(result.errors).forEach(([field, messages]) => {
+        setError(field, {
+          type: 'custom',
+          message: messages[0], // Use the first error message for each field
         });
+      });
 
-        const result = await res.json();
+    } else {
+      // sessionStorage.setItem('error', result.message);
 
-        if(res.ok){
+      // router.push('/candidates/list');
 
-          sessionStorage.setItem('success', result.message);
-
-          router.push('/candidates/list');
-
-          reset();
+      toast.error(result?.message || 'Something went wrong.')
 
 
-        } else if(res.status == 422) {
-
-          // Laravel returns validation errors in the `errors` object
-          Object.entries(result.errors).forEach(([field, messages]) => {
-            setError(field, {
-              type: 'custom',
-              message: messages[0], // Use the first error message for each field
-            });
-          });
-
-        } else {
-          sessionStorage.setItem('error', result.message);
-
-          router.push('/candidates/list');
-
-        }
-
-      } else {
-
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/store`, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await res.json();
-
-        if(res.ok){
-
-          sessionStorage.setItem('success', result.message);
-
-          router.push('/candidates/list');
-
-          reset();
-
-
-        } else if(res.status == 422) {
-
-          // Laravel returns validation errors in the `errors` object
-          Object.entries(result.errors).forEach(([field, messages]) => {
-            setError(field, {
-              type: 'custom',
-              message: messages[0], // Use the first error message for each field
-            });
-          });
-
-        } else {
-          sessionStorage.setItem('error', result.message);
-
-          router.push('/candidates/list');
-
-        }
-      }
     }
   };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue)
   }
+
 
   const selectedYears = watch('years');
   const selectedMonths = watch('months');
@@ -572,6 +536,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                     }
                   }}
                   render={({ field }) => (
+                    <>
                     <CustomTextField
                       fullWidth
                       required={false}
@@ -587,6 +552,8 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                         inputMode: 'tel',
                       }}
                     />
+                    <FormHelperText>Mobile No. will be default password</FormHelperText>
+                    </>
                   )}
                 />
               </Grid>
@@ -713,7 +680,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                       <CustomInputVertical
                       {...field}
 
-                        // type='radio'
+                        type='radio'
 
                         data={{
                           meta: 'Free',
@@ -723,7 +690,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                         }}
                         error={true}
                         selected={field.value}
-                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        handleChange={(e) => {field.onChange(e)}}
                         gridProps={{ size: { xs: 12, sm: 6 } }}
                       /></>
                     )}
@@ -737,7 +704,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                     render={({ field }) => (
                       <CustomInputVertical
 
-                        // type='radio'
+                        type='radio'
 
                         data={{
                           meta: 'Free',
@@ -746,7 +713,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                           value: 'fresher'
                         }}
                         selected={field.value}
-                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        handleChange={(e) => {field.onChange(e)}}
                         gridProps={{ size: { xs: 12, sm: 6 } }}
                       />
                     )}
@@ -888,20 +855,6 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                   </Grid>
                 </Grid>
               }
-
-              <Grid size={{ xs: 12 }}>
-                <FormControl error={Boolean(errors.checkbox)}>
-                  <Controller
-                    name='createAccount'
-                    control={control}
-                    render={({ field }) => (
-                      <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Create Account' />
-                    )}
-                  />
-                  <FormHelperText>Mobile No. will be default password</FormHelperText>
-                  {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
-                </FormControl>
-              </Grid>
             </Grid>
           </TabPanel>
           <TabPanel value='experience'>
