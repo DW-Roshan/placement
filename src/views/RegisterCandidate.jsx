@@ -18,7 +18,7 @@ import { useDropzone } from 'react-dropzone'
 
 import { useSession } from 'next-auth/react'
 
-import { Card, CardContent, Dialog } from '@mui/material'
+import { Card, CardContent, CardHeader, Checkbox, Dialog, Divider, FormControlLabel, FormGroup } from '@mui/material'
 
 import AppReactDropzone from '@/libs/styles/AppReactDropzone'
 
@@ -29,6 +29,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
   // States
   const [files, setFiles] = useState([])
   const [uploadedData, setUploadedData] = useState();
+  const [manualFill, setManualFill] = useState(false)
 
   const { data: session } = useSession();
   const token = session?.user?.token;
@@ -168,6 +169,8 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
         <i className='tabler-x' />
       </DialogCloseButton>
       <Card>
+        <CardHeader title='Register and Apply' />
+        <Divider />
         <CardContent>
           <AppReactDropzone>
             <div {...getRootProps({ className: 'dropzone' })}>
@@ -185,7 +188,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
                   <i className='tabler-upload' />
                 </Avatar>
                 <Typography variant='h4' className='mbe-2.5'>
-                  Drop files here or click to upload.
+                  Drop Resume here or click to upload.
                 </Typography>
                 <Typography>Allowed *.pdf</Typography>
                 <Typography>Only 1 file and max size of 2 MB</Typography>
@@ -200,6 +203,9 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
               </>
             ) : null}
           </AppReactDropzone>
+          <Divider className='py-4'>OR</Divider>
+          <FormControlLabel label='Manually fill form' control={<Checkbox name='manualFill' checked={manualFill} onClick={() => setManualFill(!manualFill)} />} />
+            {manualFill && candidateForm()}
         </CardContent>
       </Card>
     </Dialog>

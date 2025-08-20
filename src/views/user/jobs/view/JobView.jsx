@@ -84,7 +84,7 @@ const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) =
                   }
                 </div>
                 <div className='flex items-center gap-2'>
-                  <i className='tabler-map-pin text-[20px] max-w-[20px] w-full' />
+                  <i className='tabler-map-pin text-[20px] max-w-[20px]' />
                   <Typography>{job?.locations?.map(loc => loc?.city_name).join(', ')}</Typography>
                 </div>
               </div>
