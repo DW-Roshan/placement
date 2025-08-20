@@ -120,6 +120,8 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
     }
   }, [candidateData]);
 
+  console.log("candidate data from api:", candidateData)
+
 
   function parseDateFromString(dateStr) {
     if (!dateStr) return null;
@@ -447,7 +449,7 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
         toast.success(result?.message || 'Registered successfully.')
 
         router.push('/candidate/jobs/applied-success');
-        
+
         // setAppliedSuccess(true)
 
         // Vars

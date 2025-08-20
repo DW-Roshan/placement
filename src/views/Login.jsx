@@ -298,13 +298,13 @@ const Login = ({ mode, isCandidate }) => {
               {loading && <CircularProgress size={20} color='inherit' />}
               { jobApply ? 'Login & Apply' : 'Login' }
             </Button>
-            {/* <div className='flex justify-center items-center flex-wrap gap-2'>
+            <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
-              <Typography component={Link} href={getLocalizedUrl('/register', locale)} color='primary.main'>
-                Create an account
+              <Typography component={Link} href={getLocalizedUrl('/candidate/login', locale)} color='primary.main'>
+                Register & Apply
               </Typography>
             </div>
-            <Divider className='gap-2'>or</Divider>
+            {/* <Divider className='gap-2'>or</Divider>
             <Button
               color='secondary'
               className='self-center text-textPrimary'
