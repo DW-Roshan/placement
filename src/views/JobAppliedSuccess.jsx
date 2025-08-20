@@ -18,10 +18,10 @@ const JobAppliedSuccess = () => {
 
         {/* ✅ Success Text */}
         <Typography variant="h4" gutterBottom>
-          Thank you for applying! 
+          Thank you for applying!
         </Typography>
         <Typography variant="body1" mb={2}>
-          We’ve received your Resume and truly appreciate your interest in this opportunity. 
+          We’ve received your Resume and truly appreciate your interest in this opportunity.
         </Typography>
         <Typography variant="body1" mb={2}>
           Our team will connect with you for the next step.
@@ -34,14 +34,14 @@ const JobAppliedSuccess = () => {
         </Typography>
 
         {/* ✅ Call to Action */}
-        <Button
+        {/* <Button
           href="/candidate/dashboard"
           variant="contained"
           color="primary"
           size="large"
         >
           Go To Dashboard
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

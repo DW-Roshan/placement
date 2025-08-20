@@ -20,7 +20,7 @@ import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
 import RegisterCandidate from "@/views/RegisterCandidate";
 
-const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess }) => {
+const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
 
   const [applied, setApplied] = useState(false);
   const [openApply, setOpenApply] = useState(false);
@@ -106,7 +106,7 @@ const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess }) => {
                   {applied ? 'Applied' : 'Apply'}
                 </Button>
                 : <>
-                  <Button color='primary' className='gap-2' variant='tonal' href={getLocalizedUrl(`/candidate/login`, 'en')}>
+                  <Button color='primary' className='gap-2' variant='tonal' href={getLocalizedUrl(`/candidate/login?apply_job=${job?.uuid}`, 'en')}>
                     {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                     {applied ? 'Applied' : 'Login to apply'}
                   </Button>

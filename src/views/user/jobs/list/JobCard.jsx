@@ -149,9 +149,9 @@ const JobCard = ({job, isCandidate}) => {
             {isCandidate ?
               <div className='flex gap-2 flex-wrap'>
                 <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <Tooltip title="Save Job"><CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                {applied || <Tooltip title="Save Job"><span><CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
                   {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
-                </CustomIconButton></Tooltip>}
+                </CustomIconButton></span></Tooltip>}
                 {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
                   {applied ? 'Applied' : 'Apply'}
                 </Button>}

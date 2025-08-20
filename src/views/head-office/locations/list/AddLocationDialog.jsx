@@ -22,7 +22,7 @@ import DialogCloseButton from "@/components/dialogs/DialogCloseButton";
 
 import CustomTextField from '@/@core/components/mui/TextField';
 
-const AddLocationDialog = ({open, handleClose, stateData, locationData}) => {
+const AddLocationDialog = ({open, handleClose, stateData, locationData, setData}) => {
 
   const { data: session } = useSession()
   const token = session?.user?.token;
@@ -37,14 +37,14 @@ const AddLocationDialog = ({open, handleClose, stateData, locationData}) => {
       }],
     }
   });
-  
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'locations',
   });
 
   const onSubmit = async (data) => {
-  
+
     console.log("submitted data:", data)
 
     setLoading(true);
@@ -63,6 +63,8 @@ const AddLocationDialog = ({open, handleClose, stateData, locationData}) => {
     if(res.ok){
 
       console.log("success: ", result);
+
+      setData(result?.locations)
 
       toast.success(result.message, {
         autoClose: 3000,

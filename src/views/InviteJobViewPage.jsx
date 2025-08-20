@@ -2,27 +2,27 @@
 
 import { useState } from "react";
 
+import { redirect } from "next/navigation";
+
 import classNames from "classnames";
 
 import frontCommonStyles from '../app/jobs/styles.module.css'
 
 import JobView from "@/views/user/jobs/view/JobView";
 
-import JobAppliedSuccess from "./JobAppliedSuccess";
-
 const InviteJobViewPage = ({ data, id }) => {
 
   const [appliedSuccess, setAppliedSuccess] = useState(false);
 
   if(appliedSuccess){
-    return (
-      <JobAppliedSuccess />
-    )
+
+    redirect('/candidate/jobs/applied-success')
+
   }
 
   return (
     <section className={classNames('plb-6', frontCommonStyles.layoutSpacing)}>
-      <JobView job={data?.job} isCandidate={data?.isCandidate} jobUuid={id} setAppliedSuccess={setAppliedSuccess} />
+      <JobView job={data?.job} isCandidate={data?.isCandidate} jobUuid={id} setAppliedSuccess={setAppliedSuccess} registered={data?.registered} />
     </section>
   )
 

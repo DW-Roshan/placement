@@ -20,7 +20,7 @@ import Divider from '@mui/material/Divider'
 import Alert from '@mui/material/Alert'
 
 // Third-party Imports
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { email, object, minLength, string, pipe, nonEmpty } from 'valibot'
@@ -103,6 +103,7 @@ const Login = ({ mode, isCandidate }) => {
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
   const [loading, setLoading] = useState(false)
+  const jobApply = searchParams.get('apply_job') || null;
 
   const {
     control,
@@ -150,14 +151,26 @@ const Login = ({ mode, isCandidate }) => {
         email: data.username,
         password: data.password,
         isCandidate: Boolean(isCandidate),
+        jobApply: jobApply,
         redirect: false
       })
 
       if (res && res.ok && res.error === null) {
-        // Vars
-        const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
 
-        router.replace(getLocalizedUrl(redirectURL, locale))
+        if(jobApply){
+
+          const redirectURL = '/candidate/jobs/applied-success'
+
+          router.replace(getLocalizedUrl(redirectURL, locale))
+
+        } else{
+
+          // Vars
+          const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
+
+          router.replace(getLocalizedUrl(redirectURL, locale))
+        }
+
       } else {
         if (res?.error) {
           const error = JSON.parse(res.error)
@@ -170,6 +183,8 @@ const Login = ({ mode, isCandidate }) => {
       toast.error("Something went wrong. Server is not working", {
         autoClose: 3000
       });
+
+      console.log("error:", error)
     } finally {
       setLoading(false)
     }
@@ -281,7 +296,7 @@ const Login = ({ mode, isCandidate }) => {
             </div> */}
             <Button fullWidth variant='contained' type='submit' className='gap-2' disabled={loading}>
               {loading && <CircularProgress size={20} color='inherit' />}
-              Login
+              { jobApply ? 'Login & Apply' : 'Login' }
             </Button>
             {/* <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>

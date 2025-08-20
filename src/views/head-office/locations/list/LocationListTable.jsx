@@ -155,7 +155,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
     if(!isAdmin){
       return
     }
-    
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/locations/${id}/changeStatus`, {
       method: 'post',
       headers: {
@@ -167,7 +167,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
     const result = await res.json();
 
     if(res?.ok){
-    
+
       toast.success(result?.message, {
         autoClose: 3000,
         hideProgressBar: false
@@ -233,7 +233,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
               variant='tonal'
               label={row.original?.is_active == 1 ? 'Active' : 'Inactive'}
               size='small'
-              color={userStatusObj[row.original?.status]}
+              color={row.original?.is_active == 1 ? 'success' : 'error'}
               className='capitalize'
               onClick={() => handleChangeStatus(row.original?.id)}
             />

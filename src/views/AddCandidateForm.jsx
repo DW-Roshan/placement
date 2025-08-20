@@ -18,7 +18,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
-import { Autocomplete, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, Tab } from '@mui/material'
+import { Autocomplete, Checkbox, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Tab } from '@mui/material'
 
 // Components Imports
 import classNames from 'classnames'
@@ -50,6 +50,7 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
   const [cities, setCities] = useState();
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
+  const [loading, setLoading] = useState(false);
   const [candidateData, setCandidateData] = useState(candiData);
   const { data: session } = useSession()
   const token = session?.user?.token
@@ -402,6 +403,8 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
   const onSubmit = async (data) => {
 
+    setLoading(true);
+
     // console.log("data:", data);
 
     // Filter out completely blank experiences
@@ -431,8 +434,6 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
       // sessionStorage.setItem('success', result.message);
 
-      // router.push('/candidates/list');
-
 
       const res = await signIn('credentials', {
         email: data.mobileNo,
@@ -445,13 +446,15 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
         toast.success(result?.message || 'Registered successfully.')
 
-        setAppliedSuccess(true)
+        router.push('/candidate/jobs/applied-success');
+        
+        // setAppliedSuccess(true)
 
         // Vars
         // const redirectURL = searchParams.get('redirectTo') ?? '/dashboard'
 
         // router.replace(getLocalizedUrl(redirectURL, locale))
-        
+
       } else {
         toast.error("Registered Login failed!")
       }
@@ -459,6 +462,7 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
       reset();
 
       handleClose()
+      setLoading(false)
 
 
     } else if(res.status == 422) {
@@ -1178,7 +1182,8 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
         </CardContent>
         <Divider />
         <CardActions>
-          <Button type='submit' variant='contained' className='mie-2'>
+          <Button type='submit' variant='contained' className='mie-2' disabled={loading}>
+            {loading && <CircularProgress size={20} color='inherit' />}
             Submit & Apply
           </Button>
           <Button type='reset' variant='tonal' color='secondary' onClick={() => {reset();}}>
