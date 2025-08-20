@@ -196,9 +196,9 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
             {!isLoadingFile && files.length ? (
               <>
                 <List>{fileList}</List>
+                {candidateForm()}
               </>
             ) : null}
-            {candidateForm()}
           </AppReactDropzone>
         </CardContent>
       </Card>
