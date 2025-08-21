@@ -44,7 +44,7 @@ import { formatCTC } from '@/utils/formatCTC'
 
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 
-const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleClose, setAppliedSuccess}) => {
+const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobUuid, handleClose, setAppliedSuccess}) => {
   // States
   const [data, setData] = useState();
   const [cities, setCities] = useState();
@@ -326,6 +326,7 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
       years: years.toString() ||'',
       months: months.toString() ||'',
       currentCTC: candidateData?.current_ctc || '',
+      cv: null || '',
       experiences: candidateData?.experiences?.length > 0
       ? candidateData.experiences.map((exp) => ({
           id: exp.id || null,
@@ -393,6 +394,8 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
     }
   });
 
+  console.log("errors:", errors)
+
   const { fields: educationField, append: appendEducation, remove:removeEducation } = useFieldArray({
     control,
     name: 'educations',
@@ -407,12 +410,73 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
     setLoading(true);
 
-    // console.log("data:", data);
+    console.log("data:", data);
 
     // Filter out completely blank experiences
     const filteredExperiences = data.experiences?.filter(exp =>
       exp.jobTitle || exp.company || exp.location || exp.startDate
     ) || [];
+
+    // Create FormData and append fields
+    const formData = new FormData();
+
+    formData.append('fullName', data.fullName);
+    formData.append('email', data.email);
+    formData.append('mobileNo', data.mobileNo);
+    formData.append('industry', data.industry);
+    formData.append('department', data.department);
+    formData.append('city', data.city);
+    formData.append('profileTitle', data.profileTitle);
+    formData.append('profileSummary', data.profileSummary);
+    formData.append('workStatus', data.workStatus);
+    formData.append('totalExperience', data.totalExperience);
+    formData.append('years', data.years);
+    formData.append('months', data.months);
+    formData.append('currentCTC', data.currentCTC);
+    formData.append('createAccount', data.createAccount ? '1' : '0');
+    formData.append('jobId', jobId);
+    formData.append('jobUuid', jobUuid);
+
+    // Append JSON stringified experiences and educations
+    filteredExperiences.forEach((exp, index) => {
+      formData.append(`experiences[${index}][company]`, exp.company || '');
+      formData.append(`experiences[${index}][jobTitle]`, exp.jobTitle || '');
+      formData.append(`experiences[${index}][location]`, exp.location || '');
+      formData.append(`experiences[${index}][startDate]`, exp.startDate ? new Date(exp.startDate).toISOString().split('T')[0] : '');
+      formData.append(`experiences[${index}][endDate]`, exp.endDate ? new Date(exp.endDate).toISOString().split('T')[0] : '');
+
+      formData.append(`experiences[${index}][isCurrent]`, exp.isCurrent ? '1' : '0');
+    });
+
+    data?.educations.forEach((edu, index) => {
+      formData.append(`educations[${index}][educationLevel]`, edu.educationLevel || '');
+      formData.append(`educations[${index}][branchOrBoard]`, edu.branchOrBoard || '');
+      formData.append(`educations[${index}][degree]`, edu.degree || '');
+      formData.append(`educations[${index}][schoolOrInstitute]`, edu.schoolOrInstitute || '');
+      formData.append(`educations[${index}][gradeType]`, edu.gradeType || '');
+      formData.append(`educations[${index}][gradeValue]`, edu.gradeValue || '');
+
+      // Format passingYear as YYYY-MM-DD or empty string
+      formData.append(
+        `educations[${index}][passingYear]`,
+        edu.passingYear ? new Date(edu.passingYear).toISOString().split('T')[0] : ''
+      );
+    });
+
+    // formData.append('educations', JSON.stringify(data?.educations));
+
+    if(candidateData?.cv_path){
+      formData.append('cv_path', candidateData?.cv_path);
+    }
+
+    if(data?.cv){
+      formData.append('cv', data?.cv);
+    }
+
+    // Append the uploaded PDF file
+    // if (uploadedCV) {
+    //   formData.append('cv', uploadedCV); // 👈 this attaches the uploaded file
+    // }
 
     const payload = {
       ...data,
@@ -421,13 +485,21 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
       jobUuid: jobUuid
     };
 
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/register`, {
+    //   method: 'post',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${token}`
+    //   },
+    //   body: JSON.stringify(payload)
+    // });
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/register`, {
       method: 'post',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(payload)
+      body: formData
     });
 
     const result = await res.json();
@@ -488,6 +560,8 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
 
 
     }
+
+    setLoading(false)
   };
 
   const handleTabChange = (event, newValue) => {
@@ -880,6 +954,31 @@ const AddCandidateForm = ({candidateId, candiData, self, jobId, jobUuid, handleC
                       )}
                     />
                   </Grid>
+                </Grid>
+              }
+              {!candidateData?.cv_path &&
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='cv'
+                    rules={{
+                      required: 'This field is required'
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        label={<>Resume <span className='text-error'>*</span></>}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+
+                          field.onChange(file);
+                        }}
+                        accept="application/pdf"
+                        type='file'
+                        error={!!errors.cv}
+                        helperText={errors.cv?.message}
+                      />
+                    )}
+                  />
                 </Grid>
               }
             </Grid>

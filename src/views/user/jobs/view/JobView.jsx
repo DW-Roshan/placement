@@ -106,7 +106,7 @@ const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) =
                   {applied ? 'Applied' : 'Apply'}
                 </Button>
                 : <>
-                  <Button color='primary' className='gap-2' variant='tonal' href={getLocalizedUrl(`/candidate/login?apply_job=${job?.uuid}`, 'en')}>
+                  <Button color='primary' className='gap-2' variant='tonal' href={getLocalizedUrl(`/candidate/login?apply_job=${jobUuid}`, 'en')}>
                     {/* {loading && <CircularProgress size={20} color='inherit' />} */}
                     {applied ? 'Applied' : 'Login to apply'}
                   </Button>

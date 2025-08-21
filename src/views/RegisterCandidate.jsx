@@ -140,10 +140,10 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
     </ListItem>
   ))
 
-  const candidateForm = () => {
+  const candidateForm = (file) => {
     return (<>
       <Card className='overflow-visible mt-5' variant='outlined'>
-        <AddCandidateForm candiData={uploadedData} self={true} jobId={jobId} jobUuid={jobUuid} handleClose={handleClose} setAppliedSuccess={setAppliedSuccess} />
+        <AddCandidateForm uploadedCV={file} candiData={uploadedData} self={true} jobId={jobId} jobUuid={jobUuid} handleClose={handleClose} setAppliedSuccess={setAppliedSuccess} />
       </Card>
       </>
     )
@@ -199,7 +199,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
             {!isLoadingFile && files.length ? (
               <>
                 <List>{fileList}</List>
-                {candidateForm()}
+                {candidateForm(files[0])}
               </>
             ) : null}
           </AppReactDropzone>

@@ -31,22 +31,31 @@ const UserProfileHeader = ({ data, setOpenBasicForm }) => {
               </IconButton>
             </Typography>
             <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
+              {data?.profile_title &&
               <div className='flex items-center gap-2'>
                 {<i className={'tabler-palette'} />}
                 <Typography className='font-medium'>{data?.profile_title}</Typography>
-              </div>
+              </div>}
+              {data?.city?.city_name &&
               <div className='flex items-center gap-2'>
                 <i className='tabler-map-pin' />
                 <Typography className='font-medium'>{data?.city?.city_name}</Typography>
-              </div>
+              </div>}
+              {data?.created_at &&
               <div className='flex items-center gap-2'>
                 <i className='tabler-calendar' />
                 <Typography className='font-medium'>{data?.created_at && format(data?.created_at, 'MMMM yyyy')}</Typography>
-              </div>
+              </div>}
             </div>
           </div>
           <div className='flex gap-2'>
-            <Button variant='tonal' className='flex gap-2' startIcon={<i className='tabler-download'/>} disabled>
+            <Button
+              variant="tonal"
+              className="flex gap-2"
+              startIcon={<i className="tabler-download" />}
+              disabled={!data?.cv}
+              {...(data?.cv ? { href: `${process.env.NEXT_PUBLIC_API_URL}/download/${data.cv}` } : {})}
+            >
               Resume
             </Button>
             <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
