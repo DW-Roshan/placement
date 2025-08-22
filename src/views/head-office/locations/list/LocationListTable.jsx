@@ -55,6 +55,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 import tableStyles from '@core/styles/table.module.css'
 
 import AddLocationDialog from './AddLocationDialog'
+import UploadLocationDialog from './UploadLocationDialog'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -114,6 +115,7 @@ const columnHelper = createColumnHelper()
 const LocationListTable = ({ tableData, stateData, isAdmin }) => {
   // States
   const [openLocation, setOpenLocation] = useState(false)
+  const [openUploadLocation, setOpenUploadLocation] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState(...[tableData])
   const [filteredData, setFilteredData] = useState(data)
@@ -299,6 +301,16 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
             />
             {isAdmin ||
               <Button
+                variant='outlined'
+                startIcon={<i className='tabler-upload' />}
+                className='max-sm:is-full'
+                onClick={() => setOpenUploadLocation(true)}
+              >
+                Upload Location
+              </Button>
+            }
+            {isAdmin ||
+              <Button
                 variant='contained'
                 startIcon={<i className='tabler-plus' />}
                 className='max-sm:is-full'
@@ -381,6 +393,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
         stateData={stateData}
         setData={setData}
       />
+      <UploadLocationDialog open={openUploadLocation} handleClose={() => setOpenUploadLocation(!openUploadLocation)} />
     </>
   )
 }
