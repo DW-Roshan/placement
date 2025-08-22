@@ -34,7 +34,7 @@ const AddPage = async () => {
 
   // console.log("stateData", stateData);
 
-  return <FormAddEditJob branchData={data?.branches} skillsData={data?.skills} industries={data?.industries} departments={data?.departments}/>
+  return <FormAddEditJob branchData={data?.branches} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} locations={data?.locations}/>
 }
 
 export default AddPage

@@ -11,7 +11,7 @@ const candidateMenuData = dictionary => [
     icon: 'tabler-briefcase',
     children: [
       {
-        label: 'View',
+        label: 'View Jobs',
         icon: 'tabler-circle',
         href: '/candidate/jobs/list'
       },

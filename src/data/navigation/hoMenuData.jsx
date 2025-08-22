@@ -11,12 +11,12 @@ const hoMenuData = dictionary => [
     icon: 'tabler-briefcase',
     children: [
       {
-        label: 'View',
+        label: 'View Jobs',
         icon: 'tabler-circle',
         href: '/head-office/jobs/list'
       },
       {
-        label: 'Publish',
+        label: 'Job Post',
         icon: 'tabler-circle',
         href: '/head-office/jobs/add'
       }

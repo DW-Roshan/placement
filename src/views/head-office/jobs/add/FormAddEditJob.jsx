@@ -21,10 +21,10 @@ import Typography from '@mui/material/Typography'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 // Component Imports
-import { Autocomplete, Checkbox, Chip, FormControl, FormHelperText, ListSubheader, Tooltip } from '@mui/material'
+import { Autocomplete, Checkbox, Chip, createFilterOptions, FormControl, FormHelperText, IconButton, ListSubheader, Tooltip } from '@mui/material'
 
 
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -183,6 +183,21 @@ const EditorToolbar = ({ editor }) => {
   )
 }
 
+const filter = createFilterOptions()
+
+async function createDepartment(name, token) {
+  // Replace with your actual API call
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/departments/create`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ name }),
+  });
+  
+  if (!res.ok) throw new Error('Failed to create department');
+
+  return res.json();
+}
+
 const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments, jobData, locations, error }) => {
   // Vars
   const initialSelectedOption = data.filter(item => item.isSelected)[data.filter(item => item.isSelected).length - 1]
@@ -198,7 +213,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   const { lang: locale } = useParams()
 
   // const [industries, setIndustries] = useState(indu);
-  // const [departments, setDepartments] = useState();
+  const [departmentsData, setDepartments] = useState(departments);
 
   // const [jobData, setJobData] = useState(jobData);
 
@@ -240,7 +255,16 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     values: {
       jobTitle: jobData?.job_title || '',
       companyName: jobData?.company_name || '',
-      location: jobData?.locations?.map(loc => loc.id) || [],
+
+      // location: jobData?.locations?.map(loc => loc.id) || [],
+
+      locations: jobData?.locations?.length > 0 ? jobData?.locations?.map((loc) => ({
+        locationId: loc.id || '',
+        manager: loc?.pivot?.manager || ''
+      })) : [{
+        locationId: '',
+        manager: ''
+      }],
       totalPositions: jobData?.total_positions || '',
       industry: jobData?.industry_id || '',
       department: jobData?.department_id || '',
@@ -255,6 +279,11 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       skills: jobData?.skills?.map(skill => skill?.id) || [],
       gender: jobData?.gender || 'all',
     }
+  });
+
+  const { fields: locationFields, append: appendLocationFields, remove: removeLocationFields } = useFieldArray({
+    control,
+    name: 'locations',
   });
 
   // Debounced input handler
@@ -596,7 +625,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 )}
               />
             </Grid>
-            <LocationAutocomplete
+            {/* <LocationAutocomplete
               control={control}
               errors={errors}
               locationOptions={locationOptions} // array of { id, city_name, state_name }
@@ -604,7 +633,85 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
               setFallbackSelected={setFallbackSelected} // setState from parent
               loading={loading}
               handleInputChange={handleInputChange}
-            />
+            /> */}
+            {locationFields.map((item, index) => (
+              <Grid size={{ xs: 12, sm:6 }} className='repeater-item p-4 border rounded' key={index}>
+                <div className='flex gap-2 items-center'>
+                  <Grid container spacing={5} className='flex-1'>
+                    <Grid size={{ xs: 12, sm:6 }}>
+                      <Controller name={`locations[${index}].locationId`} control={control}
+                        rules={{ required: 'This field is required.' }}
+                        render={({ field }) => (
+                          <Autocomplete
+                            fullWidth
+                            value={locationOptions && locationOptions.length > 0 && locationOptions.find(location => location.id === field.value) || null}
+                            options={locationOptions || []}
+                            getOptionKey={option => option.id}
+                            getOptionLabel={(location) => location.city_name + ', ' + location?.state?.state_name|| ''}
+                            getOptionDisabled={(option) =>
+                              locationFields.some((f, i) => i !== index && f.locationId === option.id)
+                            }
+                            onChange={(event, value) => {
+                                field.onChange(value?.id || '')
+                            }}
+                            renderInput={(params) => (
+                              <CustomTextField
+                                {...params}
+                                label={<>Location <span className='text-error'>*</span></>}
+                                error={!!errors.locations?.[index]?.locationId}
+                                helperText={errors?.locations?.[index]?.locationId?.message}
+                              />
+                            )}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        control={control}
+                        name={`locations[${index}].manager`}
+                        rules={{ required: 'This field is required' }}
+                        render={({field}) => (
+                          <CustomTextField
+                            fullWidth
+                            label={<>Location Manager <span className='text-error'>*</span></>}
+                            error={!!errors?.locations?.[index]?.manager} helperText={errors?.locations?.[index]?.manager?.message}
+                            {...field}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    {index === 0 &&
+                      <Grid size={{ xs: 12 }}>
+                        <Button
+                          size='small'
+                          variant="tonal"
+                          color="primary"
+                          onClick={() =>
+                            appendLocationFields({
+                              name: '',
+                              manager: '',
+                            })
+                          }
+                        >
+                          Add More Locations
+                        </Button>
+                      </Grid>
+                    }
+                  </Grid>
+                  {index !== 0 && (
+                    <>
+                      <Divider orientation='vertical' flexItem />
+                      <div className='flex flex-col justify-start'>
+                        <IconButton size='small' color='error' onClick={() => removeLocationFields(index)}>
+                          <i className='tabler-x text-2xl' />
+                        </IconButton>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </Grid>
+            ))}
             {/* <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}
@@ -792,7 +899,90 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="department" control={control}
+              <Controller
+                name="department"
+                control={control}
+                rules={{ required: 'This field is required.' }}
+                render={({ field }) => (
+                  <Autocomplete
+                    fullWidth
+                    freeSolo
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    value={
+                      departmentsData?.find(dept => dept.id === field.value) ||
+                      (typeof field.value === 'string' ? field.value : null)
+                    }
+                    options={departmentsData || []}
+                    getOptionLabel={(option) => {
+                      if (typeof option === 'string') return option;
+                      if (option.inputValue) return `Click to Add "${option.inputValue}"`;
+
+                      return option.name || '';
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+
+                      const isExisting = options.some(
+                        (option) =>
+                          typeof option !== 'string' &&
+                          option.name.toLowerCase() === params.inputValue.toLowerCase()
+                      );
+
+                      if (params.inputValue !== '' && !isExisting) {
+                        filtered.push({
+                          inputValue: params.inputValue,
+                          name: `Add "${params.inputValue}"`,
+                        });
+                      }
+
+                      return filtered;
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      if (typeof value === 'string') return option.name === value;
+                      if (option.inputValue) return option.inputValue === value.inputValue;
+
+                      return option.id === value.id;
+                    }}
+                    onChange={async (event, newValue) => {
+                      if (typeof newValue === 'string') {
+                        // User typed and selected raw string
+                        try {
+                          const created = await createDepartment(newValue, token);
+
+                          field.onChange(created.department.id);
+                          setDepartments((prev) => [...(prev || []), created.department]);
+                        } catch (err) {
+                          console.error('Create failed', err);
+                        }
+                      } else if (newValue?.inputValue) {
+                        // User clicked on "Add 'XYZ'"
+                        try {
+                          const created = await createDepartment(newValue.inputValue, token);
+
+                          field.onChange(created.department.id);
+                          setDepartments((prev) => [...(prev || []), created.department]);
+                        } catch (err) {
+                          console.error('Create failed', err);
+                        }
+                      } else {
+                        // User selected existing department
+                        field.onChange(newValue?.id || '');
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <CustomTextField
+                        {...params}
+                        label={<>Department <span className="text-error">*</span></>}
+                        error={!!errors.department}
+                        helperText={errors?.department?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+              {/* <Controller name="department" control={control}
                 rules={{ required: 'This field is required.' }}
                 render={({ field }) => (
                   <Autocomplete
@@ -814,7 +1004,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     )}
                   />
                 )}
-              />
+              /> */}
             </Grid>
             <Grid size={{ xs: 12  }}>
               <FormControl fullWidth>
