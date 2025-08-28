@@ -47,7 +47,8 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
       name: '',
       email: '',
       mobile: '',
-      sendSMS: true,
+      sendWhatsApp: true,
+      sendSMS: false,
       sendEmail: false,
     },
   });
@@ -55,12 +56,13 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
   const email = watch('email');
   const mobile = watch('mobile');
   const sendSMS = watch('sendSMS');
+  const sendWhatsApp = watch('sendWhatsApp');
   const sendEmail = watch('sendEmail');
 
   // Watch email and mobile to dynamically enable/disable checkboxes
   useEffect(() => {
     trigger(['email', 'mobile']); // re-validate when email/mobile changes
-  }, [sendSMS, sendEmail, trigger]);
+  }, [sendWhatsApp, sendSMS, sendEmail, trigger]);
 
   const onSubmit = async (data) => {
 
@@ -164,7 +166,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                 name="mobile"
                 control={control}
                 rules={{
-                  required: sendSMS ? 'This field is required' : false,
+                  required: sendWhatsApp || sendSMS ? 'This field is required' : false,
                   validate: (value) => {
 
                     if (value && !/^\d{10}$/.test(value)) return 'Mobile must be 10 digits';
@@ -178,7 +180,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                     fullWidth
                     size="small"
                     label="Mobile No."
-                    required={sendSMS}
+                    required={sendWhatsApp || sendSMS}
                     placeholder="9876543210"
                     error={!!errors.mobile}
                     helperText={errors.mobile?.message}
@@ -221,6 +223,23 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
             <Grid size={{ xs: 12 }}>
               <FormGroup row>
                 <Controller
+                  name="sendWhatsApp"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      label="Send WhatsApp SMS"
+                      control={
+                        <Checkbox
+                          {...field}
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+
+                        />
+                      }
+                    />
+                  )}
+                />
+                <Controller
                   name="sendSMS"
                   control={control}
                   render={({ field }) => (
@@ -259,7 +278,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
               <Button
                 variant="contained"
                 type="submit"
-                disabled={!sendSMS && !sendEmail || loading}
+                disabled={!sendWhatsApp && !sendSMS && !sendEmail || loading}
               >
                 {loading && <CircularProgress size={20} color='inherit' />}
                 Invite
