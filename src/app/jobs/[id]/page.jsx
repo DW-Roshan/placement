@@ -55,7 +55,7 @@ const ViewJobPage = async (props) => {
   const id = params.id
   const data = await fetchData(id, lang);
 
-  console.log('invite view:', data);
+  // console.log('invite view:', data);
 
   if (!data?.job) {
     redirect('/not-found')

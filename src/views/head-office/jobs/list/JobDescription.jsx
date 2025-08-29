@@ -20,7 +20,7 @@ const parseHtmlToSingleLine = (html) => {
   if (typeof window === 'undefined') return '';
 
   const container = document.createElement('div');
-  
+
   container.innerHTML = html;
 
   let result = '';
@@ -48,7 +48,6 @@ const JobDescription = ({ html, full }) => {
     return (
       <Typography
         variant="body1"
-        className="overflow-hidden whitespace-nowrap text-ellipsis"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     );
