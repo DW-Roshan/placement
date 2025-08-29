@@ -245,6 +245,7 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
                   render={({ field }) => (
                     <FormControlLabel
                       label="Send SMS"
+                      disabled
                       control={
                         <Checkbox
                           {...field}
