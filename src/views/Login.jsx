@@ -87,7 +87,7 @@ const Login = ({ mode, isCandidate }) => {
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
+  const darkIllustration = '/images/illustrations/auth/hire-login-page-illustration.png'
   const darkIllustrationCandidate = '/images/illustrations/auth/hire-login-page-illustration.png'
   const lightIllustration = '/images/illustrations/auth/hire-login-page-illustration.png'
   const lightIllustrationCandidate = '/images/illustrations/auth/hire-login-page-illustration.png'
