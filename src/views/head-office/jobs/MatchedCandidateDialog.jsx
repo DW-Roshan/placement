@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
-import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
+import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
 
 
 import { rankItem } from '@tanstack/match-sorter-utils'
@@ -103,6 +103,15 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [loading, setLoading] = useState(false);
+  const [inviteTypes, setInviteTypes] = useState(['email']);
+
+  const toggleType = (type) => {
+    setInviteTypes((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type]
+    );
+  };
 
   const { data: session } = useSession()
   const token = session?.user?.token
@@ -328,7 +337,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
 
   // console.log("selected id:", selectedIds);
 
-  const handleInviteSend = async () => {
+  const handleInviteSend = async (inviteTypes) => {
 
     // setRowSelection({});
 
@@ -345,7 +354,8 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
         },
         method: 'POST',
         body: JSON.stringify({
-          selectedIds : selectedIds
+          selectedIds : selectedIds,
+          inviteTypes
         })
       });
 
@@ -436,16 +446,33 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
                 >
                   Export
                 </Button>
-                <Button
-                  color='primary'
-                  variant='contained'
-                  startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-send' />}
-                  className='max-sm:is-full'
-                  disabled={selectedIds.length <= 0 || loading}
-                  onClick={handleInviteSend}
-                >
-                  {loading ? 'Inviting...' : 'Invite'}
-                </Button>
+                <div className="flex flex-col max-sm:is-full">
+                  <Button
+                    color='primary'
+                    variant='contained'
+                    startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-send' />}
+                    className='max-sm:is-full'
+                    disabled={selectedIds.length <= 0 || loading || inviteTypes.length === 0}
+                    onClick={() => handleInviteSend(inviteTypes)}
+                  >
+                    {loading ? 'Inviting...' : 'Invite'}
+                  </Button>
+                  <FormGroup row>
+                    <FormControlLabel
+                      control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
+                      label="WhatsApp"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={inviteTypes.includes('sms')} onChange={() => toggleType('sms')} />}
+                      label="SMS"
+                      disabled
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
+                      label="Email"
+                    />
+                  </FormGroup>
+                </div>
                 {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
                   <Button
                     variant='contained'
