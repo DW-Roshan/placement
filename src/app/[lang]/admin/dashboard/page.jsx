@@ -2,17 +2,17 @@
 import Grid from '@mui/material/Grid2'
 
 // Component Imports
-import DistributedBarChartOrder from '@views/dashboards/crm/DistributedBarChartOrder'
-import LineAreaYearlySalesChart from '@views/dashboards/crm/LineAreaYearlySalesChart'
+import DistributedBarChartOrder from '@views/admin/dashboard/DistributedBarChartOrder'
+import LineAreaYearlySalesChart from '@views/admin/dashboard/LineAreaYearlySalesChart'
 import CardStatVertical from '@/components/card-statistics/Vertical'
-import BarChartRevenueGrowth from '@views/dashboards/crm/BarChartRevenueGrowth'
-import EarningReportsWithTabs from '@views/dashboards/crm/EarningReportsWithTabs'
-import RadarSalesChart from '@views/dashboards/crm/RadarSalesChart'
-import SalesByCountries from '@views/dashboards/crm/SalesByCountries'
-import ProjectStatus from '@views/dashboards/crm/ProjectStatus'
-import ActiveProjects from '@views/dashboards/crm/ActiveProjects'
-import LastTransaction from '@views/dashboards/crm/LastTransaction'
-import ActivityTimeline from '@views/dashboards/crm/ActivityTimeline'
+import BarChartRevenueGrowth from '@views/admin/dashboard/BarChartRevenueGrowth'
+import EarningReportsWithTabs from '@views/admin/dashboard/EarningReportsWithTabs'
+import RadarSalesChart from '@views/admin/dashboard/RadarSalesChart'
+import SalesByCountries from '@views/admin/dashboard/SalesByCountries'
+import ProjectStatus from '@views/admin/dashboard/ProjectStatus'
+import ActiveProjects from '@views/admin/dashboard/ActiveProjects'
+import LastTransaction from '@views/admin/dashboard/LastTransaction'
+import ActivityTimeline from '@views/admin/dashboard/ActivityTimeline'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'

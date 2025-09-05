@@ -37,6 +37,8 @@ import {
 
 import { toast } from 'react-toastify'
 
+import { useSession } from 'next-auth/react'
+
 // Component Imports
 import TableFilters from './TableFilters'
 
@@ -122,7 +124,10 @@ const CandidatesListTable = ({ tableData }) => {
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
-  const { lang: locale } = useParams()
+  const { lang: locale } = useParams();
+  const { data: session } = useSession();
+  const user = session?.user;
+  const token = user?.token;
 
   useEffect(() => {
     // Ensure DOM is painted before showing toasts
@@ -383,6 +388,27 @@ const CandidatesListTable = ({ tableData }) => {
     }
   }
 
+  const handleAutoImport = async() => {
+    if(!token) return;
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parse-bulk-cv`, {
+      method: 'post',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const result = await res.json();
+
+    if(res.ok){
+
+      toast.success(result?.message);
+    } else {
+      toast.error(result?.message || 'Something went wrong');
+    }
+
+  }
+
   return (
     <>
       <Card>
@@ -406,14 +432,26 @@ const CandidatesListTable = ({ tableData }) => {
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            <Button
-              color='secondary'
-              variant='tonal'
-              startIcon={<i className='tabler-upload' />}
-              className='max-sm:is-full'
-            >
-              Export
-            </Button>
+            {user?.id == 10 ?
+              <Button
+                color='info'
+                variant='tonal'
+                startIcon={<i className='tabler-download' />}
+                className='max-sm:is-full'
+                onClick={handleAutoImport}
+              >
+                Auto Import
+              </Button>
+             :
+              <Button
+                color='secondary'
+                variant='tonal'
+                startIcon={<i className='tabler-upload' />}
+                className='max-sm:is-full'
+              >
+                Export
+              </Button>
+            }
             <Link href={getLocalizedUrl('/candidates/add', locale)}>
               <Button
                 variant='contained'

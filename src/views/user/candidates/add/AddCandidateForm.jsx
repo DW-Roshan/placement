@@ -65,6 +65,8 @@ const AddCandidateForm = ({candidateId, candiData}) => {
     const months = [];
     const formats = ['dd-MM-yyyy', 'MM-yyyy', 'yyyy-MM-dd', 'yyyy-MM'];
 
+    if (!start) return [];
+
     const parsedStartDate = formats.reduce((acc, format) => {
       const parsed = parse(start, format, new Date());
 
@@ -713,7 +715,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                       <CustomInputVertical
                       {...field}
 
-                        // type='radio'
+                        type='radio'
 
                         data={{
                           meta: 'Free',
@@ -723,7 +725,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                         }}
                         error={true}
                         selected={field.value}
-                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        handleChange={(e) => {field.onChange(e)}}
                         gridProps={{ size: { xs: 12, sm: 6 } }}
                       /></>
                     )}
@@ -737,7 +739,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                     render={({ field }) => (
                       <CustomInputVertical
 
-                        // type='radio'
+                        type='radio'
 
                         data={{
                           meta: 'Free',
@@ -746,7 +748,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                           value: 'fresher'
                         }}
                         selected={field.value}
-                        handleChange={(e) => {handleChange(e); field.onChange(e)}}
+                        handleChange={(e) => {field.onChange(e)}}
                         gridProps={{ size: { xs: 12, sm: 6 } }}
                       />
                     )}
