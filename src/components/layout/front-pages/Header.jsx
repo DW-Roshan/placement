@@ -46,9 +46,9 @@ const Header = ({ mode }) => {
         <div className={classnames(frontLayoutClasses.navbarContent, styles.navbarContent)}>
           {isBelowLgScreen ? (
             <div className='flex items-center gap-2 sm:gap-4'>
-              <IconButton onClick={() => setIsDrawerOpen(true)} className='-mis-2'>
+              {/* <IconButton onClick={() => setIsDrawerOpen(true)} className='-mis-2'>
                 <i className='tabler-menu-2 text-textPrimary' />
-              </IconButton>
+              </IconButton> */}
               <Link href='/front-pages/landing-page'>
                 <Logo />
               </Link>
