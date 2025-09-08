@@ -14,9 +14,11 @@ const TableFilters = ({ setData, tableData }) => {
   // States
   const [industry, setIndustry] = useState('')
   const [department, setDepartment] = useState('')
+  const [skillsFilter, setSkillsFilter] = useState([]);
   const [status, setStatus] = useState('')
   const [industries, setIndustries] = useState(null);
   const [departments, setDepartments] = useState(null);
+  const [skills, setSkills] = useState(null);
   const { data: session } = useSession()
   const token = session?.user?.token
 
@@ -24,13 +26,22 @@ const TableFilters = ({ setData, tableData }) => {
     const filteredData = tableData?.filter(candidate => {
       if (industry && candidate.industry_id != industry) return false
       if (department && candidate.department_id != department) return false
+
+      if (skillsFilter.length > 0) {
+        
+        const candidateSkillIds = candidate.skills?.map(s => s.id) || [];
+        const hasAll = skillsFilter.every(skillId => candidateSkillIds.includes(skillId));
+
+        if (!hasAll) return false;
+      }
+
       if (status && candidate.status != status) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [industry, department, status, tableData, setData])
+  }, [industry, department, skillsFilter, status, tableData, setData])
 
   useEffect(() => {
 
@@ -50,6 +61,7 @@ const TableFilters = ({ setData, tableData }) => {
 
         setIndustries(jsonData?.industries || []);
         setDepartments(jsonData?.departments || []);
+        setSkills(jsonData?.skills || []);
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -93,6 +105,23 @@ const TableFilters = ({ setData, tableData }) => {
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
               <TextField label='Select Department' {...params}/>
+            )}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Autocomplete
+            multiple
+            fullWidth
+            options={skills || []}
+            getOptionLabel={(skill) => skill?.name || ''}
+            value={(skills || []).filter(opt => skillsFilter.includes(opt.id))}
+            onChange={(event, value) => {
+              setSkillsFilter(value.map(v => v.id)); // store IDs only
+            }}
+            size='small'
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
+            renderInput={(params) => (
+              <TextField label='Select Skills' {...params} />
             )}
           />
         </Grid>

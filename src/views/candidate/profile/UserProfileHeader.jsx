@@ -46,6 +46,11 @@ const UserProfileHeader = ({ data, setOpenBasicForm }) => {
                 <i className='tabler-calendar' />
                 <Typography className='font-medium'>{data?.created_at && format(data?.created_at, 'MMMM yyyy')}</Typography>
               </div>}
+              {data?.date_of_birth &&
+              <div className='flex items-center gap-2'>
+                <i className='tabler-cake' />
+                <Typography className='font-medium'>{data?.date_of_birth && format(data?.date_of_birth, 'do MMMM yyyy')}</Typography>
+              </div>}
             </div>
           </div>
           <div className='flex gap-2'>

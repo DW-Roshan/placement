@@ -42,6 +42,8 @@ import { formatCTC } from '@/utils/formatCTC'
 import CustomInputVertical from '@/@core/components/custom-inputs/Vertical'
 import DialogCloseButton from '@/components/dialogs/DialogCloseButton'
 
+import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+
 const BasicDetailForm = ({ setData, open, data, cities, industries, departments, handleClose}) => {
 
   // console.log('industry:', data)
@@ -110,6 +112,7 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
       profileTitle: data?.profile_title || '',
       profileSummary: data?.profile_summary || '',
       workStatus: data?.work_status || '',
+      dateOfBirth: data?.date_of_birth ? new Date(data?.date_of_birth) : null,
       totalExperience: data?.total_experience || '',
       years: years.toString() ||'',
       months: months.toString() ||'',
@@ -570,6 +573,20 @@ const BasicDetailForm = ({ setData, open, data, cities, industries, departments,
                 </Grid>
               </Grid>
             }
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Controller name="dateOfBirth" control={control}
+                render={({ field }) => (
+                  <AppReactDatepicker
+                    selected={field.value} onChange={field.onChange}
+                    showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                    placeholderText="YYYY/MM/DD"
+                    customInput={
+                      <CustomTextField fullWidth label='Date of Birth'
+                        error={!!errors.dateOfBirth} helperText={errors?.dateOfBirth?.message} />
+                    }
+                  />
+                )} />
+            </Grid>
           </Grid>
 
         </DialogContent>

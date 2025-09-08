@@ -230,6 +230,14 @@ const CandidatesListTable = ({ tableData }) => {
         header: 'Mobile No.',
         cell: ({ row }) => <Typography>{row.original?.mobile_no}</Typography>
       }),
+      columnHelper.accessor('date_of_birth', {
+        header: 'Date of Birth',
+        cell: ({ row }) => <Typography>{row.original?.date_of_birth ? new Date(row.original?.date_of_birth).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }) : ''}</Typography>
+      }),
       columnHelper.accessor('work_status', {
         header: 'Work Status',
         cell: ({ row }) => (
@@ -261,6 +269,23 @@ const CandidatesListTable = ({ tableData }) => {
           <Typography className='capitalize' color='text.primary'>
             {row.original?.department?.name}
           </Typography>
+        )
+      }),
+      columnHelper.accessor('skill', {
+        header: 'Skills',
+        cell: ({ row }) => (
+          <div className='capitalize flex flex-wrap gap-2'>
+            {row.original?.skills?.map(s => (
+              <Chip
+                key={s.id}
+                variant='tonal'
+                label={s.name}
+                size='small'
+                color='info'
+                className='capitalize'
+              />
+            ))}
+          </div>
         )
       }),
       columnHelper.accessor('city.city_name', {

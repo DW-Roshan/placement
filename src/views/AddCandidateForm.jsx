@@ -50,6 +50,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
   const [cities, setCities] = useState();
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
+  const [skills, setSkills] = useState();
   const [loading, setLoading] = useState(false);
   const [candidateData, setCandidateData] = useState(candiData);
   const { data: session } = useSession()
@@ -239,6 +240,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
           setCities(jsonData.cities || []);
           setIndustries(jsonData.industries);
+          setSkills(jsonData?.skills || []);
 
           setDepartments(jsonData.industryDepartments || null);
 
@@ -322,6 +324,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
       workStatus: candidateData?.work_status || '',
+      dateOfBirth: candidateData?.date_of_birth ? new Date(candidateData?.date_of_birth) : null,
       totalExperience: candidateData?.total_experience || '',
       years: years.toString() ||'',
       months: months.toString() ||'',
@@ -390,6 +393,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
           }
         ]
       ),
+      skills: [...candidateData?.skills?.map(skill => skill.id) || []],
       createAccount: true
     }
   });
@@ -579,6 +583,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
         <Tab label='Personal Info' value='personal_info' />
         <Tab label='Experience' value='experience' />
         <Tab label='Education' value='education' />
+        <Tab label='Skill' value='skill' />
       </TabList>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
@@ -956,6 +961,20 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
                   </Grid>
                 </Grid>
               }
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller name="dateOfBirth" control={control}
+                  render={({ field }) => (
+                    <AppReactDatepicker
+                      selected={field.value} onChange={field.onChange}
+                      showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
+                      placeholderText="YYYY/MM/DD"
+                      customInput={
+                        <CustomTextField fullWidth label='Date of Birth'
+                          error={!!errors.dateOfBirth} helperText={errors?.dateOfBirth?.message} />
+                      }
+                    />
+                  )} />
+              </Grid>
               {!candidateData?.cv_path &&
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
@@ -1279,6 +1298,42 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
                 >
                   Add More Education
                 </Button>
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value='skill'>
+            <Grid container spacing={6}>
+              <Grid size={{ xs: 12 }}>
+                <Controller name='skills' control={control}
+                  rules={{
+                    required: 'This field is required.',
+                  }}
+                  render={({ field }) => (
+                    <Autocomplete
+                      multiple
+                      fullWidth
+                      options={skills || []}
+                      value={(skills || []).filter((s) => field.value?.includes(s.id))}
+                      getOptionLabel={(option) => option.name || ''}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      onChange={(event, value) => {
+                        field.onChange(value.map((v) => v.id));
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label={
+                            <>
+                              Skills <span className="text-error">*</span>
+                            </>
+                          }
+                          error={!!errors.skills}
+                          helperText={errors?.skills?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
               </Grid>
             </Grid>
           </TabPanel>
