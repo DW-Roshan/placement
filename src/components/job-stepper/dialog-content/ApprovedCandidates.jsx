@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
-import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem, Tab, TablePagination, Typography } from "@mui/material";
+import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem, Tab, TablePagination, Tooltip, Typography } from "@mui/material";
 
 
 import { rankItem } from '@tanstack/match-sorter-utils'
@@ -50,6 +50,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
 
 import CustomTextField from "@/@core/components/mui/TextField";
+import CustomIconButton from "@/@core/components/mui/IconButton";
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -95,9 +96,8 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue, jobId}) => {
+const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
 
-  const [value, setValue] = useState(selectValue || '30%')
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [data, setData] = useState([])
@@ -117,12 +117,26 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   const token = session?.user?.token
 
   useEffect(() => {
+    if (candidateData && approvedCandidateIds.length > 0) {
 
-    if(selectValue){
-      setValue(selectValue);
+      const selected = {};
+      
+      candidateData.forEach(candidate => {
+        if (approvedCandidateIds.includes(candidate.id)) {
+          selected[candidate.id] = true;
+        }
+      });
+      setRowSelection(selected);
     }
+  }, [candidateData, approvedCandidateIds]);
 
-  }, [selectValue])
+  // useEffect(() => {
+
+  //   if(selectValue){
+  //     setValue(selectValue);
+  //   }
+
+  // }, [selectValue])
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -130,7 +144,32 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
 
   const { lang: locale } = useParams()
 
-  // console.log("matched candidates", candidateData?.['30%'], selectValue)
+  console.log("can:", candidateData)
+
+  const getInviteIcon = (type, index) => {
+    switch (type) {
+      case 'sms':
+        return (
+          <Tooltip title="SMS" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
+          </Tooltip>
+        );
+      case 'whatsapp':
+        return (
+          <Tooltip title="WhatsApp" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
+          </Tooltip>
+        );
+      case 'email':
+        return (
+          <Tooltip title="Email" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
+          </Tooltip>
+        );
+      default:
+        return null;
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -302,8 +341,9 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   )
 
   const table = useReactTable({
-    data: appliedCandidates ? candidateData : candidateData?.[value] || [],
+    data: candidateData || [],
     columns,
+    getRowId: row => row.id,
     filterFns: {
       fuzzy: fuzzyFilter
     },
@@ -335,7 +375,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
     [table.getSelectedRowModel()]
   );
 
-  // console.log("selected id:", selectedIds);
+  console.log("selected id:", selectedIds);
 
   const handleInviteSend = async (inviteTypes) => {
 
@@ -347,7 +387,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
 
     try {
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/invite`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/approve-candidate`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -377,7 +417,6 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
 
     } finally {
       setLoading(false);
-      handleClose();
       setRowSelection({});
     }
 
@@ -396,165 +435,145 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   }
 
   return (
-    <Dialog
-      fullWidth
-      open={open}
-      maxWidth='xl'
-      sx={{ '& .MuiDialog-paper': { overflow: 'visible' } }}
-    >
-      <DialogCloseButton onClick={() => {handleClose(); setRowSelection({});}}>
-        <i className='tabler-x' />
-      </DialogCloseButton>
+    <>
       <DialogTitle>
-        {appliedCandidates ? 'Applied Candidates' : 'Matched Candidates'}
+        Applied Candidates
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
-        <TabContext value={value}>
-          {appliedCandidates ||
-          <TabList variant='fullWidth' onChange={handleChange} aria-label='full width tabs example'>
-            <Tab value='100%' label='100%' />
-            <Tab value='70%' label='70%' />
-            <Tab value='50%' label='50%' />
-            <Tab value='30%' label='30%' />
-          </TabList> }
-          <TabPanel value={value} className='pbs-0'>
-
-            <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-              <CustomTextField
-                select
-                value={table.getState().pagination.pageSize}
-                onChange={e => table.setPageSize(Number(e.target.value))}
-                className='max-sm:is-full sm:is-[70px]'
-              >
-                <MenuItem value='10'>10</MenuItem>
-                <MenuItem value='25'>25</MenuItem>
-                <MenuItem value='50'>50</MenuItem>
-              </CustomTextField>
-              <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
-                <DebouncedInput
-                  value={globalFilter ?? ''}
-                  onChange={value => setGlobalFilter(String(value))}
-                  placeholder='Search Candidate'
-                  className='max-sm:is-full'
-                />
-                <Button
-                  color='secondary'
-                  variant='tonal'
-                  startIcon={<i className='tabler-upload' />}
-                  className='max-sm:is-full'
-                >
-                  Export
-                </Button>
-                {appliedCandidates ||
-                <div className="flex flex-col max-sm:is-full">
-                  <Button
-                    color='primary'
-                    variant='contained'
-                    startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-send' />}
-                    className='max-sm:is-full'
-                    disabled={selectedIds.length <= 0 || loading || inviteTypes.length === 0}
-                    onClick={() => handleInviteSend(inviteTypes)}
-                  >
-                    {loading ? 'Inviting...' : 'Invite'}
-                  </Button>
-                  <FormGroup row>
-                    <FormControlLabel
-                      control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
-                      label="WhatsApp"
-                    />
-                    <FormControlLabel
-                      control={<Checkbox checked={inviteTypes.includes('sms')} onChange={() => toggleType('sms')} />}
-                      label="SMS"
-                      disabled
-                    />
-                    <FormControlLabel
-                      control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
-                      label="Email"
-                    />
-                  </FormGroup>
-                </div>}
-                {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
-                  <Button
-                    variant='contained'
-                    startIcon={<i className='tabler-plus' />}
-                    className='max-sm:is-full'
-                  >
-                    Add Candidate
-                  </Button>
-                </Link> */}
-              </div>
-            </div>
-
-            <div className='overflow-x-auto'>
-              <table className={tableStyles.table}>
-                <thead>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                          {header.isPlaceholder ? null : (
-                            <>
-                              <div
-                                className={classnames({
-                                  'flex items-center': header.column.getIsSorted(),
-                                  'cursor-pointer select-none': header.column.getCanSort()
-                                })}
-                                onClick={header.column.getToggleSortingHandler()}
-                              >
-                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                {{
-                                  asc: <i className='tabler-chevron-up text-xl' />,
-                                  desc: <i className='tabler-chevron-down text-xl' />
-                                }[header.column.getIsSorted()] ?? null}
-                              </div>
-                            </>
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                {table.getFilteredRowModel().rows.length === 0 ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                        No data available
-                      </td>
-                    </tr>
-                  </tbody>
-                ) : (
-                  <tbody>
-                    {table
-                      .getRowModel()
-                      .rows.slice(0, table.getState().pagination.pageSize)
-                      .map(row => {
-                        return (
-                          <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                            {row.getVisibleCells().map(cell => (
-                              <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                            ))}
-                          </tr>
-                        )
-                      })}
-                  </tbody>
-                )}
-              </table>
-            </div>
-            <TablePagination
-              component={() => <TablePaginationComponent table={table} />}
-              count={table.getFilteredRowModel().rows.length}
-              rowsPerPage={table.getState().pagination.pageSize}
-              page={table.getState().pagination.pageIndex}
-              onPageChange={(_, page) => {
-                table.setPageIndex(page)
-              }}
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={e => table.setPageSize(Number(e.target.value))}
+            className='max-sm:is-full sm:is-[70px]'
+          >
+            <MenuItem value='10'>10</MenuItem>
+            <MenuItem value='25'>25</MenuItem>
+            <MenuItem value='50'>50</MenuItem>
+          </CustomTextField>
+          <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              onChange={value => setGlobalFilter(String(value))}
+              placeholder='Search Candidate'
+              className='max-sm:is-full'
             />
-          </TabPanel>
-        </TabContext>
+            <Button
+              color='secondary'
+              variant='tonal'
+              startIcon={<i className='tabler-upload' />}
+              className='max-sm:is-full'
+            >
+              Export
+            </Button>
+            <div className="flex flex-col max-sm:is-full">
+              <Button
+                color='primary'
+                variant='contained'
+                startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
+                className='max-sm:is-full'
+                disabled={selectedIds.length <= 0 || loading}
+                onClick={() => handleInviteSend(inviteTypes)}
+              >
+                {loading ? 'Inviting...' : 'Approve'}
+              </Button>
+
+              {/* <FormGroup row>
+                <FormControlLabel
+                  control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
+                  label="WhatsApp"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={inviteTypes.includes('sms')} onChange={() => toggleType('sms')} />}
+                  label="SMS"
+                  disabled
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
+                  label="Email"
+                />
+              </FormGroup> */}
+            </div>
+            {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
+              <Button
+                variant='contained'
+                startIcon={<i className='tabler-plus' />}
+                className='max-sm:is-full'
+              >
+                Add Candidate
+              </Button>
+            </Link> */}
+          </div>
+        </div>
+
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            className={classnames({
+                              'flex items-center': header.column.getIsSorted(),
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' />,
+                              desc: <i className='tabler-chevron-down text-xl' />
+                            }[header.column.getIsSorted()] ?? null}
+                          </div>
+                        </>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                    No data available
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map(row => {
+                    return (
+                      <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                        {row.getVisibleCells().map(cell => (
+                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                        ))}
+                      </tr>
+                    )
+                  })}
+              </tbody>
+            )}
+          </table>
+        </div>
+        <TablePagination
+          component={() => <TablePaginationComponent table={table} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          onPageChange={(_, page) => {
+            table.setPageIndex(page)
+          }}
+        />
       </DialogContent>
-    </Dialog>
+    </>
   )
 }
 
-export default MatchedCandidateDialog;
+export default ApprovedCandidates;

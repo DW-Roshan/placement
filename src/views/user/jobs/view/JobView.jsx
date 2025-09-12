@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 
 import Grid from "@mui/material/Grid2";
 
-import { Avatar, Button, Card, CardContent, CircularProgress, Divider, Typography } from "@mui/material"
+import { Avatar, Button, Card, CardContent, CircularProgress, Divider, Step, StepLabel, Stepper, Typography } from "@mui/material"
 
 import { formatDistanceToNow } from "date-fns";
 
@@ -19,6 +19,7 @@ import DialogsConfirmation from "../DialogConfirmation";
 import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
 import RegisterCandidate from "@/views/RegisterCandidate";
+import JobStepper from "@/components/job-stepper/JobStepper";
 
 const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
 
@@ -64,6 +65,7 @@ const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) =
                 </div>
               </div>
             </Grid>
+            { !isCandidate && <Grid size={{ xs: 12 }}> <JobStepper job={job} /> </Grid> }
             <Grid size={{ xs: 12 }} className='justify-between flex items-center flex-wrap' gap={3}>
               <div>
                 <div className='flex gap-5'>

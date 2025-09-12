@@ -446,6 +446,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
                 >
                   Export
                 </Button>
+                {appliedCandidates ||
                 <div className="flex flex-col max-sm:is-full">
                   <Button
                     color='primary'
@@ -457,7 +458,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
                   >
                     {loading ? 'Inviting...' : 'Invite'}
                   </Button>
-                
+
                   <FormGroup row>
                     <FormControlLabel
                       control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
@@ -473,7 +474,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
                       label="Email"
                     />
                   </FormGroup>
-                </div>
+                </div>}
                 {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
                   <Button
                     variant='contained'
