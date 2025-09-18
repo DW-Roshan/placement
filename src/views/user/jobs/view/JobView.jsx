@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import dynamic from "next/dynamic";
 
 import { useSession } from "next-auth/react";
@@ -34,6 +36,8 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
   const token = session?.user?.token;
   const userId = session?.user?.id;
 
+  const router = useRouter();
+
   useEffect(() => {
     if(userId && job){
       setApplied(job?.candidates?.some((cnd) => cnd?.id === userId))
@@ -51,6 +55,16 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
       <CardContent>
         {job &&
           <Grid container spacing={4}>
+            <Grid size={{ xs: 12 }}>
+              <div className="flex gap-3 justify-between flex-wrap">
+                <div className="flex-1">
+                  <Typography variant="h5" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
+                </div>
+                <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
+                  Go Back
+                </Button>
+              </div>
+            </Grid>
             <Grid size={{ xs: 12 }}>
               <div className='flex gap-3 justify-between'>
                 <div className='flex-1'>
