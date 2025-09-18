@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import dynamic from "next/dynamic";
 
 import { useSession } from "next-auth/react";
@@ -18,7 +20,6 @@ import CustomChip from "@/@core/components/mui/Chip";
 import DialogsConfirmation from "../DialogConfirmation";
 import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
-import { useRouter } from "next/navigation";
 
 const JobView = ({ job, isCandidate }) => {
 
