@@ -46,7 +46,7 @@ const AlertTemplateData = ({template}) => {
 
   return (
     <Card>
-      <CardHeader title={templateData?.name} action={<Switch color='success' checked={!!templateData?.status} onChange={(e) => handleStatusChange(e.target.checked)} />} />
+      <CardHeader title={templateData?.template_name} action={<Switch color='success' checked={!!templateData?.status} onChange={(e) => handleStatusChange(e.target.checked)} />} />
       <Divider />
       <CardContent>
         <div dangerouslySetInnerHTML={{ __html: templateData?.body }} />

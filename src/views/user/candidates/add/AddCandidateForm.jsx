@@ -256,7 +256,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
         if( industries ){
 
           let matched = industries ? industries.find(
-            (industry) => industry?.name?.toLowerCase() === (candidateData?.industry || '')?.toLowerCase()
+            (industry) => industry?.name?.toLowerCase() === (candidateData?.industry?.name || '')?.toLowerCase()
           ) : '';
 
           if(!matched){
@@ -279,12 +279,12 @@ const AddCandidateForm = ({candidateId, candiData}) => {
         if( departments ){
 
           let matched = departments ? departments.find(
-            (department) => department?.name?.toLowerCase() === (candidateData?.department || '')?.toLowerCase()
+            (department) => department?.name?.toLowerCase() === (candidateData?.department?.name || '')?.toLowerCase()
           ) : '';
 
           if(!matched){
             matched = departments ? departments.find(department =>
-              department?.name?.toLowerCase().includes(candidateData?.department?.trim()?.toLowerCase() || '')
+              department?.name?.toLowerCase().includes(candidateData?.department?.name?.trim()?.toLowerCase() || '')
             ) : '';
           }
 
@@ -294,12 +294,12 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
         if( cities ) {
           let matched = cities ? cities.find(
-            (city) => city?.city_name?.toLowerCase() === (candidateData?.city || '')?.toLowerCase()
+            (city) => city?.city_name?.toLowerCase() === (candidateData?.city?.city_name || '')?.toLowerCase()
           ) : '';
 
           if(!matched){
             matched = cities ? cities.find(city =>
-              city?.name?.toLowerCase().includes(candidateData?.city?.trim()?.toLowerCase() || '')
+              city?.name?.toLowerCase().includes(candidateData?.city?.city_name?.trim()?.toLowerCase() || '')
             ) : '';
           }
 

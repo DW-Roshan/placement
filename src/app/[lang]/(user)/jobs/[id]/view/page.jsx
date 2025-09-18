@@ -19,7 +19,8 @@ const fetchData = async (id, lang) => {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
-    }
+    },
+    cache: "no-store",
   })
 
   const data = await res.json();
@@ -43,7 +44,7 @@ const ViewJobPage = async (props) => {
 
   // console.log("data:", data);
 
-  return <JobView job={data?.job} />
+  return <JobView jobData={data?.job} />
 
 }
 

@@ -96,14 +96,14 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
+const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCandidateIds, jobId}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [loading, setLoading] = useState(false);
-  const [inviteTypes, setInviteTypes] = useState(['email']);
+  const [inviteTypes, setInviteTypes] = useState(['whatsapp']);
 
   const toggleType = (type) => {
     setInviteTypes((prev) =>
@@ -120,7 +120,7 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
     if (candidateData && approvedCandidateIds.length > 0) {
 
       const selected = {};
-      
+
       candidateData.forEach(candidate => {
         if (approvedCandidateIds.includes(candidate.id)) {
           selected[candidate.id] = true;
@@ -146,30 +146,30 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
 
   console.log("can:", candidateData)
 
-  const getInviteIcon = (type, index) => {
-    switch (type) {
-      case 'sms':
-        return (
-          <Tooltip title="SMS" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
-          </Tooltip>
-        );
-      case 'whatsapp':
-        return (
-          <Tooltip title="WhatsApp" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
-          </Tooltip>
-        );
-      case 'email':
-        return (
-          <Tooltip title="Email" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
-          </Tooltip>
-        );
-      default:
-        return null;
-    }
-  };
+  // const getInviteIcon = (type, index) => {
+  //   switch (type) {
+  //     case 'sms':
+  //       return (
+  //         <Tooltip title="SMS" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     case 'whatsapp':
+  //       return (
+  //         <Tooltip title="WhatsApp" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     case 'email':
+  //       return (
+  //         <Tooltip title="Email" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const columns = useMemo(
     () => [
@@ -188,7 +188,7 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
           <Checkbox
             {...{
               checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
+              disabled: approvedCandidateIds.includes(row.original.id),
               indeterminate: row.getIsSomeSelected(),
               onChange: row.getToggleSelectedHandler()
             }}
@@ -375,9 +375,14 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
     [table.getSelectedRowModel()]
   );
 
+  const newSelectedIds = useMemo(
+    () => selectedIds.filter(id => !approvedCandidateIds.includes(id)),
+    [selectedIds, approvedCandidateIds]
+  );
+
   console.log("selected id:", selectedIds);
 
-  const handleInviteSend = async (inviteTypes) => {
+  const handleApproveCandidate = async (inviteTypes) => {
 
     // setRowSelection({});
 
@@ -404,6 +409,7 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
         const data = await res.json();
 
         toast.success(data?.message || 'Mail sent successfully!')
+        setJobData(data?.job);
 
         console.log("data from invite sent:", data);
       }
@@ -418,6 +424,7 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
     } finally {
       setLoading(false);
       setRowSelection({});
+      handleClose()
     }
 
 
@@ -473,13 +480,13 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
                 variant='contained'
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
-                disabled={selectedIds.length <= 0 || loading}
-                onClick={() => handleInviteSend(inviteTypes)}
+                disabled={newSelectedIds.length <= 0 || loading || inviteTypes.length === 0}
+                onClick={() => handleApproveCandidate(inviteTypes)}
               >
-                {loading ? 'Inviting...' : 'Approve'}
+                {loading ? 'Approving...' : 'Approve'}
               </Button>
 
-              {/* <FormGroup row>
+              <FormGroup row>
                 <FormControlLabel
                   control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
                   label="WhatsApp"
@@ -493,7 +500,7 @@ const ApprovedCandidates = ({candidateData, approvedCandidateIds, jobId}) => {
                   control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
                   label="Email"
                 />
-              </FormGroup> */}
+              </FormGroup>
             </div>
             {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
               <Button

@@ -175,7 +175,7 @@ const UserListTable = ({userData}) => {
             {getAvatar({ avatar: `${process.env.NEXT_PUBLIC_ASSET_URL}${row.original?.profile_image}`, fullName: row.original?.first_name+" "+row.original?.last_name })}
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
-                {row.original?.first_name+" "+row.original?.last_name}
+                {`${row.original?.first_name ?? ""} ${row.original?.last_name ?? ""}`.trim()}
               </Typography>
               <Typography variant='body2'>{row.original?.username}</Typography>
             </div>

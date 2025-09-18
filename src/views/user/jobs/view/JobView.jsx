@@ -21,8 +21,9 @@ import { getLocalizedUrl } from "@/utils/i18n";
 import RegisterCandidate from "@/views/RegisterCandidate";
 import JobStepper from "@/components/job-stepper/JobStepper";
 
-const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
+const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
 
+  const [job, setJobData] = useState(jobData);
   const [applied, setApplied] = useState(false);
   const [openApply, setOpenApply] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -65,7 +66,7 @@ const JobView = ({ job, isCandidate, jobUuid, setAppliedSuccess, registered }) =
                 </div>
               </div>
             </Grid>
-            { !isCandidate && <Grid size={{ xs: 12 }}> <JobStepper job={job} /> </Grid> }
+            { !isCandidate && <Grid size={{ xs: 12 }}> <JobStepper job={job} setJobData={setJobData}/> </Grid> }
             <Grid size={{ xs: 12 }} className='justify-between flex items-center flex-wrap' gap={3}>
               <div>
                 <div className='flex gap-5'>
