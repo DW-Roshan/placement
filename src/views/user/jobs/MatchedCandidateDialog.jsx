@@ -105,6 +105,8 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
   const [loading, setLoading] = useState(false);
   const [inviteTypes, setInviteTypes] = useState(['email']);
 
+  console.log("candidateData:", candidateData);
+
   const toggleType = (type) => {
     setInviteTypes((prev) =>
       prev.includes(type)
