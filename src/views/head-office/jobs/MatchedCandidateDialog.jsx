@@ -193,6 +193,22 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
         ),
         enableSorting: false
       }),
+      columnHelper.accessor('invited_by_name', {
+        header: 'Invited By',
+        cell: ({ row }) => (
+          <Typography color='text.primary'>
+            {row.original?.invited_by_name}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('invited_at', {
+        header: 'Invited At',
+        cell: ({ row }) => (
+          <Typography color='text.primary'>
+            {row.original?.invited_at}
+          </Typography>
+        )
+      }),
       columnHelper.accessor('full_name', {
         header: 'Candidate',
         cell: ({ row }) => (
