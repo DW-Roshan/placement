@@ -324,7 +324,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
       workStatus: candidateData?.work_status || '',
-      dateOfBirth: candidateData?.date_of_birth ? new Date(candidateData?.date_of_birth) : null,
+      dateOfBirth: candidateData?.date_of_birth ? parseDateFromString(candidateData?.date_of_birth) : null,
       totalExperience: candidateData?.total_experience || '',
       years: years.toString() ||'',
       months: months.toString() ||'',
