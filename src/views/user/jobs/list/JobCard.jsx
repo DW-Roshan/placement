@@ -93,10 +93,10 @@ const JobCard = ({job, isCandidate}) => {
                   : `${job?.min_exp ?? 0}-${job?.max_exp ?? 0} Yrs`
               }
               color='primary'
-              variant='tonal'
+              variant='contained'
               icon={<i className='tabler-briefcase' />}
             />
-            <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='tonal' icon={ <i className='tabler-currency-rupee' /> } />
+            <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='contained' icon={ <i className='tabler-currency-rupee' /> } />
             <Chip
               label={
                 Array.isArray(job?.locations) && job.locations.length > 0
@@ -106,7 +106,7 @@ const JobCard = ({job, isCandidate}) => {
                   : ''
               }
               color="warning"
-              variant="tonal"
+              variant="contained"
               icon={<i className="tabler-map-pin" />}
             />
 
@@ -133,14 +133,14 @@ const JobCard = ({job, isCandidate}) => {
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Matched Candidates</Typography>
               <div className='flex gap-2'>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='tonal' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='tonal' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
               </div>
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
+              <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
             </Grid></>
           }
           <Grid size={{ xs: 12 }} className='flex justify-between items-center gap-2 flex-wrap'>
@@ -148,8 +148,8 @@ const JobCard = ({job, isCandidate}) => {
 
             {isCandidate ?
               <div className='flex gap-2 flex-wrap'>
-                <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <Tooltip title="Save Job"><span><CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='contained' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                {applied || <Tooltip title="Save Job"><span><CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'contained' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
                   {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
                 </CustomIconButton></span></Tooltip>}
                 {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
@@ -165,11 +165,11 @@ const JobCard = ({job, isCandidate}) => {
                 }
                 <Tooltip title="View Job">
                   <Link href={getLocalizedUrl(`${authUser?.userType === 'B' ? `/branch/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}>
-                    <CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton>
+                    <CustomIconButton variant='contained' color='success' size='small'><i className='tabler-eye' /></CustomIconButton>
                   </Link>
                 </Tooltip>
                 {/* {authUser?.userType !== 'B' &&
-                  <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                  <Link href={getLocalizedUrl(`/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='contained' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
                 } */}
               </div>
             }

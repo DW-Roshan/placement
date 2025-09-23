@@ -175,7 +175,7 @@ const JobsListCard = ({ jobs, branchData, isCandidate, hideSearch }) => {
           <Grid container spacing={6} className='p-6 border-bs'>
             {jobsData?.map((job, index) => (
               <Grid key={index} size={{ xs: 12, sm: 12, md: 6, xl: 4 }}>
-                <JobCard job={job} branchData={branchData} isCandidate={isCandidate} />
+                <JobCard job={job} branchData={branchData} isCandidate={isCandidate} setJobsData={setJobsData} />
               </Grid>
             ))}
           </Grid>

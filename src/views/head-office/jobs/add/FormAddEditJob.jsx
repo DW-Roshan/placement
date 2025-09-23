@@ -192,7 +192,7 @@ async function createDepartment(name, token) {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({ name }),
   });
-  
+
   if (!res.ok) throw new Error('Failed to create department');
 
   return res.json();
@@ -257,6 +257,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       companyName: jobData?.company_name || '',
 
       // location: jobData?.locations?.map(loc => loc.id) || [],
+      manager: jobData?.locations?.length > 0 ? jobData?.locations[0]?.pivot?.manager || '' : '',
 
       locations: jobData?.locations?.length > 0 ? jobData?.locations?.map((loc) => ({
         locationId: loc.id || '',
@@ -610,7 +611,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Controller
                 control={control}
                 name='companyName'
@@ -634,11 +635,26 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
               loading={loading}
               handleInputChange={handleInputChange}
             /> */}
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Controller
+                control={control}
+                name='manager'
+                rules={{ required: 'This field is required' }}
+                render={({field}) => (
+                  <CustomTextField
+                    fullWidth
+                    label={<>Manager <span className='text-error'>*</span></>}
+                    error={!!errors?.manager} helperText={errors?.manager?.message}
+                    {...field}
+                  />
+                )}
+              />
+            </Grid>
             {locationFields.map((item, index) => (
               <Grid size={{ xs: 12, sm:6 }} className='repeater-item p-4 border rounded' key={index}>
                 <div className='flex gap-2 items-center'>
                   <Grid container spacing={5} className='flex-1'>
-                    <Grid size={{ xs: 12, sm:6 }}>
+                    <Grid size={{ xs: 12 }}>
                       <Controller name={`locations[${index}].locationId`} control={control}
                         rules={{ required: 'This field is required.' }}
                         render={({ field }) => (
@@ -662,21 +678,6 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                                 helperText={errors?.locations?.[index]?.locationId?.message}
                               />
                             )}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <Controller
-                        control={control}
-                        name={`locations[${index}].manager`}
-                        rules={{ required: 'This field is required' }}
-                        render={({field}) => (
-                          <CustomTextField
-                            fullWidth
-                            label={<>Location Manager <span className='text-error'>*</span></>}
-                            error={!!errors?.locations?.[index]?.manager} helperText={errors?.locations?.[index]?.manager?.message}
-                            {...field}
                           />
                         )}
                       />

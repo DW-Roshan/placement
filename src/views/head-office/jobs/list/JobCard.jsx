@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 // MUI Imports
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Switch, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Switch, Tooltip, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
@@ -36,7 +36,7 @@ import DialogsConfirmation from '../DialogConfirmation'
 
 import AssignBranchDialog from '@/views/head-office/jobs/AssignBranchDialog'
 
-const JobCard = ({job, branchData, isCandidate}) => {
+const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
 
   const [skillRef] = useKeenSlider({
     slides: {
@@ -62,6 +62,7 @@ const JobCard = ({job, branchData, isCandidate}) => {
   const [openApply, setOpenApply] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
+  const [cloneLoading, setCloneLoading] = useState(false);
 
   const { lang: locale } = useParams()
   const JobDescription = dynamic(() => import('./JobDescription'), { ssr: false });
@@ -95,6 +96,31 @@ const JobCard = ({job, branchData, isCandidate}) => {
     }
   }
 
+  const handleCloneJob = async () => {
+
+    setCloneLoading(true);
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${job?.id}/clone`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    const result = await res.json();
+
+    if(res?.ok){
+
+      setJobsData(prev => [result.job, ...prev]);
+      toast.success(result?.message || 'Job Cloned Successfully');
+    } else {
+      toast.error(result?.message || 'Something went wrong');
+    }
+
+    setCloneLoading(false);
+  }
+
   return (
     <Card variant='outlined'>
       <CardHeader title={job?.job_title}
@@ -118,22 +144,23 @@ const JobCard = ({job, branchData, isCandidate}) => {
                   : `${job?.min_exp ?? 0}-${job?.max_exp ?? 0} Yrs`
               }
               color='primary'
-              variant='tonal'
+              variant='contained'
               icon={<i className='tabler-briefcase' />}
             />
-            <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='tonal' icon={ <i className='tabler-currency-rupee' /> } />
-            <Chip
-              label={
-                Array.isArray(job?.locations) && job.locations.length > 0
-                  ? job.locations.length === 1
-                    ? job.locations[0].city_name
-                    : `${job.locations[0].city_name} +${job.locations.length - 1} more`
-                  : ''
-              }
-              color="warning"
-              variant="tonal"
-              icon={<i className="tabler-map-pin" />}
-            />
+            <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='contained' icon={ <i className='tabler-currency-rupee' /> } />
+            {Array.isArray(job?.locations) && job.locations.length > 0 && (
+              <Chip
+                label={
+                  job.locations.length === 1
+                    ? job.locations[0]?.city_name
+                    : `${job.locations[0]?.city_name} +${job.locations.length - 1} more`
+                }
+                color="warning"
+                variant="contained"
+                icon={<i className="tabler-map-pin" />}
+              />
+            )}
+
 
 
           </Grid>
@@ -158,16 +185,16 @@ const JobCard = ({job, branchData, isCandidate}) => {
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Matched Candidates</Typography>
               <div className='flex gap-2'>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='tonal' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='tonal' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='tonal' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
               </div>
             </Grid>
             <Grid size={{ xs: 12 }} className='flex gap-2'>
-              <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='tonal' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
+              <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
               {/* {authUser?.userType === 'HO' &&
-                <Button onClick={() => {setOpenAssignBranch(true)}} variant='tonal' color='info' size='small' className='m-0'>Assign to Branch</Button>
+                <Button onClick={() => {setOpenAssignBranch(true)}} variant='contained' color='info' size='small' className='m-0'>Assign to Branch</Button>
               } */}
             </Grid></>
           }
@@ -176,8 +203,8 @@ const JobCard = ({job, branchData, isCandidate}) => {
 
             {isCandidate ?
               <div className='flex gap-2 flex-wrap'>
-                <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {applied || <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'tonal' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
+                <Link href={getLocalizedUrl(`/candidate/jobs/${job?.id}/view`, locale)}><CustomIconButton variant='contained' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                {applied || <CustomIconButton onClick={() => { if(!saved) {setOpenSave(true)}}} variant={saved ? 'contained' : 'outlined'} color='warning' size='small' disabled={status === 'loading'}>
                   {saved ? <i className='tabler-star-filled' /> : <i className='tabler-star' />}
                 </CustomIconButton>}
                 {applied || <Button className='ml-0' onClick={() => setOpenApply(true)} variant='contained' color='primary' size='small' disabled={status === 'loading' || applied}>
@@ -186,9 +213,17 @@ const JobCard = ({job, branchData, isCandidate}) => {
               </div>
              :
               <div className='flex gap-2'>
-                <Link href={getLocalizedUrl(`${authUser?.userType === 'HO' ? `/head-office/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='tonal' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
-                {authUser?.userType === 'HO' &&
-                  <Link href={getLocalizedUrl(`/head-office/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='tonal' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                <Tooltip title="View Job">
+                  <Link href={getLocalizedUrl(`${authUser?.userType === 'HO' ? `/head-office/jobs/${job?.id}/view` : `/jobs/${job?.id}/view`}`, locale)}><CustomIconButton variant='contained' color='success' size='small'><i className='tabler-eye' /></CustomIconButton></Link>
+                </Tooltip>
+                {authUser?.userType === 'HO' && <>
+                  <Tooltip title="Edit Job">
+                    <Link href={getLocalizedUrl(`/head-office/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='contained' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
+                  </Tooltip>
+                  <Tooltip title="Clone Job">
+                    <CustomIconButton disabled={cloneLoading} onClick={handleCloneJob} variant='contained' color='primary' size='small' className='m-0'>{cloneLoading ? <CircularProgress size={20} /> : <i className='tabler-copy' />}</CustomIconButton>
+                  </Tooltip>
+                  </>
                 }
               </div>
             }

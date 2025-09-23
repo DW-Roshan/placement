@@ -22,10 +22,12 @@ import InvitedCandidates from "./dialog-content/InvitedCandidates";
 import AppliedCandidates from "./dialog-content/ApppliedCandidates";
 import ApprovedCandidates from "./dialog-content/ApprovedCandidates";
 import InterviewScheduled from "./dialog-content/InterviewScheduled";
+import CVSharedCandidates from "./dialog-content/CVSharedCandidates";
 
 const steps = {
   invite: "Invited Candidates",
   applied: "Applied",
+  cv_shared: "CV Shared",
   hr_review: "HR reviews and approves the profile",
   interview_scheduled: "Interview Lined up",
   selected: "Candidate Selected / Job selection",
@@ -37,11 +39,12 @@ const steps = {
 const statusToStep = {
   invite: 0,
   applied: 1,
-  hr_review: 2,
-  interview_scheduled: 3,
-  selected: 4,
-  offer_accepted: 5,
-  onboarded: 6,
+  cv_shared: 2,
+  hr_review: 3,
+  interview_scheduled: 4,
+  selected: 5,
+  offer_accepted: 6,
+  onboarded: 7,
 };
 
 export default function JobStepper({ job, setJobData }) {
@@ -68,11 +71,15 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "applied":
         return (
-          <AppliedCandidates candidateData={job?.candidates} jobId={job?.id} />
+          <AppliedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.candidates} jobId={job?.id} />
+        );
+      case "cv_shared":
+        return (
+          <CVSharedCandidates candidateData={job?.cv_shared_candidates} jobId={job?.id} />
         );
       case "hr_review":
         return (
-          <ApprovedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.candidates} approvedCandidateIds={job?.approved_candidates?.map(c => c.id) || []} jobId={job?.id}  />
+          <ApprovedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.cv_shared_candidates} approvedCandidateIds={job?.approved_candidates?.map(c => c.id) || []} jobId={job?.id}  />
         );
       case "interview_scheduled":
         return (
@@ -120,6 +127,7 @@ export default function JobStepper({ job, setJobData }) {
 
             if (key === "invite") count = job?.all_invited_candidates?.length || 0;
             if (key === "applied") count = job?.candidates?.length || 0;
+            if (key === "cv_shared") count = job?.cv_shared_candidates?.length || 0;
             if (key === "hr_review") count = job?.approved_candidates?.length || 0;
             if (key === "interview_scheduled") count = job?.interview_scheduled_candidates?.length || 0;
 

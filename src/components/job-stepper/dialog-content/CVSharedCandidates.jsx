@@ -96,14 +96,14 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
+const CVSharedCandidates = ({handleClose, setJobData, candidateData, approvedCandidateIds, jobId}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [loading, setLoading] = useState(false);
-  const [inviteTypes, setInviteTypes] = useState(['email']);
+  const [inviteTypes, setInviteTypes] = useState(['whatsapp']);
 
   const toggleType = (type) => {
     setInviteTypes((prev) =>
@@ -115,6 +115,20 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
 
   const { data: session } = useSession()
   const token = session?.user?.token
+
+  // useEffect(() => {
+  //   if (candidateData && approvedCandidateIds.length > 0) {
+
+  //     const selected = {};
+
+  //     candidateData.forEach(candidate => {
+  //       if (approvedCandidateIds.includes(candidate.id)) {
+  //         selected[candidate.id] = true;
+  //       }
+  //     });
+  //     setRowSelection(selected);
+  //   }
+  // }, [candidateData, approvedCandidateIds]);
 
   // useEffect(() => {
 
@@ -132,55 +146,55 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
 
   console.log("can:", candidateData)
 
-  const getInviteIcon = (type, index) => {
-    switch (type) {
-      case 'sms':
-        return (
-          <Tooltip title="SMS" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
-          </Tooltip>
-        );
-      case 'whatsapp':
-        return (
-          <Tooltip title="WhatsApp" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
-          </Tooltip>
-        );
-      case 'email':
-        return (
-          <Tooltip title="Email" key={index}>
-            <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
-          </Tooltip>
-        );
-      default:
-        return null;
-    }
-  };
+  // const getInviteIcon = (type, index) => {
+  //   switch (type) {
+  //     case 'sms':
+  //       return (
+  //         <Tooltip title="SMS" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     case 'whatsapp':
+  //       return (
+  //         <Tooltip title="WhatsApp" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     case 'email':
+  //       return (
+  //         <Tooltip title="Email" key={index}>
+  //           <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
+  //         </Tooltip>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const columns = useMemo(
     () => [
-      {
-        id: 'select',
-        header: ({ table }) => (
-          <Checkbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler()
-            }}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
-            }}
-          />
-        )
-      },
+      // {
+      //   id: 'select',
+      //   header: ({ table }) => (
+      //     <Checkbox
+      //       {...{
+      //         checked: table.getIsAllRowsSelected(),
+      //         indeterminate: table.getIsSomeRowsSelected(),
+      //         onChange: table.getToggleAllRowsSelectedHandler()
+      //       }}
+      //     />
+      //   ),
+      //   cell: ({ row }) => (
+      //     <Checkbox
+      //       {...{
+      //         checked: row.getIsSelected(),
+      //         disabled: approvedCandidateIds.includes(row.original.id),
+      //         indeterminate: row.getIsSomeSelected(),
+      //         onChange: row.getToggleSelectedHandler()
+      //       }}
+      //     />
+      //   )
+      // },
       columnHelper.accessor('full_name', {
         header: 'Candidate',
         cell: ({ row }) => (
@@ -193,6 +207,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
               <Typography variant='body2'>{row.original?.profile_title}</Typography>
             </div>
           </div>
+
         )
       }),
       columnHelper.accessor('email', {
@@ -329,6 +344,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   const table = useReactTable({
     data: candidateData || [],
     columns,
+    getRowId: row => row.id,
     filterFns: {
       fuzzy: fuzzyFilter
     },
@@ -355,61 +371,66 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues()
   })
 
-  const selectedIds = useMemo(
-    () => table.getSelectedRowModel().rows.map(r => r.original.id),
-    [table.getSelectedRowModel()]
-  );
+  // const selectedIds = useMemo(
+  //   () => table.getSelectedRowModel().rows.map(r => r.original.id),
+  //   [table.getSelectedRowModel()]
+  // );
 
-  console.log("selected id:", selectedIds);
+  // const newSelectedIds = useMemo(
+  //   () => selectedIds.filter(id => !approvedCandidateIds.includes(id)),
+  //   [selectedIds, approvedCandidateIds]
+  // );
 
-  const handleCVShare = async (inviteTypes) => {
+  // console.log("selected id:", selectedIds);
 
-    // setRowSelection({});
+  // const handleApproveCandidate = async (inviteTypes) => {
 
-    if(!token) return
+  //   // setRowSelection({});
 
-    setLoading(true);
+  //   if(!token) return
 
-    try {
+  //   setLoading(true);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/share-cv-to-hr`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          selectedIds : selectedIds,
-          inviteTypes
-        })
-      });
+  //   try {
 
-      if(res.ok) {
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/approve-candidate`, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       method: 'POST',
+  //       body: JSON.stringify({
+  //         selectedIds : selectedIds,
+  //         inviteTypes
+  //       })
+  //     });
 
-        const data = await res.json();
+  //     if(res.ok) {
 
-        toast.success(data?.message || 'Mail sent successfully!')
-        setJobData(data?.job);
+  //       const data = await res.json();
 
-        console.log("data from invite sent:", data);
-      }
+  //       toast.success(data?.message || 'Mail sent successfully!')
+  //       setJobData(data?.job);
 
-    } catch (error) {
+  //       console.log("data from invite sent:", data);
+  //     }
 
-      toast.error('Something went wrong.');
+  //   } catch (error) {
 
-      console.log("error:", error);
+  //     toast.error('Something went wrong.');
 
-
-    } finally {
-      setLoading(false);
-      setRowSelection({});
-      handleClose()
-    }
+  //     console.log("error:", error);
 
 
+  //   } finally {
+  //     setLoading(false);
+  //     setRowSelection({});
+  //     handleClose()
+  //   }
 
-  }
+
+
+  // }
 
   const getAvatar = params => {
     const { avatar, fullName } = params
@@ -424,7 +445,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   return (
     <>
       <DialogTitle>
-        Applied Candidates
+        CV Shared Candidates
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
@@ -455,16 +476,16 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
               Export
             </Button>
             <div className="flex flex-col max-sm:is-full">
-              <Button
+              {/* <Button
                 color='primary'
                 variant='contained'
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
-                disabled={selectedIds.length <= 0 || loading}
-                onClick={() => handleCVShare(inviteTypes)}
+                disabled={newSelectedIds.length <= 0 || loading || inviteTypes.length === 0}
+                onClick={() => handleApproveCandidate(inviteTypes)}
               >
-                {loading ? 'Sharing...' : 'CV Share'}
-              </Button>
+                {loading ? 'Approving...' : 'Approve'}
+              </Button> */}
 
               {/* <FormGroup row>
                 <FormControlLabel
@@ -563,4 +584,4 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   )
 }
 
-export default AppliedCandidates;
+export default CVSharedCandidates;

@@ -6,14 +6,14 @@ import { Controller } from 'react-hook-form'
 
 import { MenuItem, TextField } from '@mui/material'
 
-import { startOfMonth, endOfMonth } from 'date-fns'
+import { startOfMonth, endOfMonth, subDays } from 'date-fns'
 
 import Grid from "@mui/material/Grid2";
 
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker';
 
 const DateFilterWithPicker = ({ control, errors, setValue }) => {
-  
+
   // const [startDateRange, setStartDateRange] = useState(startOfMonth(new Date()))
   // const [endDateRange, setEndDateRange] = useState(endOfMonth(new Date()))
   const myDateRef = useRef(null);
@@ -22,10 +22,21 @@ const DateFilterWithPicker = ({ control, errors, setValue }) => {
   const [endDateRange, setEndDateRange] = useState(null)
   const [mounted, setMounted] = useState(false)
 
+  // useEffect(() => {
+  //   const now = new Date()
+  //   const start = startOfMonth(now)
+  //   const end = endOfMonth(now)
+
+  //   setStartDateRange(start)
+  //   setEndDateRange(end)
+  //   setValue('date', [start, end])
+  //   setMounted(true) // ✅ hydration-safe render
+  // }, [setValue])
+
   useEffect(() => {
     const now = new Date()
-    const start = startOfMonth(now)
-    const end = endOfMonth(now)
+    const start = subDays(now, 30) // ✅ 30 days ago
+    const end = now               // ✅ today
 
     setStartDateRange(start)
     setEndDateRange(end)
@@ -59,7 +70,7 @@ const DateFilterWithPicker = ({ control, errors, setValue }) => {
 
               setStartDateRange(start)
               setEndDateRange(end)
-              
+
               field.onChange(dates) // update react-hook-form value
             }}
             showYearDropdown
