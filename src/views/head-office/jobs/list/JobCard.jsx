@@ -35,6 +35,7 @@ import CustomChip from '@/@core/components/mui/Chip'
 import DialogsConfirmation from '../DialogConfirmation'
 
 import AssignBranchDialog from '@/views/head-office/jobs/AssignBranchDialog'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
 
@@ -63,6 +64,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
   const [cloneLoading, setCloneLoading] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   const { lang: locale } = useParams()
   const JobDescription = dynamic(() => import('./JobDescription'), { ssr: false });
@@ -221,8 +223,19 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
                     <Link href={getLocalizedUrl(`/head-office/jobs/${job?.id}/edit`, locale)}><CustomIconButton variant='contained' color='primary' size='small'><i className='tabler-edit' /></CustomIconButton></Link>
                   </Tooltip>
                   <Tooltip title="Clone Job">
-                    <CustomIconButton disabled={cloneLoading} onClick={handleCloneJob} variant='contained' color='primary' size='small' className='m-0'>{cloneLoading ? <CircularProgress size={20} /> : <i className='tabler-copy' />}</CustomIconButton>
+                    <CustomIconButton disabled={cloneLoading} onClick={() => setOpenConfirm(true)} variant='contained' color='primary' size='small' className='m-0'>{cloneLoading ? <CircularProgress size={20} /> : <i className='tabler-copy' />}</CustomIconButton>
                   </Tooltip>
+                  <ConfirmDialog
+                    open={openConfirm}
+                    setOpen={setOpenConfirm}
+                    title="Clone Job?"
+                    message={`Are you sure you want to clone "${job?.job_title}"?`}
+                    confirmText="Yes, Clone"
+                    cancelText="Cancel"
+                    successMessage="Job cloned successfully!"
+                    cancelMessage="Job cloning cancelled."
+                    onConfirm={handleCloneJob}
+                  />
                   </>
                 }
               </div>

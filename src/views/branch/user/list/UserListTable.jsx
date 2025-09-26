@@ -378,14 +378,14 @@ const UserListTable = ({userData}) => {
               placeholder='Search User'
               className='max-sm:is-full'
             />
-            <Button
+            {/* <Button
               color='secondary'
               variant='tonal'
               startIcon={<i className='tabler-upload' />}
               className='max-sm:is-full'
             >
               Export
-            </Button>
+            </Button> */}
             <Link href={getLocalizedUrl('/branch/user/add', locale)}>
               <Button
                 variant='contained'

@@ -96,14 +96,14 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCandidateIds, jobId}) => {
+const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, selectedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [data, setData] = useState([])
   const [filteredData, setFilteredData] = useState([])
   const [loading, setLoading] = useState(false);
-  const [inviteTypes, setInviteTypes] = useState(['whatsapp']);
+  const [inviteTypes, setInviteTypes] = useState(['email']);
 
   const toggleType = (type) => {
     setInviteTypes((prev) =>
@@ -117,26 +117,18 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   const token = session?.user?.token
 
   useEffect(() => {
-    if (candidateData && approvedCandidateIds.length > 0) {
+    if (candidateData && selectedCandidateIds.length > 0) {
 
       const selected = {};
 
       candidateData.forEach(candidate => {
-        if (approvedCandidateIds.includes(candidate.id)) {
+        if (selectedCandidateIds.includes(candidate.id)) {
           selected[candidate.id] = true;
         }
       });
       setRowSelection(selected);
     }
-  }, [candidateData, approvedCandidateIds]);
-
-  // useEffect(() => {
-
-  //   if(selectValue){
-  //     setValue(selectValue);
-  //   }
-
-  // }, [selectValue])
+  }, [candidateData, selectedCandidateIds]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -146,30 +138,30 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
 
   console.log("can:", candidateData)
 
-  // const getInviteIcon = (type, index) => {
-  //   switch (type) {
-  //     case 'sms':
-  //       return (
-  //         <Tooltip title="SMS" key={index}>
-  //           <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
-  //         </Tooltip>
-  //       );
-  //     case 'whatsapp':
-  //       return (
-  //         <Tooltip title="WhatsApp" key={index}>
-  //           <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
-  //         </Tooltip>
-  //       );
-  //     case 'email':
-  //       return (
-  //         <Tooltip title="Email" key={index}>
-  //           <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
-  //         </Tooltip>
-  //       );
-  //     default:
-  //       return null;
-  //   }
-  // };
+  const getInviteIcon = (type, index) => {
+    switch (type) {
+      case 'sms':
+        return (
+          <Tooltip title="SMS" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="error"><i className="tabler-phone" /></CustomIconButton>
+          </Tooltip>
+        );
+      case 'whatsapp':
+        return (
+          <Tooltip title="WhatsApp" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="success"><i className="tabler-brand-whatsapp" /></CustomIconButton>
+          </Tooltip>
+        );
+      case 'email':
+        return (
+          <Tooltip title="Email" key={index}>
+            <CustomIconButton size="small" variant="tonal" color="primary"><i className="tabler-mail" /></CustomIconButton>
+          </Tooltip>
+        );
+      default:
+        return null;
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -188,7 +180,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
           <Checkbox
             {...{
               checked: row.getIsSelected(),
-              disabled: approvedCandidateIds.includes(row.original.id),
+              disabled: !row.getCanSelect(),
               indeterminate: row.getIsSomeSelected(),
               onChange: row.getToggleSelectedHandler()
             }}
@@ -357,7 +349,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
+    enableRowSelection: row => !row.original?.pivot?.selected, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -376,13 +368,13 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   );
 
   const newSelectedIds = useMemo(
-    () => selectedIds.filter(id => !approvedCandidateIds.includes(id)),
-    [selectedIds, approvedCandidateIds]
+    () => selectedIds.filter(id => !selectedCandidateIds.includes(id)),
+    [selectedIds, selectedCandidateIds]
   );
 
   console.log("selected id:", selectedIds);
 
-  const handleApproveCandidate = async (inviteTypes) => {
+  const handleCandidateSelection = async () => {
 
     // setRowSelection({});
 
@@ -392,7 +384,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
 
     try {
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/approve-candidate`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/select-candidate`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -400,18 +392,19 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
-          inviteTypes
         })
       });
 
+      const data = await res.json();
+
       if(res.ok) {
 
-        const data = await res.json();
-
-        toast.success(data?.message || 'Mail sent successfully!')
+        toast.success(data?.message || 'Candidate selected successfully!')
         setJobData(data?.job);
 
         console.log("data from invite sent:", data);
+      } else {
+        toast.error(data?.message || 'Service not available right now. Please try again later.');
       }
 
     } catch (error) {
@@ -444,7 +437,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   return (
     <>
       <DialogTitle>
-        Applied Candidates
+        Selected Candidates
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
@@ -480,13 +473,13 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
                 variant='contained'
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
-                disabled={newSelectedIds.length <= 0 || loading || inviteTypes.length === 0}
-                onClick={() => handleApproveCandidate(inviteTypes)}
+                disabled={newSelectedIds.length <= 0 || loading}
+                onClick={handleCandidateSelection}
               >
-                {loading ? 'Approving...' : 'Approve'}
+                {loading ? 'Selecting...' : 'Select Candidate'}
               </Button>
 
-              <FormGroup row>
+              {/* <FormGroup row>
                 <FormControlLabel
                   control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
                   label="WhatsApp"
@@ -500,7 +493,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
                   control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
                   label="Email"
                 />
-              </FormGroup>
+              </FormGroup> */}
             </div>
             {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
               <Button
@@ -583,4 +576,4 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   )
 }
 
-export default ApprovedCandidates;
+export default SelectedCandidates;

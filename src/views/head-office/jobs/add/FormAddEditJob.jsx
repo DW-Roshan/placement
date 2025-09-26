@@ -241,6 +241,27 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     })
   }
 
+  const fetchLocations = async() => {
+    if(token){
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/all-locations`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+
+        setLocationOptions(data);
+      }
+
+    }
+  }
+
+  useEffect(() => {
+    fetchLocations();
+  }, [token]);
+
   // useEffect(() => {
   //   if(error){
   //     // console.log("jobData", jobData)
@@ -660,10 +681,11 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         render={({ field }) => (
                           <Autocomplete
                             fullWidth
+                            loading={locationOptions.length === 0}
                             value={locationOptions && locationOptions.length > 0 && locationOptions.find(location => location.id === field.value) || null}
                             options={locationOptions || []}
                             getOptionKey={option => option.id}
-                            getOptionLabel={(location) => location.city_name + ', ' + location?.state?.state_name|| ''}
+                            getOptionLabel={(location) => location.city_name + (location?.state?.state_name ? ', ' + location.state.state_name : location?.state_name ? ', ' + location.state_name : '') || ''}
                             getOptionDisabled={(option) =>
                               locationFields.some((f, i) => i !== index && f.locationId === option.id)
                             }

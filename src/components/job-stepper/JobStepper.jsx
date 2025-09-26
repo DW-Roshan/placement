@@ -19,10 +19,13 @@ import StepperWrapper from "@/@core/styles/stepper";
 import StepperCustomDot from '@components/stepper-dot';
 import DialogCloseButton from "@/components/dialogs/DialogCloseButton";
 import InvitedCandidates from "./dialog-content/InvitedCandidates";
-import AppliedCandidates from "./dialog-content/ApppliedCandidates";
+import AppliedCandidates from "./dialog-content/AppliedCandidates";
 import ApprovedCandidates from "./dialog-content/ApprovedCandidates";
 import InterviewScheduled from "./dialog-content/InterviewScheduled";
 import CVSharedCandidates from "./dialog-content/CVSharedCandidates";
+import SelectedCandidates from "./dialog-content/SelectedCandidates";
+import OfferLetterAcceptedCandidates from "./dialog-content/OfferAcceptedCandidates";
+import OnboardedCandidates from "./dialog-content/OnboardedCandidates";
 
 const steps = {
   invite: "Invited Candidates",
@@ -87,30 +90,15 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "selected":
         return (
-          <>
-            <DialogTitle>Selected Candidates</DialogTitle>
-            <DialogContent>
-              <Typography>Selected candidates for the job.</Typography>
-            </DialogContent>
-          </>
+          <SelectedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.interview_scheduled_candidates} selectedCandidateIds={job?.selected_candidates?.map(c => c.id) || []} jobId={job?.id} />
         );
       case "offer_accepted":
         return (
-          <>
-            <DialogTitle>Offer Accepted</DialogTitle>
-            <DialogContent>
-              <Typography>Candidates who accepted the offer.</Typography>
-            </DialogContent>
-          </>
+          <OfferLetterAcceptedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.selected_candidates} offerAcceptedCandidateIds={job?.offer_letter_accepted_candidates?.map(c => c.id) || []} jobId={job?.id} />
         );
       case "onboarded":
         return (
-          <>
-            <DialogTitle>Onboarded</DialogTitle>
-            <DialogContent>
-              <Typography>Candidates who joined the company.</Typography>
-            </DialogContent>
-          </>
+          <OnboardedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.offer_letter_accepted_candidates} onboardedCandidateIds={job?.onboarded_candidates?.map(c => c.id) || []} jobId={job?.id} />
         );
       default:
         return null;
@@ -130,6 +118,9 @@ export default function JobStepper({ job, setJobData }) {
             if (key === "cv_shared") count = job?.cv_shared_candidates?.length || 0;
             if (key === "hr_review") count = job?.approved_candidates?.length || 0;
             if (key === "interview_scheduled") count = job?.interview_scheduled_candidates?.length || 0;
+            if (key === "selected") count = job?.selected_candidates?.length || 0;
+            if (key === "offer_accepted") count = job?.offer_letter_accepted_candidates?.length || 0;
+            if (key === "onboarded") count = job?.onboarded_candidates?.length || 0;
 
             return (
               <Step

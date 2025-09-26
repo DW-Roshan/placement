@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
+const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJobData, offerAcceptedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -116,13 +116,19 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   const { data: session } = useSession()
   const token = session?.user?.token
 
-  // useEffect(() => {
+  useEffect(() => {
+    if (candidateData && offerAcceptedCandidateIds.length > 0) {
 
-  //   if(selectValue){
-  //     setValue(selectValue);
-  //   }
+      const selected = {};
 
-  // }, [selectValue])
+      candidateData.forEach(candidate => {
+        if (offerAcceptedCandidateIds.includes(candidate.id)) {
+          selected[candidate.id] = true;
+        }
+      });
+      setRowSelection(selected);
+    }
+  }, [candidateData, offerAcceptedCandidateIds]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -329,6 +335,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   const table = useReactTable({
     data: candidateData || [],
     columns,
+    getRowId: row => row.id,
     filterFns: {
       fuzzy: fuzzyFilter
     },
@@ -342,7 +349,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
+    enableRowSelection: row => !row.original?.pivot?.offer_letter_accepted, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -360,9 +367,14 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
     [table.getSelectedRowModel()]
   );
 
+  const newSelectedIds = useMemo(
+    () => selectedIds.filter(id => !offerAcceptedCandidateIds.includes(id)),
+    [selectedIds, offerAcceptedCandidateIds]
+  );
+
   console.log("selected id:", selectedIds);
 
-  const handleCVShare = async (inviteTypes) => {
+  const handleCandidateOfferLetterAccepted = async () => {
 
     // setRowSelection({});
 
@@ -372,7 +384,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
 
     try {
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/share-cv-to-hr`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/offer-accept`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -380,18 +392,19 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
-          inviteTypes
         })
       });
 
+      const data = await res.json();
+
       if(res.ok) {
 
-        const data = await res.json();
-
-        toast.success(data?.message || 'Mail sent successfully!')
+        toast.success(data?.message || 'Candidate offer letter accepted successfully!')
         setJobData(data?.job);
 
         console.log("data from invite sent:", data);
+      } else {
+        toast.error(data?.message || 'Service not available right now. Please try again later.');
       }
 
     } catch (error) {
@@ -424,7 +437,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   return (
     <>
       <DialogTitle>
-        Applied Candidates
+        Offer Letter Accepted Candidates
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
@@ -446,24 +459,24 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            <Button
+            {/* <Button
               color='secondary'
               variant='tonal'
               startIcon={<i className='tabler-upload' />}
               className='max-sm:is-full'
             >
               Export
-            </Button>
+            </Button> */}
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'
                 variant='contained'
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
-                disabled={selectedIds.length <= 0 || loading}
-                onClick={() => handleCVShare(inviteTypes)}
+                disabled={newSelectedIds.length <= 0 || loading}
+                onClick={handleCandidateOfferLetterAccepted}
               >
-                {loading ? 'Sharing...' : 'CV Share'}
+                {loading ? 'Updating...' : 'Offer Accepted'}
               </Button>
 
               {/* <FormGroup row>
@@ -563,4 +576,4 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
   )
 }
 
-export default AppliedCandidates;
+export default OfferLetterAcceptedCandidates;

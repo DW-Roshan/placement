@@ -467,16 +467,16 @@ const CVSharedCandidates = ({handleClose, setJobData, candidateData, approvedCan
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            <Button
+            {/* <Button
               color='secondary'
               variant='tonal'
               startIcon={<i className='tabler-upload' />}
               className='max-sm:is-full'
             >
               Export
-            </Button>
-            <div className="flex flex-col max-sm:is-full">
-              {/* <Button
+            </Button> */}
+            {/* <div className="flex flex-col max-sm:is-full">
+              <Button
                 color='primary'
                 variant='contained'
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
@@ -485,9 +485,9 @@ const CVSharedCandidates = ({handleClose, setJobData, candidateData, approvedCan
                 onClick={() => handleApproveCandidate(inviteTypes)}
               >
                 {loading ? 'Approving...' : 'Approve'}
-              </Button> */}
+              </Button>
 
-              {/* <FormGroup row>
+              <FormGroup row>
                 <FormControlLabel
                   control={<Checkbox checked={inviteTypes.includes('whatsapp')} onChange={() => toggleType('whatsapp')} />}
                   label="WhatsApp"
@@ -501,8 +501,8 @@ const CVSharedCandidates = ({handleClose, setJobData, candidateData, approvedCan
                   control={<Checkbox checked={inviteTypes.includes('email')} onChange={() => toggleType('email')} />}
                   label="Email"
                 />
-              </FormGroup> */}
-            </div>
+              </FormGroup>
+            </div> */}
             {/* <Link href={getLocalizedUrl('/candidates/add', locale)}>
               <Button
                 variant='contained'

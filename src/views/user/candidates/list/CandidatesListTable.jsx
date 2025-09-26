@@ -457,7 +457,7 @@ const CandidatesListTable = ({ tableData }) => {
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            {user?.id == 10 ?
+            {user?.id == 10 &&
               <Button
                 color='info'
                 variant='tonal'
@@ -467,16 +467,15 @@ const CandidatesListTable = ({ tableData }) => {
               >
                 Auto Import
               </Button>
-             :
-              <Button
+            }
+              {/* <Button
                 color='secondary'
                 variant='tonal'
                 startIcon={<i className='tabler-upload' />}
                 className='max-sm:is-full'
               >
                 Export
-              </Button>
-            }
+              </Button> */}
             <Link href={getLocalizedUrl('/candidates/add', locale)}>
               <Button
                 variant='contained'

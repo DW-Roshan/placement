@@ -335,14 +335,14 @@ const InvitedCandidates = ({candidateData}) => {
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            <Button
+            {/* <Button
               color='secondary'
               variant='tonal'
               startIcon={<i className='tabler-upload' />}
               className='max-sm:is-full'
             >
               Export
-            </Button>
+            </Button> */}
             {/* <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'

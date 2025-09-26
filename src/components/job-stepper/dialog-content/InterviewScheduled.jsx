@@ -463,7 +463,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
+    enableRowSelection: row => row.original?.pivot?.interview_date, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -571,14 +571,14 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
               placeholder='Search Candidate'
               className='max-sm:is-full'
             />
-            <Button
+            {/* <Button
               color='secondary'
               variant='tonal'
               startIcon={<i className='tabler-upload' />}
               className='max-sm:is-full'
             >
               Export
-            </Button>
+            </Button> */}
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'
