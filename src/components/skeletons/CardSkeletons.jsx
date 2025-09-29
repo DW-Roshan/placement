@@ -13,7 +13,7 @@ const CardSkeletons = ({totalCards = 4}) => {
     <Grid container spacing={6}>
       {Array.from({ length: cardCounts }).map((_, index) => (
         <Grid size={{ xs: 12, sm: 12, md: 6, xl: 4 }} key={index}>
-          <Skeleton variant='rectangular' radius={20} height={400} sx={{ borderRadius: 2 }} />
+          <Skeleton variant='rectangular' height={400} sx={{ borderRadius: 1 }} />
         </Grid>
       ))}
     </Grid>

@@ -10,7 +10,7 @@ import { useSession } from 'next-auth/react';
 
 import DateFilterWithPicker from '@/components/DateFilterWithPicker';
 
-const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
+const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate, searching, setSearching }) => {
   const { control, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
       keyword: '',
@@ -110,6 +110,7 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
 
     if(!token) return;
 
+    setSearching(true);
 
     if(token){
 
@@ -140,6 +141,8 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
     } else{
       setJobsData([])
     }
+
+    setSearching(false);
 
     // if(data?.keyword || data?.minExp || data?.maxExp || data?.location.length > 0 ){
     //   setJobsData([]);
@@ -319,7 +322,7 @@ const JobSearchForm = ({ yearsOpt, setJobsData, isCandidate }) => {
 
         {/* Submit Button */}
         <Grid size={{ xs:12 }} className="flex justify-end">
-          <Button variant="contained" type="submit">
+          <Button variant="contained" type="submit" disabled={searching}>
             Search
           </Button>
         </Grid>

@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid2'
 // import CandidatesListTable from './CandidatesListTable'
 import JobsListCard from './JobsListCard'
 import CardSkeletons from '@/components/skeletons/CardSkeletons';
+import JobsListSkeleton from '@/components/skeletons/JobsListSkeleton';
 
 
 const JobsList = ({token, isCandidate, hideSearch}) => {
@@ -27,20 +28,40 @@ const JobsList = ({token, isCandidate, hideSearch}) => {
 
       setLoading(true) // start loading
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+      if(isCandidate) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+
+          setJobsData(data.data)
+        } else {
+          setJobsData([])
         }
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-
-        setJobsData(data.data)
       } else {
-        setJobsData([])
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+
+          setJobsData(data.data)
+        } else {
+          setJobsData([])
+        }
+
       }
     } catch (error) {
       console.error('Error fetching jobs:', error)
@@ -57,7 +78,7 @@ const JobsList = ({token, isCandidate, hideSearch}) => {
   // const jobsData = await getJobsData()
 
   if(loading) {
-    return <CardSkeletons totalCards={6} />
+    return <JobsListSkeleton totalCards={3}/>
   }
   
 

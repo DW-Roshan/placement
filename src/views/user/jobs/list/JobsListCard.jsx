@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid2";
 
 import { useSession } from "next-auth/react";
 
-import { Autocomplete, Button, Card, CardContent, TextField } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, Card, CardContent, Divider, TextField, Typography } from "@mui/material";
 
 import { toast } from "react-toastify";
 
@@ -14,6 +14,7 @@ import JobCard from "./JobCard";
 
 import { yearsOpt } from "@/configs/customDataConfig";
 import JobSearchForm from "../JobSearchForm";
+import CardSkeletons from "@/components/skeletons/CardSkeletons";
 
 // import { useRouter, useSearchParams } from "next/navigation";
 
@@ -25,6 +26,7 @@ const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
   const [status, setStatus] = useState('')
   const [industries, setIndustries] = useState(null);
   const [departments, setExperiences] = useState(null);
+  const [searching, setSearching] = useState(false);
   const { data: session } = useSession()
   const token = session?.user?.token
 
@@ -42,7 +44,7 @@ const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
 
   useEffect(() => {
 
-    if(!token) return
+    if (!token) return
 
     const getIndustry = async () => {
       try {
@@ -138,7 +140,7 @@ const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
         <Grid size={{ xs: 12 }}>
           <CardContent>
             {!hideSearch &&
-              <JobSearchForm yearsOpt={yearsOpt} setJobsData={setJobsData} isCandidate={isCandidate} />
+              <JobSearchForm yearsOpt={yearsOpt} setJobsData={setJobsData} isCandidate={isCandidate} searching={searching} setSearching={setSearching} />
             }
             {/* <Grid container spacing={6}>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -172,13 +174,29 @@ const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
           </CardContent>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Grid container spacing={6} className='p-6 border-bs'>
-            {jobsData?.map((job, index) => (
-              <Grid key={index} size={{ xs: 12, sm: 12, md: 6, xl: 4 }}>
-                <JobCard job={job} isCandidate={isCandidate} />
+          <Divider />
+          <CardContent>
+            {searching ? 
+              <CardSkeletons totalCards={3} /> 
+              : 
+              <Grid container spacing={6}>
+              {jobsData?.length <= 0 ? 
+                <Grid size={{ xs: 12 }}>
+                  <div className="flex flex-col items-center py-10">
+                    <Avatar sx={{ width: 56, height: 56, mb: 2 }}>
+                      <i className='tabler-report'></i>
+                    </Avatar>
+                    <Typography color="text.secondary">No data found</Typography>
+                  </div>
+                </Grid>
+                : jobsData?.map((job, index) => (
+                <Grid key={index} size={{ xs: 12, sm: 12, md: 6, xl: 4 }}>
+                  <JobCard job={job} isCandidate={isCandidate} />
+                </Grid>
+              ))}
               </Grid>
-            ))}
-          </Grid>
+            }
+          </CardContent>
         </Grid>
       </Card>
     </Grid>
