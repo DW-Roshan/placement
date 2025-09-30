@@ -1,13 +1,15 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // MUI Imports
 import Grid from '@mui/material/Grid2'
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
+
+import { Skeleton } from '@mui/material'
 
 // Component Imports
 import UserProfileHeader from './UserProfileHeader'
@@ -18,9 +20,12 @@ import Education from './educations'
 import EducationForm from './forms/EducationForm'
 import Skills from './skills'
 import SkillForm from './forms/SkillForm'
+
 import BasicDetails from './basicDetails.jsx'
 
-const UserProfile = ({ tabContentList, data }) => {
+import UserProfileHeaderSkeleton from '@/components/skeletons/UserProfileHeaderSkeleton'
+
+const UserProfile = ({ tabContentList, data, token, id }) => {
 
   // States
   const [openBasicForm, setOpenBasicForm] = useState(false);
@@ -28,8 +33,81 @@ const UserProfile = ({ tabContentList, data }) => {
   const [openEduForm, setOpenEduForm] = useState(false);
   const [openSkillForm, setOpenSkillForm] = useState(false);
   const [allData, setData] = useState(data);
+  const [loading, setLoading] = useState(true);
+  const [loadingExperience, setLoadingExperience] = useState(true);
+  const [loadingEducation, setLoadingEducation] = useState(true);
+  const [loadingSkills, setLoadingSkills] = useState(true);
+  const [candidate, setCandidateData] = useState(null);
+
+  const animation = 'wave';
+
+  const getProfileData = async () => {
+    // Vars
+
+    try {
+      if(!token){
+
+        return;
+      }
+    
+      // const session = await getServerSession(authOptions);
+      // const token = session?.user?.token;
+    
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/${id}/view`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+    
+      if (res.ok) {
+        const data = await res.json();
+
+        setData(data || null)
+      }
+    
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if(token){
+      getProfileData();
+    }
+  }, [token])
 
   // console.log("all data:", allData);
+
+  if(loading) {
+
+    return (
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12 }}>
+          <UserProfileHeaderSkeleton animation={animation} />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <Grid container spacing={6}>
+            <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+              <Skeleton animation={animation} variant='rectangular' height={420} sx={{ borderRadius: 1 }} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+              <Skeleton animation={animation} variant='rectangular' height={420} sx={{ borderRadius: 1 }} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+              <Skeleton animation={animation} variant='rectangular' height={420} sx={{ borderRadius: 1 }} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+              <Skeleton animation={animation} variant='rectangular' height={420} sx={{ borderRadius: 1 }} />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    )
+  }
 
   return (
     <Grid container spacing={6}>

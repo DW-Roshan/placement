@@ -11,7 +11,7 @@ import JobsListCard from './JobsListCard'
 import JobsListSkeleton from '@/components/skeletons/JobsListSkeleton';
 
 const JobsList = ({token, isCandidate, hideSearch}) => {
-  
+
   const [jobsData, setJobsData] = useState([]);
   const [branchData, setBranchData] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -176,11 +176,11 @@ const JobsListCard = ({ jobs, isCandidate, hideSearch }) => {
         <Grid size={{ xs: 12 }}>
           <Divider />
           <CardContent>
-            {searching ? 
-              <CardSkeletons totalCards={3} /> 
-              : 
+            {searching ?
+              <CardSkeletons totalCards={3} />
+              :
               <Grid container spacing={6}>
-              {jobsData?.length <= 0 ? 
+              {jobsData?.length <= 0 ?
                 <Grid size={{ xs: 12 }}>
                   <div className="flex flex-col items-center py-10">
                     <Avatar sx={{ width: 56, height: 56, mb: 2 }}>

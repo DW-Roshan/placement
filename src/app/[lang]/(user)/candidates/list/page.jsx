@@ -16,44 +16,47 @@ import { authOptions } from '@/libs/auth'
  * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
  * ! because we've used the server action for getting our static data.
  */
-const getCandidatesData = async () => {
-  // Vars
-  try {
-    // const token = await getCookie('token');
+// const getCandidatesData = async () => {
+//   // Vars
+//   try {
+//     // const token = await getCookie('token');
 
-    const session = await getServerSession(authOptions);
-    const token = session?.user?.token;
+//     const session = await getServerSession(authOptions);
+//     const token = session?.user?.token;
 
-    if(token){
+//     if(token){
 
-      const res = await fetch(`${process.env.API_URL}/candidates`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
+//       const res = await fetch(`${process.env.API_URL}/candidates`, {
+//         method: 'GET',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${token}`
+//         }
+//       })
 
-      const data = await res.json();
+//       const data = await res.json();
 
-      return data;
-    } else{
-      return [];
-    }
+//       return data;
+//     } else{
+//       return [];
+//     }
 
-  } catch (error) {
-    console.error('Error fetching user data:', error);
+//   } catch (error) {
+//     console.error('Error fetching user data:', error);
 
-    return [];
-  }
-}
+//     return [];
+//   }
+// }
 
 const CandidatesPage = async () => {
 
   // Vars
-  const candidatesData = await getCandidatesData()
+  // const candidatesData = await getCandidatesData()
 
-  return <CandidatesList candidatesData={candidatesData?.data || []} />
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.token;
+
+  return <CandidatesList token={token} />
 }
 
 export default CandidatesPage

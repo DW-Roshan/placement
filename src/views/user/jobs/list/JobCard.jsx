@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Link from 'next/link'
 
@@ -9,7 +9,7 @@ import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 // MUI Imports
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Tooltip, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Divider, Grid2, IconButton, Rating, Skeleton, Tooltip, Typography } from '@mui/material'
 
 import { formatDistanceToNow } from 'date-fns'
 
@@ -56,6 +56,8 @@ const JobCard = ({job, isCandidate}) => {
   const [openMatchedCandidate, setOpenMatchedCandidate] = useState(false);
   const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
   const [openInviteCandidate, setOpenInviteCandidate] = useState(false);
+  const [matchedCandidates, setMatchedCandidates] = useState([]);
+  const [matchedCandidateLoading, setMatchedCandidateLoading] = useState(true);
   const [openApply, setOpenApply] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
@@ -72,6 +74,47 @@ const JobCard = ({job, isCandidate}) => {
       setSaved(job?.saved_candidates?.some((cnd) => cnd?.id === userId))
     }
   }, [userId, job])
+
+  const getMatchedCandidates = async () => {
+
+    if(!token || !job.id) return
+
+    setMatchedCandidateLoading(true);
+
+    try {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${job.id}/matched-candidates`, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if(res.ok){
+        const data = await res.json();
+
+        setMatchedCandidates(data?.matched_candidates || []);
+      } else {
+        setMatchedCandidates([]);
+      }
+    } catch (error) {
+      setMatchedCandidates([]);
+
+    } finally {
+      setMatchedCandidateLoading(false);
+    }
+
+  }
+
+  const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (job.id && !fetchedRef.current) {
+      fetchedRef.current = true;
+      getMatchedCandidates();
+    }
+  }, [job.id]);
 
   return (
     <Card variant='outlined'>
@@ -133,10 +176,18 @@ const JobCard = ({job, isCandidate}) => {
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Matched Candidates</Typography>
               <div className='flex gap-2'>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.matched_candidates?.['100%']?.length === 0}>100% ({job?.matched_candidates?.['100%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={job?.matched_candidates?.['70%']?.length === 0}>70% ({job?.matched_candidates?.['70%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={job?.matched_candidates?.['50%']?.length === 0}>50% ({job?.matched_candidates?.['50%']?.length})</Button>
-                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={job?.matched_candidates?.['30%']?.length === 0}>30% ({job?.matched_candidates?.['30%']?.length})</Button>
+                { matchedCandidateLoading ?
+                  <>
+                    <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                    <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                    <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                    <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                  </> : <>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length})</Button>
+                </>}
               </div>
             </Grid>
             <Grid size={{ xs: 12 }}>
@@ -176,8 +227,8 @@ const JobCard = ({job, isCandidate}) => {
           </Grid>
         </Grid>
       </CardActions>
-      <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={job?.matched_candidates} jobId={job?.id} selectValue={tabOpen} />
-      <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />
+      {openMatchedCandidate && <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={matchedCandidates} jobId={job?.id} selectValue={tabOpen} />}
+      {openAppliedCandidate && <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />}
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
       <InviteCandidateDialog open={openInviteCandidate} handleClose={() => setOpenInviteCandidate(!openInviteCandidate)} jobId={job?.id} />

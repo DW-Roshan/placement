@@ -6,38 +6,40 @@ import { authOptions } from '@/libs/auth'
 
 import UserProfile from '@/views/candidate/profile'
 
-const getProfileData = async (id) => {
-  // Vars
+// const getProfileData = async (id) => {
+//   // Vars
 
-  const session = await getServerSession(authOptions);
-  const token = session?.user?.token;
+//   const session = await getServerSession(authOptions);
+//   const token = session?.user?.token;
 
-  const res = await fetch(`${process.env.API_URL}/candidates/${id}/view`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
+//   const res = await fetch(`${process.env.API_URL}/candidates/${id}/view`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${token}`
+//     }
+//   })
 
-  if (!res.ok) {
-    console.error('profile data fetch failed')
+//   if (!res.ok) {
+//     console.error('profile data fetch failed')
 
-    return [];
-  }
+//     return [];
+//   }
 
-  return res.json()
-}
+//   return res.json()
+// }
 
 const ProfilePage = async (props) => {
 
   const params = await props.params;
   const id = params.id
 
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.token;
 
   // Vars
-  const data = await getProfileData(id)
+  // const data = await getProfileData(id)
 
-  return <UserProfile data={data} cities={data?.cities} industries={data?.industries} />
+  return <UserProfile token={token} id={id} />
 }
 
 export default ProfilePage

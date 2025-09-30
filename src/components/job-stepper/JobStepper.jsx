@@ -150,6 +150,7 @@ export default function JobStepper({ job, setJobData }) {
 
       {/* Dialog for each step */}
       {/* <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm"> */}
+      {dialogOpen &&
         <Dialog
           fullWidth
           open={dialogOpen}
@@ -165,6 +166,7 @@ export default function JobStepper({ job, setJobData }) {
           <Button onClick={() => setDialogOpen(false)}>Close</Button>
         </DialogActions> */}
       </Dialog>
+      }
     </>
   );
 }
