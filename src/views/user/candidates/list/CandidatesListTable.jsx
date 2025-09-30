@@ -204,6 +204,43 @@ const CandidatesListTable = ({ tableData }) => {
           />
         )
       },
+      columnHelper.accessor('action', {
+        header: 'Action',
+        cell: ({ row }) => (
+          <div className='flex items-center'>
+            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
+              <i className='tabler-trash text-textSecondary' />
+            </IconButton> */}
+            <IconButton>
+              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+                <i className='tabler-eye text-textSecondary' />
+              </Link>
+            </IconButton>
+            <IconButton>
+              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/edit`, locale)} className='flex'>
+                <i className='tabler-edit text-textSecondary' />
+              </Link>
+            </IconButton>
+            {/* <OptionMenu
+              iconButtonProps={{ size: 'medium' }}
+              iconClassName='text-textSecondary'
+              options={[
+                {
+                  text: 'Download',
+                  icon: 'tabler-download',
+                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
+                },
+                {
+                  text: 'Edit',
+                  icon: 'tabler-edit',
+                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
+                }
+              ]}
+            /> */}
+          </div>
+        ),
+        enableSorting: false
+      }),
       columnHelper.accessor('full_name', {
         header: 'Candidate',
         cell: ({ row }) => (
@@ -332,43 +369,6 @@ const CandidatesListTable = ({ tableData }) => {
           </div>
         )
       }),
-      columnHelper.accessor('action', {
-        header: 'Action',
-        cell: ({ row }) => (
-          <div className='flex items-center'>
-            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton> */}
-            <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
-                <i className='tabler-eye text-textSecondary' />
-              </Link>
-            </IconButton>
-            <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/edit`, locale)} className='flex'>
-                <i className='tabler-edit text-textSecondary' />
-              </Link>
-            </IconButton>
-            {/* <OptionMenu
-              iconButtonProps={{ size: 'medium' }}
-              iconClassName='text-textSecondary'
-              options={[
-                {
-                  text: 'Download',
-                  icon: 'tabler-download',
-                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
-                },
-                {
-                  text: 'Edit',
-                  icon: 'tabler-edit',
-                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
-                }
-              ]}
-            /> */}
-          </div>
-        ),
-        enableSorting: false
-      })
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data, filteredData]
