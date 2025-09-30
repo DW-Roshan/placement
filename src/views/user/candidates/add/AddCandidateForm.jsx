@@ -143,52 +143,95 @@ const AddCandidateForm = ({candidateId, candiData}) => {
     return new Date(dateStr);
   }
 
+  // useEffect(() => {
+
+  //   if(candidateId){
+  //     const fetchCandidateData = async () => {
+  //       // const token = await getCookie('token');
+
+  //       if(!token) return
+
+  //       try {
+  //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/${candidateId}/edit`, {
+  //           method: "GET",
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             'Authorization': `Bearer ${token}`
+  //           }
+  //         });
+
+  //         const jsonData = await response.json();
+
+  //         setCities(jsonData.cities || []);
+  //         setIndustries(jsonData.industries);
+  //         setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate?.industry_id)?.departments)
+  //         setCandidateData(jsonData.candidate || null);
+
+  //         // setData(jsonData);
+  //       } catch (error) {
+  //         console.error('Error fetching data:', error);
+  //         setCities(null);
+  //       }
+  //     };
+
+  //     fetchCandidateData();
+  //   }
+
+  // }, [candidateId, token])
+
+  // useEffect(() => {
+
+  //   const fetchData = async () => {
+
+  //     // const token = await getCookie('token');
+
+  //     if(!token) return
+
+  //     try {
+  //       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/add`, {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${token}`
+  //         }
+  //       });
+
+  //       const jsonData = await response.json();
+
+  //       setCities(jsonData.cities || []);
+  //       setIndustries(jsonData.industries);
+  //       setSkills(jsonData?.skills || []);
+
+  //       setDepartments(jsonData.industryDepartments || null);
+
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //       setCities(null);
+  //       setIndustries(null);
+  //       setDepartments(null);
+  //     }
+  //   };
+
+  //   fetchData();
+
+  // }, [token]);
+
   useEffect(() => {
+    if (!token) return;
 
-    if(candidateId){
-      const fetchCandidateData = async () => {
-        // const token = await getCookie('token');
-
-        if(!token) return
-
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/${candidateId}/edit`, {
-            method: "GET",
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          const jsonData = await response.json();
-
-          setCities(jsonData.cities || []);
-          setIndustries(jsonData.industries);
-          setDepartments(jsonData.industries.find(industry => industry.id === jsonData.candidate?.industry_id)?.departments)
-          setCandidateData(jsonData.candidate || null);
-
-          // setData(jsonData);
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          setCities(null);
-        }
-      };
-
-      fetchCandidateData();
-    }
-
-  }, [candidateId, token])
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-
-      // const token = await getCookie('token');
-
-      if(!token) return
-
+    const fetchCandidateData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/add`, {
+        let url;
+
+        if (candidateId) {
+          // Edit mode
+          url = `${process.env.NEXT_PUBLIC_API_URL}/candidates/${candidateId}/edit`;
+        } else {
+          // Add mode
+          url = `${process.env.NEXT_PUBLIC_API_URL}/candidates/add`;
+        }
+
+        const response = await fetch(url, {
+          method: "GET",
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -197,11 +240,21 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
         const jsonData = await response.json();
 
+        // Common sets
         setCities(jsonData.cities || []);
-        setIndustries(jsonData.industries);
+        setIndustries(jsonData.industries || []);
         setSkills(jsonData?.skills || []);
 
-        setDepartments(jsonData.industryDepartments || null);
+        if (candidateId) {
+          // Extra for edit mode
+          setDepartments(
+            jsonData.industries.find(ind => ind.id === jsonData.candidate?.industry_id)?.departments || []
+          );
+          setCandidateData(jsonData.candidate || null);
+        } else {
+          // Extra for add mode
+          setDepartments(jsonData.industryDepartments || []);
+        }
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -211,9 +264,9 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       }
     };
 
-    fetchData();
+    fetchCandidateData();
+  }, [candidateId, token]);
 
-  }, [token]);
 
   useEffect(() => {
 
