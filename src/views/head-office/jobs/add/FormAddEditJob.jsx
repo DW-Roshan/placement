@@ -252,7 +252,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       if (res.ok) {
         const data = await res.json();
 
-        setLocationOptions(data);
+        setLocationOptions(data?.all_locations);
       }
 
     }
