@@ -44,15 +44,54 @@ import DialogCloseButton from '@/components/dialogs/DialogCloseButton'
 
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-const BasicDetailForm = ({ setData, open, data, cities, industries, departments, handleClose}) => {
+const BasicDetailForm = ({ setData, open, data, industries, departments, handleClose}) => {
 
   // console.log('industry:', data)
 
   // const [selected, setSelected] = useState(data?.work_status || '')
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [cities, setCities] = useState([]);
 
   const { data: session } = useSession()
   const token = session?.user?.token
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if(!token) return
+      setLoadingCities(true);
+      
+      try {
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/all-locations`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          method: 'get',
+        });
+
+        if(res.ok){
+          const data = await res.json();
+
+          setCities(data?.all_locations || []);
+        } else {
+          setCities([]);
+        }
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        setCities([]);
+      } finally {
+        setLoadingCities(false);
+      }
+
+
+    }
+
+    console.log('fetching cities')
+
+    fetchCities()
+  }, [token])
 
   function getAllMonths(start, end) {
     const months = [];

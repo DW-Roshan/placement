@@ -25,7 +25,7 @@ import BasicDetails from './basicDetails.jsx'
 
 import UserProfileHeaderSkeleton from '@/components/skeletons/UserProfileHeaderSkeleton'
 
-const UserProfile = ({ tabContentList, data, token, id }) => {
+const UserProfile = ({ tabContentList, data, token, id, isCandidate }) => {
 
   // States
   const [openBasicForm, setOpenBasicForm] = useState(false);
@@ -42,30 +42,25 @@ const UserProfile = ({ tabContentList, data, token, id }) => {
   const animation = 'wave';
 
   const getProfileData = async () => {
-    // Vars
-
     try {
-      if(!token){
+      if (!token) return;
 
-        return;
-      }
-    
-      // const session = await getServerSession(authOptions);
-      // const token = session?.user?.token;
-    
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidates/${id}/view`, {
+      // Determine URL based on candidate or not
+      const url = isCandidate
+        ? `${process.env.NEXT_PUBLIC_API_URL}/candidate/profile`
+        : `${process.env.NEXT_PUBLIC_API_URL}/candidates/${id}/view`;
+
+      const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-    
-      if (res.ok) {
-        const data = await res.json();
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-        setData(data || null)
-      }
-    
+      const data = res.ok ? await res.json() : null;
+      
+      setData(data || null);
+
     } catch (error) {
       console.error('Error fetching profile data:', error);
       setData(null);
@@ -131,7 +126,7 @@ const UserProfile = ({ tabContentList, data, token, id }) => {
         </Grid>
       </Grid>
 
-      <BasicDetailForm data={allData?.candidate} setData={setData} cities={allData?.cities} industries={allData?.industries} departments={allData?.departments} open={openBasicForm} handleClose={() => setOpenBasicForm(!openBasicForm)} />
+      <BasicDetailForm data={allData?.candidate} setData={setData} industries={allData?.industries} departments={allData?.departments} open={openBasicForm} handleClose={() => setOpenBasicForm(!openBasicForm)} />
       <ExperienceForm data={allData?.candidate?.experiences} setData={setData} open={openExpForm} handleClose={() => setOpenExpForm(!openExpForm)} />
       <EducationForm data={allData?.candidate?.educations} setData={setData} open={openEduForm} handleClose={() => setOpenEduForm(!openEduForm)} />
       <SkillForm data={allData?.candidate?.skills} setData={setData} open={openSkillForm} handleClose={() => setOpenSkillForm(!openSkillForm)} skillsData={allData?.skills} />

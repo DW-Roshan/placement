@@ -20,7 +20,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 import { toast } from 'react-toastify'
 
-import { Autocomplete, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, Tab } from '@mui/material'
+import { Autocomplete, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, Radio, RadioGroup, Tab } from '@mui/material'
 
 // Components Imports
 import classNames from 'classnames'
@@ -52,6 +52,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
   const [candidateData, setCandidateData] = useState(candiData);
+  const [citiesLoading, setLoadingCities] = useState(false);
   const { data: session } = useSession()
   const token = session?.user?.token
 
@@ -241,15 +242,13 @@ const AddCandidateForm = ({candidateId, candiData}) => {
         const jsonData = await response.json();
 
         // Common sets
-        setCities(jsonData.cities || []);
+        // setCities(jsonData.cities || []);
         setIndustries(jsonData.industries || []);
         setSkills(jsonData?.skills || []);
 
         if (candidateId) {
           // Extra for edit mode
-          setDepartments(
-            jsonData.industries.find(ind => ind.id === jsonData.candidate?.industry_id)?.departments || []
-          );
+          setDepartments(jsonData.industryDepartments || []);
           setCandidateData(jsonData.candidate || null);
         } else {
           // Extra for add mode
@@ -258,7 +257,9 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        setCities(null);
+        
+        // setCities(null);
+
         setIndustries(null);
         setDepartments(null);
       }
@@ -266,6 +267,41 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
     fetchCandidateData();
   }, [candidateId, token]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if(!token) return
+      setLoadingCities(true);
+
+      try {
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/all-locations`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          method: 'get',
+        });
+
+        if(res.ok){
+          const data = await res.json();
+
+          setCities(data?.all_locations || []);
+        } else {
+          setCities([]);
+        }
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        setCities([]);
+      } finally {
+        setLoadingCities(false);
+      }
+
+
+    }
+
+    fetchCities()
+  }, [token])
 
 
   useEffect(() => {
@@ -378,6 +414,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       profileSummary: candidateData?.profile_summary || '',
       workStatus: candidateData?.work_status || '',
       dateOfBirth: candidateData?.date_of_birth ? parseDateFromString(candidateData?.date_of_birth) : null,
+      gender: (candidateData?.gender?.toLowerCase() === 'female' || candidateData?.gender?.toLowerCase() === 'f') ? 'f' : 'm',
       totalExperience: candidateData?.total_experience || '',
       years: years.toString() ||'',
       months: months.toString() ||'',
@@ -662,6 +699,8 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                       fullWidth
                       value={cities && cities.length > 0 && cities.find(city => city.id === field.value) || null}
                       options={cities || []}
+                      groupBy={option => option.state_name || ''}
+                      loading={citiesLoading}
                       getOptionKey={option => option.id}
                       getOptionLabel={(city) => city.city_name || ''}
                       onChange={(event, value) => {
@@ -966,6 +1005,18 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                       }
                     />
                   )} />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControl error={!!errors.gender}>
+                  <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Gender</FormLabel>
+                  <Controller name="gender" control={control}
+                    render={({ field }) => (
+                      <RadioGroup row {...field}>
+                        <FormControlLabel value="m" control={<Radio />} label="Male" />
+                        <FormControlLabel value="f" control={<Radio />} label="Female" />
+                      </RadioGroup>
+                    )} />
+                </FormControl>
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <FormControl error={Boolean(errors.checkbox)}>

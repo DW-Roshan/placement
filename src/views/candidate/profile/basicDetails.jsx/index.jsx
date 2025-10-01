@@ -48,16 +48,23 @@ const BasicDetails = ({ data }) => {
               <Typography>{data?.department?.name}</Typography>
             </div>
           </div>
-
-            <div className='flex items-center gap-2'>
-              <div className='flex items-center flex-wrap gap-2'>
-                <Typography className='font-medium'>
-                  Current CTC:
-                </Typography>
-                {data?.current_ctc && <Chip size='small' variant='tonal' label={data?.current_ctc} color='success' icon={<i className='tabler-currency-rupee' />} /> }
-                {/* <Typography className='flex items-center'><i className='tabler-currency-rupee text-[20px]' />{data?.current_ctc}</Typography> */}
-              </div>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center flex-wrap gap-2'>
+              <Typography className='font-medium'>
+                Current CTC:
+              </Typography>
+              {data?.current_ctc && <Chip size='small' variant='tonal' label={data?.current_ctc} color='success' icon={<i className='tabler-currency-rupee' />} /> }
+              {/* <Typography className='flex items-center'><i className='tabler-currency-rupee text-[20px]' />{data?.current_ctc}</Typography> */}
             </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center flex-wrap gap-2'>
+              <Typography className='font-medium'>
+                Gender:
+              </Typography>
+              <Typography>{data?.gender == 'f' ? 'Female' : 'Male'}</Typography>
+            </div>
+          </div>
           <Divider className='uppercase'>Contacts</Divider>
           <div className='flex items-center gap-2'>
             <div className='flex items-center flex-wrap gap-2'>
