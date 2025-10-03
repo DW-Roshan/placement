@@ -24,7 +24,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 // Component Imports
-import { Autocomplete, Checkbox, Chip, createFilterOptions, FormControl, FormHelperText, IconButton, ListSubheader, Tooltip } from '@mui/material'
+import { Autocomplete, Card, CardActions, CardContent, CardHeader, Checkbox, Chip, createFilterOptions, FormControl, FormHelperText, IconButton, ListSubheader, Tab, Tooltip } from '@mui/material'
 
 
 import { useEditor, EditorContent } from '@tiptap/react'
@@ -46,6 +46,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 import { yearsOpt } from '@/configs/customDataConfig'
 import LocationAutocomplete from './LocationAutoComplete'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 // Vars
 const data = [
@@ -207,6 +208,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   const [minExpData, setMinExpData] = useState(yearsOpt || null);
   const [maxExpData, setMaxExpData] = useState(yearsOpt || null);
   const [fallbackSelected, setFallbackSelected] = useState([]);
+  const [tabValue, setTabValue] = useState('job_details')
 
   const [locationOptions, setLocationOptions] = useState(locations || []);
   const [loading, setLoading] = useState(false);
@@ -221,7 +223,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   // const roleResContent = this.props?.rContent || null;
 
   const router = useRouter();
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const token = session?.user?.token;
 
   const handleReset = () => {
@@ -241,8 +243,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     })
   }
 
-  const fetchLocations = async() => {
-    if(token){
+  const fetchLocations = async () => {
+    if (token) {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/all-locations`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -272,7 +274,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   // }, [])
 
 
-  const { control, handleSubmit, reset, setValue, watch, setError, formState: { errors } } = useForm({
+  const { control, handleSubmit, reset, setValue, watch, getValues, setError, formState: { errors } } = useForm({
     values: {
       jobTitle: jobData?.job_title || '',
       companyName: jobData?.company_name || '',
@@ -421,6 +423,112 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
   })
 
+
+  const preferredIndustryEditor = useEditor({
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: 'outline-none'
+      }
+    },
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      }),
+      Underline,
+    ],
+
+    content: jobData?.source_criteria?.preferred_industry ?? ``,
+    onUpdate: ({ editor }) => {
+      setValue('preferred_industry', editor.getHTML())
+    }
+  })
+
+  const keySkillsEditor = useEditor({
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: 'outline-none'
+      }
+    },
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      }),
+      Underline,
+    ],
+
+    content: jobData?.source_criteria?.key_skills ?? ``,
+    onUpdate: ({ editor }) => {
+      setValue('key_skills', editor.getHTML())
+    }
+  })
+
+  const companySourcesEditor = useEditor({
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: 'outline-none'
+      }
+    },
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      }),
+      Underline,
+    ],
+
+    content: jobData?.source_criteria?.company_sources ?? ``,
+    onUpdate: ({ editor }) => {
+      setValue('company_sources', editor.getHTML())
+    }
+  })
+
   // console.log("editor", editor.getHTML());
 
 
@@ -428,7 +536,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
     console.log("submitted data:", data)
 
-    if(jobId){
+    if (jobId) {
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}`, {
         method: 'put',
@@ -441,7 +549,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
       const result = await res.json();
 
-      if(res.ok){
+      if (res.ok) {
 
         sessionStorage.setItem('success', result.message);
 
@@ -450,7 +558,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         reset();
 
 
-      } else if(res.status == 422) {
+      } else if (res.status == 422) {
 
         // Laravel returns validation errors in the `errors` object
         Object.entries(result.errors).forEach(([field, messages]) => {
@@ -480,7 +588,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
       const result = await res.json();
 
-      if(res.ok){
+      if (res.ok) {
 
         sessionStorage.setItem('success', result.message);
 
@@ -489,7 +597,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         reset();
 
 
-      } else if(res.status == 422) {
+      } else if (res.status == 422) {
 
         // Laravel returns validation errors in the `errors` object
         Object.entries(result.errors).forEach(([field, messages]) => {
@@ -517,7 +625,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
     // console.log('selectedMinExp 1', selectedMinExp)
 
-    if(selectedMinExp) {
+    if (selectedMinExp) {
 
       // console.log('selectedMinExp 2', selectedMinExp)
 
@@ -530,7 +638,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
 
     // console.log('selectedMaxExp 1', selectedMaxExp)
-    if(selectedMaxExp) {
+    if (selectedMaxExp) {
 
       // console.log('selectedMaxExp 2', selectedMaxExp)
 
@@ -542,13 +650,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       setMinExpData(yearsOpt)
     }
 
-  },[selectedMinExp, selectedMaxExp])
+  }, [selectedMinExp, selectedMaxExp])
 
 
 
   const fetchCities = async (searchTerm = '') => {
 
-    if(!token) return null;
+    if (!token) return null;
 
     setLoading(true);
 
@@ -580,7 +688,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   };
 
   useEffect(() => {
-    if(!locations){
+    if (!locations) {
 
       fetchCities();
     }
@@ -606,707 +714,1220 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue)
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {/* <Accordion expanded={expanded === 'panel1'} onChange={handleExpandChange('panel1')}> */}
+      {/* <Card> */}
+      {/* <CardHeader title={jobId ? 'Edit Job' : 'Post New Job'} />
+        <Divider /> */}
+        <Typography variant='h4' className='mbe-1'>{jobId ? 'Edit Job' : 'Post New Job'}</Typography>
       <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
-          <Typography>Job Details</Typography>
-        </AccordionSummary>
-        <Divider />
-        <AccordionDetails className='!pbs-6'>
-          <Grid container spacing={6}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                control={control}
-                name='jobTitle'
-                rules={{ required: 'This field is required' }}
-                render={({field}) => (
-                  <CustomTextField
-                    fullWidth
-                    label={<>Job Title/Search <span className='text-error'>*</span></>}
-                    error={!!errors?.jobTitle} helperText={errors?.jobTitle?.message}
-                    {...field}
+        <TabContext value={tabValue}>
+          <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
+            <TabList variant='scrollable' onChange={handleTabChange} className='border-be'>
+              <Tab label='Job Details' value='job_details' />
+              {/* <Tab label='Roles & Responsibility' value='role_responsibility' />
+            <Tab label='Additional Details' value='additional_details' />
+            <Tab label='Assign to Branches' value='assign_branches' /> */}
+              <Tab label='Source Criteria' value='source_criteria' />
+              <Tab label='Search Criteria' value='search_criteria' />
+            </TabList>
+          </AccordionSummary>
+          <Divider />
+          <AccordionDetails className='!pbs-6'>
+            {/* <Accordion expanded={expanded === 'panel1'} onChange={handleExpandChange('panel1')}> */}
+            {/* <CardContent> */}
+            <TabPanel value='job_details'>
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='jobTitle'
+                    rules={{ required: 'This field is required' }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Job Title/Search <span className='text-error'>*</span></>}
+                        error={!!errors?.jobTitle} helperText={errors?.jobTitle?.message}
+                        {...field}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Controller
-                control={control}
-                name='companyName'
-                rules={{ required: 'This field is required' }}
-                render={({field}) => (
-                  <CustomTextField
-                    fullWidth
-                    label={<>Company Name <span className='text-error'>*</span></>}
-                    error={!!errors?.companyName} helperText={errors?.companyName?.message}
-                    {...field}
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    control={control}
+                    name='companyName'
+                    rules={{ required: 'This field is required' }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Company Name <span className='text-error'>*</span></>}
+                        error={!!errors?.companyName} helperText={errors?.companyName?.message}
+                        {...field}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-            {/* <LocationAutocomplete
-              control={control}
-              errors={errors}
-              locationOptions={locationOptions} // array of { id, city_name, state_name }
-              fallbackSelected={fallbackSelected} // array
-              setFallbackSelected={setFallbackSelected} // setState from parent
-              loading={loading}
-              handleInputChange={handleInputChange}
-            /> */}
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Controller
-                control={control}
-                name='manager'
-                rules={{ required: 'This field is required' }}
-                render={({field}) => (
-                  <CustomTextField
-                    fullWidth
-                    label={<>Manager <span className='text-error'>*</span></>}
-                    error={!!errors?.manager} helperText={errors?.manager?.message}
-                    {...field}
+                </Grid>
+                {/* <LocationAutocomplete
+                    control={control}
+                    errors={errors}
+                    locationOptions={locationOptions} // array of { id, city_name, state_name }
+                    fallbackSelected={fallbackSelected} // array
+                    setFallbackSelected={setFallbackSelected} // setState from parent
+                    loading={loading}
+                    handleInputChange={handleInputChange}
+                  /> */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <Controller
+                    control={control}
+                    name='manager'
+                    rules={{ required: 'This field is required' }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Manager <span className='text-error'>*</span></>}
+                        error={!!errors?.manager} helperText={errors?.manager?.message}
+                        {...field}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-            {locationFields.map((item, index) => (
-              <Grid size={{ xs: 12, sm:6 }} className='repeater-item p-4 border rounded' key={index}>
-                <div className='flex gap-2 items-center'>
-                  <Grid container spacing={5} className='flex-1'>
-                    <Grid size={{ xs: 12 }}>
-                      <Controller name={`locations[${index}].locationId`} control={control}
-                        rules={{ required: 'This field is required.' }}
-                        render={({ field }) => (
+                </Grid>
+                {locationFields.map((item, index) => (
+                  <Grid size={{ xs: 12, sm: 6 }} className='repeater-item p-4 border rounded' key={index}>
+                    <div className='flex gap-2 items-center'>
+                      <Grid container spacing={5} className='flex-1'>
+                        <Grid size={{ xs: 12 }}>
+                          <Controller name={`locations[${index}].locationId`} control={control}
+                            rules={{ required: 'This field is required.' }}
+                            render={({ field }) => (
+                              <Autocomplete
+                                fullWidth
+                                loading={locationOptions.length === 0}
+                                value={locationOptions && locationOptions.length > 0 && locationOptions.find(location => location.id === field.value) || null}
+                                options={locationOptions || []}
+                                getOptionKey={option => option.id}
+                                getOptionLabel={(location) => location.city_name + (location?.state?.state_name ? ', ' + location.state.state_name : location?.state_name ? ', ' + location.state_name : '') || ''}
+                                getOptionDisabled={(option) =>
+                                  locationFields.some((f, i) => i !== index && f.locationId === option.id)
+                                }
+                                onChange={(event, value) => {
+                                  field.onChange(value?.id || '')
+                                }}
+                                renderInput={(params) => (
+                                  <CustomTextField
+                                    {...params}
+                                    label={<>Location <span className='text-error'>*</span></>}
+                                    error={!!errors.locations?.[index]?.locationId}
+                                    helperText={errors?.locations?.[index]?.locationId?.message}
+                                  />
+                                )}
+                              />
+                            )}
+                          />
+                        </Grid>
+                        {index === 0 &&
+                          <Grid size={{ xs: 12 }}>
+                            <Button
+                              size='small'
+                              variant="tonal"
+                              color="primary"
+                              onClick={() =>
+                                appendLocationFields({
+                                  name: '',
+                                  manager: '',
+                                })
+                              }
+                            >
+                              Add More Locations
+                            </Button>
+                          </Grid>
+                        }
+                      </Grid>
+                      {index !== 0 && (
+                        <>
+                          <Divider orientation='vertical' flexItem />
+                          <div className='flex flex-col justify-start'>
+                            <IconButton size='small' color='error' onClick={() => removeLocationFields(index)}>
+                              <i className='tabler-x text-2xl' />
+                            </IconButton>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </Grid>
+                ))}
+                {/* <Grid size={{ xs: 12, sm: 6 }}>
+                    <Controller
+                      control={control}
+                      name="location"
+                      rules={{ required: 'This field is required' }}
+                      render={({ field }) => {
+
+                        // Map selected IDs to full city objects from locationOptions or fallbackSelected
+                        const selectedValues = useMemo(() => {
+
+                          if (!field.value || !Array.isArray(field.value)) return [];
+
+                          return field.value
+                            .map(id => locationOptions.find(opt => opt.id === id) || fallbackSelected.find(opt => opt.id === id))
+                            .filter(Boolean);
+                        }, [field.value, locationOptions, fallbackSelected]);
+
+                        // Keep track of any selected cities not currently in locationOptions (to keep them visible)
+                        useEffect(() => {
+
+                          const missingSelected = (field.value || [])
+                            .map(id => locationOptions.find(opt => opt.id === id))
+                            .filter(Boolean);
+
+                          setFallbackSelected(prev => {
+                            const combined = [...prev, ...missingSelected];
+
+                            return combined.filter((v, i, a) => a.findIndex(x => x.id === v.id) === i);
+                          });
+                        }, [locationOptions, field.value]);
+
+                        // Combine locationOptions + selectedValues (to ensure selected options are visible even if filtered out)
+                        const combinedOptions = useMemo(() => {
+                          const all = [...locationOptions, ...selectedValues];
+
+                          return Array.from(new Map(all.map(item => [item.id, item])).values());
+                        }, [locationOptions, selectedValues]);
+
+                        // Group cities by state for toggling selection on group checkbox
+                        const groupedCities = useMemo(() => {
+
+                          return combinedOptions.reduce((acc, city) => {
+                            if (!acc[city.state_name]) acc[city.state_name] = [];
+                            acc[city.state_name].push(city);
+
+                            return acc;
+                          }, {});
+                        }, [combinedOptions]);
+
+                        // Toggle all cities of a group
+                        const handleGroupToggle = (group) => {
+                          const groupCities = groupedCities[group] || [];
+                          const groupIds = groupCities.map(city => city.id);
+                          const currentIds = field.value || [];
+
+                          // Check if all group cities selected
+                          const isFullySelected = groupCities.every(city => currentIds.includes(city.id));
+
+                          const newSelection = isFullySelected
+                            ? currentIds.filter(id => !groupIds.includes(id)) // deselect group
+                            : Array.from(new Set([...currentIds, ...groupIds])); // select group
+
+                          field.onChange(newSelection);
+                        };
+
+                        return (
                           <Autocomplete
                             fullWidth
-                            loading={locationOptions.length === 0}
-                            value={locationOptions && locationOptions.length > 0 && locationOptions.find(location => location.id === field.value) || null}
-                            options={locationOptions || []}
-                            getOptionKey={option => option.id}
-                            getOptionLabel={(location) => location.city_name + (location?.state?.state_name ? ', ' + location.state.state_name : location?.state_name ? ', ' + location.state_name : '') || ''}
-                            getOptionDisabled={(option) =>
-                              locationFields.some((f, i) => i !== index && f.locationId === option.id)
-                            }
-                            onChange={(event, value) => {
-                                field.onChange(value?.id || '')
+                            multiple
+                            loading={loading}
+                            disableCloseOnSelect
+                            groupBy={(option) => option.state_name}
+                            options={combinedOptions}
+                            value={selectedValues}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            getOptionLabel={(option) => option.city_name || ''}
+                            onInputChange={(event, value, reason) => {
+                              if (reason === 'input' && value.length >= 3) {
+                                handleInputChange(event, value); // debounced fetch call
+                              }
+                            }}
+                            onChange={(event, selectedOptions) => {
+                              field.onChange(selectedOptions.map(opt => opt.id));
+                            }}
+                            renderGroup={(params) => {
+                              const group = params.group;
+
+                              const isAllSelected = groupedCities[group]?.every(city =>
+                                (field.value || []).includes(city.id)
+                              );
+
+                              return [
+                                <ListSubheader key={`header-${group}`} component="div" style={{ display: 'flex', alignItems: 'center' }}>
+                                  <Checkbox
+                                    size="small"
+                                    checked={!!isAllSelected}
+                                    indeterminate={
+                                      !isAllSelected &&
+                                      groupedCities[group]?.some(city => (field.value || []).includes(city.id))
+                                    }
+                                    onChange={() => handleGroupToggle(group)}
+                                    style={{ marginRight: 8 }}
+                                    onClick={e => e.stopPropagation()} // prevent autocomplete toggle on click
+                                  />
+                                  {group}
+                                </ListSubheader>,
+                                params.children
+                              ];
+                            }}
+                            renderOption={(props, option, { selected }) => {
+                              const { key, ...rest } = props;
+
+                              return (
+                                <li key={key} {...rest}>
+                                  <Checkbox
+                                    className="mie-2"
+                                    checked={selected}
+                                    onClick={e => e.stopPropagation()} // prevent autocomplete toggle on click
+                                  />
+                                  {option.city_name}
+                                </li>
+                              );
                             }}
                             renderInput={(params) => (
                               <CustomTextField
                                 {...params}
-                                label={<>Location <span className='text-error'>*</span></>}
-                                error={!!errors.locations?.[index]?.locationId}
-                                helperText={errors?.locations?.[index]?.locationId?.message}
+                                label={<>Location <span className="text-error">*</span></>}
+                                error={!!errors?.location}
+                                helperText={errors?.location?.message}
                               />
                             )}
                           />
+                        );
+                      }}
+                    />
+                  </Grid> */}
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='totalPositions'
+                    rules={{
+                      required: 'This field is required',
+
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        onInput={(e) => {
+                          e.target.value = e.target.value.replace(/[^0-9+]/g, '');
+                        }}
+                        inputProps={{
+                          maxLength: 10,
+                        }}
+                        label={<>Total Positions <span className='text-error'>*</span></>}
+                        error={!!errors?.totalPositions} helperText={errors?.totalPositions?.message}
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller name="industry" control={control}
+                    rules={{ required: 'This field is required.' }}
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
+                        options={industries || []}
+                        groupBy={option => option.category || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, value) => {
+                          field.onChange(value?.id || '');
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label={<>Industry <span className='text-error'>*</span></>}
+                            error={!!errors.industry}
+                            helperText={errors?.industry?.message}
+                          />
                         )}
                       />
-                    </Grid>
-                    {index === 0 &&
-                      <Grid size={{ xs: 12 }}>
-                        <Button
-                          size='small'
-                          variant="tonal"
-                          color="primary"
-                          onClick={() =>
-                            appendLocationFields({
-                              name: '',
-                              manager: '',
-                            })
-                          }
-                        >
-                          Add More Locations
-                        </Button>
-                      </Grid>
-                    }
-                  </Grid>
-                  {index !== 0 && (
-                    <>
-                      <Divider orientation='vertical' flexItem />
-                      <div className='flex flex-col justify-start'>
-                        <IconButton size='small' color='error' onClick={() => removeLocationFields(index)}>
-                          <i className='tabler-x text-2xl' />
-                        </IconButton>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Grid>
-            ))}
-            {/* <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                control={control}
-                name="location"
-                rules={{ required: 'This field is required' }}
-                render={({ field }) => {
-
-                  // Map selected IDs to full city objects from locationOptions or fallbackSelected
-                  const selectedValues = useMemo(() => {
-
-                    if (!field.value || !Array.isArray(field.value)) return [];
-
-                    return field.value
-                      .map(id => locationOptions.find(opt => opt.id === id) || fallbackSelected.find(opt => opt.id === id))
-                      .filter(Boolean);
-                  }, [field.value, locationOptions, fallbackSelected]);
-
-                  // Keep track of any selected cities not currently in locationOptions (to keep them visible)
-                  useEffect(() => {
-
-                    const missingSelected = (field.value || [])
-                      .map(id => locationOptions.find(opt => opt.id === id))
-                      .filter(Boolean);
-
-                    setFallbackSelected(prev => {
-                      const combined = [...prev, ...missingSelected];
-
-                      return combined.filter((v, i, a) => a.findIndex(x => x.id === v.id) === i);
-                    });
-                  }, [locationOptions, field.value]);
-
-                  // Combine locationOptions + selectedValues (to ensure selected options are visible even if filtered out)
-                  const combinedOptions = useMemo(() => {
-                    const all = [...locationOptions, ...selectedValues];
-
-                    return Array.from(new Map(all.map(item => [item.id, item])).values());
-                  }, [locationOptions, selectedValues]);
-
-                  // Group cities by state for toggling selection on group checkbox
-                  const groupedCities = useMemo(() => {
-
-                    return combinedOptions.reduce((acc, city) => {
-                      if (!acc[city.state_name]) acc[city.state_name] = [];
-                      acc[city.state_name].push(city);
-
-                      return acc;
-                    }, {});
-                  }, [combinedOptions]);
-
-                  // Toggle all cities of a group
-                  const handleGroupToggle = (group) => {
-                    const groupCities = groupedCities[group] || [];
-                    const groupIds = groupCities.map(city => city.id);
-                    const currentIds = field.value || [];
-
-                    // Check if all group cities selected
-                    const isFullySelected = groupCities.every(city => currentIds.includes(city.id));
-
-                    const newSelection = isFullySelected
-                      ? currentIds.filter(id => !groupIds.includes(id)) // deselect group
-                      : Array.from(new Set([...currentIds, ...groupIds])); // select group
-
-                    field.onChange(newSelection);
-                  };
-
-                  return (
-                    <Autocomplete
-                      fullWidth
-                      multiple
-                      loading={loading}
-                      disableCloseOnSelect
-                      groupBy={(option) => option.state_name}
-                      options={combinedOptions}
-                      value={selectedValues}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      getOptionLabel={(option) => option.city_name || ''}
-                      onInputChange={(event, value, reason) => {
-                        if (reason === 'input' && value.length >= 3) {
-                          handleInputChange(event, value); // debounced fetch call
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    name="department"
+                    control={control}
+                    rules={{ required: 'This field is required.' }}
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        freeSolo
+                        selectOnFocus
+                        clearOnBlur
+                        handleHomeEndKeys
+                        value={
+                          departmentsData?.find(dept => dept.id === field.value) ||
+                          (typeof field.value === 'string' ? field.value : null)
                         }
-                      }}
-                      onChange={(event, selectedOptions) => {
-                        field.onChange(selectedOptions.map(opt => opt.id));
-                      }}
-                      renderGroup={(params) => {
-                        const group = params.group;
+                        options={departmentsData || []}
+                        getOptionLabel={(option) => {
+                          if (typeof option === 'string') return option;
+                          if (option.inputValue) return `Click to Add "${option.inputValue}"`;
 
-                        const isAllSelected = groupedCities[group]?.every(city =>
-                          (field.value || []).includes(city.id)
-                        );
+                          return option.name || '';
+                        }}
+                        filterOptions={(options, params) => {
+                          const filtered = filter(options, params);
 
-                        return [
-                          <ListSubheader key={`header-${group}`} component="div" style={{ display: 'flex', alignItems: 'center' }}>
-                            <Checkbox
-                              size="small"
-                              checked={!!isAllSelected}
-                              indeterminate={
-                                !isAllSelected &&
-                                groupedCities[group]?.some(city => (field.value || []).includes(city.id))
+                          const isExisting = options.some(
+                            (option) =>
+                              typeof option !== 'string' &&
+                              option.name.toLowerCase() === params.inputValue.toLowerCase()
+                          );
+
+                          if (params.inputValue !== '' && !isExisting) {
+                            filtered.push({
+                              inputValue: params.inputValue,
+                              name: `Add "${params.inputValue}"`,
+                            });
+                          }
+
+                          return filtered;
+                        }}
+                        isOptionEqualToValue={(option, value) => {
+                          if (typeof value === 'string') return option.name === value;
+                          if (option.inputValue) return option.inputValue === value.inputValue;
+
+                          return option.id === value.id;
+                        }}
+                        onChange={async (event, newValue) => {
+                          if (typeof newValue === 'string') {
+                            // User typed and selected raw string
+                            try {
+                              const created = await createDepartment(newValue, token);
+
+                              field.onChange(created.department.id);
+                              setDepartments((prev) => [...(prev || []), created.department]);
+                            } catch (err) {
+                              console.error('Create failed', err);
+                            }
+                          } else if (newValue?.inputValue) {
+                            // User clicked on "Add 'XYZ'"
+                            try {
+                              const created = await createDepartment(newValue.inputValue, token);
+
+                              field.onChange(created.department.id);
+                              setDepartments((prev) => [...(prev || []), created.department]);
+                            } catch (err) {
+                              console.error('Create failed', err);
+                            }
+                          } else {
+                            // User selected existing department
+                            field.onChange(newValue?.id || '');
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label={<>Department <span className="text-error">*</span></>}
+                            error={!!errors.department}
+                            helperText={errors?.department?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                  {/* <Controller name="department" control={control}
+                      rules={{ required: 'This field is required.' }}
+                      render={({ field }) => (
+                        <Autocomplete
+                          fullWidth
+                          value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
+                          options={departments || []}
+                          getOptionKey={option => option.id}
+                          getOptionLabel={(department) => department.name || ''}
+                          onChange={(event, value) => {
+                              field.onChange(value?.id || '')
+                          }}
+                          renderInput={(params) => (
+                            <CustomTextField
+                              {...params}
+                              label={<>Department <span className='text-error'>*</span></>}
+                              error={!!errors.department}
+                              helperText={errors?.department?.message}
+                            />
+                          )}
+                        />
+                      )}
+                    /> */}
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.description ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.description}>Description <span className="text-error">*</span></FormLabel>
+                    <Controller
+                      control={control}
+                      name='description'
+                      rules={{ required: 'This field is required' }}
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.description && 'border-error'}`}>
+                          <EditorToolbar editor={editor} />
+                          <Divider className={errors?.description && 'border-error'} />
+                          <EditorContent {...field} editor={editor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.description && <FormHelperText error>{errors?.description?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.aboutCompany ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.aboutCompany}>About Company</FormLabel>
+                    <Controller
+                      control={control}
+                      name='aboutCompany'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.aboutCompany && 'border-error'}`}>
+                          <EditorToolbar editor={aboutCompanyEditor} />
+                          <Divider className={errors?.aboutCompany && 'border-error'} />
+                          <EditorContent {...field} editor={aboutCompanyEditor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.aboutCompany && <FormHelperText error>{errors?.aboutCompany?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                {/* <Grid size={{ xs: 12, sm: 6 }}>
+                    <Controller
+                      control={control}
+                      name='aboutCompany'
+                      render={({field}) => (
+                        <CustomTextField
+                          fullWidth
+                          label='About Company'
+                          error={!!errors?.aboutCompany} helperText={errors?.aboutCompany?.message}
+                          {...field}
+                        />
+                      )}
+                    />
+                  </Grid> */}
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='education'
+                    rules={{ required: 'This field is required' }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        select
+                        required={false}
+                        label={<>Education Level <span className='text-error'>*</span></>}
+                        error={!!errors?.education}
+                        helperText={errors?.education?.message}
+                        {...field}
+                        slotProps={{
+                          select: {
+                            multiple: true
+                          }
+                        }}
+                      >
+                        <MenuItem value='10th'>10th</MenuItem>
+                        <MenuItem value='12th'>12th</MenuItem>
+                        <MenuItem value='Diploma'>Diploma</MenuItem>
+                        <MenuItem value='Graduate'>Graduate</MenuItem>
+                        <MenuItem value='UG'>UG</MenuItem>
+                        <MenuItem value='PG'>PG</MenuItem>
+                        <MenuItem value='PHD'>PHD</MenuItem>
+                      </CustomTextField>
+
+                      // <Autocomplete
+                      //   fullWidth
+                      //   multiple
+                      //   disableCloseOnSelect
+                      //   options={skillsData || []}
+                      //   value={skillsData?.filter(option => field.value?.includes(option.id)) || []}
+                      //   getOptionLabel={(option) => option.name || ''}
+                      //   onChange={(event, newValue) => {
+                      //     field.onChange(newValue.map(option => option.id));
+                      //   }}
+                      //   isOptionEqualToValue={(option, value) => option.id === value.id}
+                      //   renderTags={(value, getTagProps) =>
+                      //     value.map((option, index) => {
+                      //       const tagProps = getTagProps({ index });
+                      //       const { key, ...rest } = tagProps;
+                      //       return <Chip label={option.name} key={key} {...rest} />;
+                      //     })
+                      //   }
+                      //   renderInput={(params) => (
+                      //     <CustomTextField
+                      //       {...params}
+                      //       error={!!errors?.skills}
+                      //       helperText={errors?.skills?.message}
+                      //       label='Skills'
+                      //     />
+                      //   )}
+                      // />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
+                      Experience <span className="text-error">*</span>
+                    </FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='minExp'
+                          rules={{ required: 'This field is required' }}
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={minExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
                               }
-                              onChange={() => handleGroupToggle(group)}
-                              style={{ marginRight: 8 }}
-                              onClick={e => e.stopPropagation()} // prevent autocomplete toggle on click
-                            />
-                            {group}
-                          </ListSubheader>,
-                          params.children
-                        ];
-                      }}
-                      renderOption={(props, option, { selected }) => {
-                        const { key, ...rest } = props;
-
-                        return (
-                          <li key={key} {...rest}>
-                            <Checkbox
-                              className="mie-2"
-                              checked={selected}
-                              onClick={e => e.stopPropagation()} // prevent autocomplete toggle on click
-                            />
-                            {option.city_name}
-                          </li>
-                        );
-                      }}
-                      renderInput={(params) => (
-                        <CustomTextField
-                          {...params}
-                          label={<>Location <span className="text-error">*</span></>}
-                          error={!!errors?.location}
-                          helperText={errors?.location?.message}
-                        />
-                      )}
-                    />
-                  );
-                }}
-              />
-            </Grid> */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                control={control}
-                name='totalPositions'
-                rules={{
-                  required: 'This field is required',
-
-                }}
-                render={({field}) => (
-                  <CustomTextField
-                    fullWidth
-                    onInput={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9+]/g, '');
-                    }}
-                    inputProps={{
-                      maxLength: 10,
-                    }}
-                    label={<>Total Positions <span className='text-error'>*</span></>}
-                    error={!!errors?.totalPositions} helperText={errors?.totalPositions?.message}
-                    {...field}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller name="industry" control={control}
-                rules={{ required: 'This field is required.' }}
-                render={({ field }) => (
-                  <Autocomplete
-                    fullWidth
-                    value={industries && industries.length > 0 && industries.find(industry => industry.id === field.value) || null}
-                    options={industries || []}
-                    groupBy={option => option.category || ''}
-                    getOptionKey={option => option.id}
-                    getOptionLabel={(industry) => industry.name || ''}
-                    onChange={(event, value) => {
-                      field.onChange(value?.id || '');
-                    }}
-                    renderInput={(params) => (
-                      <CustomTextField
-                        {...params}
-                        label={<>Industry <span className='text-error'>*</span></>}
-                        error={!!errors.industry}
-                        helperText={errors?.industry?.message}
-                      />
-                    )}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                name="department"
-                control={control}
-                rules={{ required: 'This field is required.' }}
-                render={({ field }) => (
-                  <Autocomplete
-                    fullWidth
-                    freeSolo
-                    selectOnFocus
-                    clearOnBlur
-                    handleHomeEndKeys
-                    value={
-                      departmentsData?.find(dept => dept.id === field.value) ||
-                      (typeof field.value === 'string' ? field.value : null)
-                    }
-                    options={departmentsData || []}
-                    getOptionLabel={(option) => {
-                      if (typeof option === 'string') return option;
-                      if (option.inputValue) return `Click to Add "${option.inputValue}"`;
-
-                      return option.name || '';
-                    }}
-                    filterOptions={(options, params) => {
-                      const filtered = filter(options, params);
-
-                      const isExisting = options.some(
-                        (option) =>
-                          typeof option !== 'string' &&
-                          option.name.toLowerCase() === params.inputValue.toLowerCase()
-                      );
-
-                      if (params.inputValue !== '' && !isExisting) {
-                        filtered.push({
-                          inputValue: params.inputValue,
-                          name: `Add "${params.inputValue}"`,
-                        });
-                      }
-
-                      return filtered;
-                    }}
-                    isOptionEqualToValue={(option, value) => {
-                      if (typeof value === 'string') return option.name === value;
-                      if (option.inputValue) return option.inputValue === value.inputValue;
-
-                      return option.id === value.id;
-                    }}
-                    onChange={async (event, newValue) => {
-                      if (typeof newValue === 'string') {
-                        // User typed and selected raw string
-                        try {
-                          const created = await createDepartment(newValue, token);
-
-                          field.onChange(created.department.id);
-                          setDepartments((prev) => [...(prev || []), created.department]);
-                        } catch (err) {
-                          console.error('Create failed', err);
-                        }
-                      } else if (newValue?.inputValue) {
-                        // User clicked on "Add 'XYZ'"
-                        try {
-                          const created = await createDepartment(newValue.inputValue, token);
-
-                          field.onChange(created.department.id);
-                          setDepartments((prev) => [...(prev || []), created.department]);
-                        } catch (err) {
-                          console.error('Create failed', err);
-                        }
-                      } else {
-                        // User selected existing department
-                        field.onChange(newValue?.id || '');
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <CustomTextField
-                        {...params}
-                        label={<>Department <span className="text-error">*</span></>}
-                        error={!!errors.department}
-                        helperText={errors?.department?.message}
-                      />
-                    )}
-                  />
-                )}
-              />
-              {/* <Controller name="department" control={control}
-                rules={{ required: 'This field is required.' }}
-                render={({ field }) => (
-                  <Autocomplete
-                    fullWidth
-                    value={departments && departments.length > 0 && departments.find(department => department.id === field.value) || null}
-                    options={departments || []}
-                    getOptionKey={option => option.id}
-                    getOptionLabel={(department) => department.name || ''}
-                    onChange={(event, value) => {
-                        field.onChange(value?.id || '')
-                    }}
-                    renderInput={(params) => (
-                      <CustomTextField
-                        {...params}
-                        label={<>Department <span className='text-error'>*</span></>}
-                        error={!!errors.department}
-                        helperText={errors?.department?.message}
-                      />
-                    )}
-                  />
-                )}
-              /> */}
-            </Grid>
-            <Grid size={{ xs: 12  }}>
-              <FormControl fullWidth>
-                <FormLabel className={`${errors?.description ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.description}>Description <span className="text-error">*</span></FormLabel>
-                <Controller
-                  control={control}
-                  name='description'
-                  rules={{ required: 'This field is required' }}
-                  render={({field}) => (
-                    <div className={`border rounded-md ${errors?.description && 'border-error'}`}>
-                      <EditorToolbar editor={editor} />
-                      <Divider className={errors?.description && 'border-error'} />
-                      <EditorContent {...field} editor={editor} className='overflow-y-auto p-3' />
-                    </div>
-                  )}
-                />
-                {errors?.description && <FormHelperText error>{errors?.description?.message}</FormHelperText>}
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12  }}>
-              <FormControl fullWidth>
-                <FormLabel className={`${errors?.aboutCompany ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.aboutCompany}>About Company</FormLabel>
-                <Controller
-                  control={control}
-                  name='aboutCompany'
-                  render={({field}) => (
-                    <div className={`border rounded-md ${errors?.aboutCompany && 'border-error'}`}>
-                      <EditorToolbar editor={aboutCompanyEditor} />
-                      <Divider className={errors?.aboutCompany && 'border-error'} />
-                      <EditorContent {...field} editor={aboutCompanyEditor} className='overflow-y-auto p-3' />
-                    </div>
-                  )}
-                />
-                {errors?.aboutCompany && <FormHelperText error>{errors?.aboutCompany?.message}</FormHelperText>}
-              </FormControl>
-            </Grid>
-            {/* <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                control={control}
-                name='aboutCompany'
-                render={({field}) => (
-                  <CustomTextField
-                    fullWidth
-                    label='About Company'
-                    error={!!errors?.aboutCompany} helperText={errors?.aboutCompany?.message}
-                    {...field}
-                  />
-                )}
-              />
-            </Grid> */}
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
-                control={control}
-                name='education'
-                rules={{ required: 'This field is required' }}
-                render={({ field }) => (
-                  <CustomTextField
-                    fullWidth
-                    select
-                    required={false}
-                    label={<>Education Level <span className='text-error'>*</span></>}
-                    error={!!errors?.education}
-                    helperText={errors?.education?.message}
-                    {...field}
-                    slotProps={{
-                      select: {
-                        multiple: true
-                      }
-                    }}
-                  >
-                    <MenuItem value='10th'>10th</MenuItem>
-                    <MenuItem value='12th'>12th</MenuItem>
-                    <MenuItem value='Diploma'>Diploma</MenuItem>
-                    <MenuItem value='Graduate'>Graduate</MenuItem>
-                    <MenuItem value='UG'>UG</MenuItem>
-                    <MenuItem value='PG'>PG</MenuItem>
-                    <MenuItem value='PHD'>PHD</MenuItem>
-                  </CustomTextField>
-
-                  // <Autocomplete
-                  //   fullWidth
-                  //   multiple
-                  //   disableCloseOnSelect
-                  //   options={skillsData || []}
-                  //   value={skillsData?.filter(option => field.value?.includes(option.id)) || []}
-                  //   getOptionLabel={(option) => option.name || ''}
-                  //   onChange={(event, newValue) => {
-                  //     field.onChange(newValue.map(option => option.id));
-                  //   }}
-                  //   isOptionEqualToValue={(option, value) => option.id === value.id}
-                  //   renderTags={(value, getTagProps) =>
-                  //     value.map((option, index) => {
-                  //       const tagProps = getTagProps({ index });
-                  //       const { key, ...rest } = tagProps;
-                  //       return <Chip label={option.name} key={key} {...rest} />;
-                  //     })
-                  //   }
-                  //   renderInput={(params) => (
-                  //     <CustomTextField
-                  //       {...params}
-                  //       error={!!errors?.skills}
-                  //       helperText={errors?.skills?.message}
-                  //       label='Skills'
-                  //     />
-                  //   )}
-                  // />
-                )}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
-                <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
-                  Experience <span className="text-error">*</span>
-                </FormLabel>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
-                    <Controller
-                      control={control}
-                      name='minExp'
-                      rules={{ required: 'This field is required' }}
-                      render={({field}) => (
-                        <Autocomplete
-                          fullWidth
-                          {...field}
-                          options={minExpData || []}
-                          value={
-                            yearsOpt.find(option => option.value === field.value) || null
-                          }
-                          getOptionKey={option => option.value}
-                          getOptionLabel={(option) => option.label || ''}
-                          onChange={(event, value) => {
-                            field.onChange(value?.value || '')
-                          }}
-                          renderInput={(params) => (
-                            <CustomTextField
-                              {...params}
-                              error={!!errors?.minExp}
-                              helperText={errors?.minExp?.message}
-                              placeholder='Min experience'
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.minExp}
+                                  helperText={errors?.minExp?.message}
+                                  placeholder='Min experience'
+                                />
+                              )}
                             />
                           )}
                         />
-                      )}
-                    />
-                    to
-                  </Grid>
-                  {/* <Grid size={{ xs: 12, sm: 0 }}>to</Grid> */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Controller
-                      control={control}
-                      name='maxExp'
-                      rules={{ required: 'This field is required' }}
-                      render={({field}) => (
-                        <Autocomplete
-                          fullWidth
-                          {...field}
-                          options={maxExpData || []}
-                          value={
-                            yearsOpt.find(option => option.value === field.value) || null
-                          }
-                          getOptionKey={option => option.value}
-                          getOptionLabel={(option) => option.label || ''}
-                          onChange={(event, value) => {
-                            field.onChange(value?.value || '')
-                          }}
-                          renderInput={(params) => (
-                            <CustomTextField
-                              {...params}
-                              error={!!errors?.maxExp}
-                              helperText={errors?.maxExp?.message}
-                              placeholder='Max experience'
+                        to
+                      </Grid>
+                      {/* <Grid size={{ xs: 12, sm: 0 }}>to</Grid> */}
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Controller
+                          control={control}
+                          name='maxExp'
+                          rules={{ required: 'This field is required' }}
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={maxExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
+                              }
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.maxExp}
+                                  helperText={errors?.maxExp?.message}
+                                  placeholder='Max experience'
+                                />
+                              )}
                             />
                           )}
                         />
-                      )}
-                    />
-                  </Grid>
+                      </Grid>
+                    </Grid>
+                  </FormControl>
                 </Grid>
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
-                <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
-                  Annual Salary <span className="text-error">*</span>
-                </FormLabel>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
+                      Annual Salary <span className="text-error">*</span>
+                    </FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='minCTC'
+                          rules={{
+                            required: 'This field is required',
+                            validate: {
+                              isValidCTC: (value) => {
+
+                                // Remove commas from the value for proper numeric validation
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
+                                  return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              },
+                            },
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              error={!!errors?.minCTC}
+                              helperText={errors?.minCTC?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
+                                  .replace(/^\./, '')                    // Remove leading dot
+                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
+
+                              }}
+                              placeholder='1.5'
+                              {...field}
+                            />
+
+                          )}
+                        />
+                        to
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='maxCTC'
+                          rules={{
+                            required: 'This field is required',
+                            validate: {
+                              isValidCTC: (value) => {
+
+                                // Remove commas from the value for proper numeric validation
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
+                                  return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              },
+                            },
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              {...field}
+                              error={!!errors?.maxCTC}
+                              helperText={errors?.maxCTC?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
+                                  .replace(/^\./, '')                    // Remove leading dot
+                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
+
+                              }}
+                              placeholder='2.5'
+                            />
+                          )}
+                        />
+                        Lacs
+                      </Grid>
+                    </Grid>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </TabPanel>
+            <TabPanel value='source_criteria'>
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    1. Experience
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
+                      Experience
+                    </FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='minExp'
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={minExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
+                              }
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.minExp}
+                                  helperText={errors?.minExp?.message}
+                                  placeholder='Min experience'
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                        to
+                      </Grid>
+                      {/* <Grid size={{ xs: 12, sm: 0 }}>to</Grid> */}
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Controller
+                          control={control}
+                          name='maxExp'
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={maxExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
+                              }
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.maxExp}
+                                  helperText={errors?.maxExp?.message}
+                                  placeholder='Max experience'
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      </Grid>
+                    </Grid>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    2. Preferred Industry
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='preferred_industry_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        {...field}
+                        options={maxExpData || []}
+                        value={
+                          yearsOpt.find(option => option.value === field.value) || null
+                        }
+                        getOptionKey={option => option.value}
+                        getOptionLabel={(option) => option.label || ''}
+                        onChange={(event, value) => {
+                          field.onChange(value?.value || '')
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Select Industry'
+                            error={!!errors?.preferred_industry_ids}
+                            helperText={errors?.preferred_industry_ids?.message}
+                            placeholder='Select Industries'
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.preferred_industry ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.preferred_industry}>Preferred Industry</FormLabel>
                     <Controller
                       control={control}
-                      name='minCTC'
-                      rules={{
-                        required: 'This field is required',
-                        validate: {
-                          isValidCTC: (value) => {
-
-                            // Remove commas from the value for proper numeric validation
-                            const sanitizedValue = value.replace(/,/g, '');
-
-                            // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
-                            if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
-                              return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
-                            }
-
-                            return true;
-                          },
-                        },
-                      }}
-                      render={({field}) => (
-                        <CustomTextField
-                          fullWidth
-                          error={!!errors?.minCTC}
-                          helperText={errors?.minCTC?.message}
-                          onInput={(e) => {
-                            e.target.value = e.target.value
-                            .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
-                            .replace(/^\./, '')                    // Remove leading dot
-                            .replace(/(\..*)\./g, '$1')            // Allow only first dot
-                            .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
-
-                          }}
-                          placeholder='1.5'
-                          {...field}
-                        />
-
+                      name='preferred_industry'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.preferred_industry && 'border-error'}`}>
+                          <EditorToolbar editor={preferredIndustryEditor} />
+                          <Divider className={errors?.preferred_industry && 'border-error'} />
+                          <EditorContent {...field} editor={preferredIndustryEditor} className='overflow-y-auto p-3' />
+                        </div>
                       )}
                     />
-                    to
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                    {errors?.preferred_industry && <FormHelperText error>{errors?.preferred_industry?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    3. Educational Qualification
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='min_qualification'
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        select
+                        required={false}
+                        label={<>Minimum Qualification</>}
+                        error={!!errors?.min_qualification}
+                        helperText={errors?.min_qualification?.message}
+                        {...field}
+                      >
+                        <MenuItem value='1'>10th</MenuItem>
+                        <MenuItem value='2'>12th</MenuItem>
+                        <MenuItem value='3'>Diploma</MenuItem>
+                        <MenuItem value='4'>Graduate</MenuItem>
+                        <MenuItem value='5'>UG</MenuItem>
+                        <MenuItem value='6'>PG</MenuItem>
+                        <MenuItem value='7'>PHD</MenuItem>
+                      </CustomTextField>
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    4. Age Criteria
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='min_age'
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return 'Please enter a valid positive number';
+                          }
+                          return true;
+                        },
+                        isLessThanMaxAge: (value) => {
+                          const maxAge = getValues('max_age');
+                          if (maxAge && !isNaN(maxAge) && Number(value) >= Number(maxAge)) {
+                            return 'Min age must be less than Max age';
+                          }
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Min. Age</>}
+                        error={!!errors?.min_age} helperText={errors?.min_age?.message}
+                        {...field}
+                        onInput={(e) => {
+                          let val = e.target.value
+                            .replace(/[^0-9]/g, ''); // allow only digits (no dots)
+
+                          if (val !== '' && Number(val) > 100) {
+                            val = '100'; // cap at 100
+                          }
+
+                          e.target.value = val;
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='max_age'
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return 'Please enter a valid positive number';
+                          }
+                          return true;
+                        },
+                        isGreaterThanMinAge: (value) => {
+                          const minAge = getValues('min_age');
+                          if (minAge && !isNaN(minAge) && Number(value) <= Number(minAge)) {
+                            return 'Max age must be greater than Min age';
+                          }
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Max. Age</>}
+                        error={!!errors?.max_age} helperText={errors?.max_age?.message}
+                        {...field}
+                        onInput={(e) => {
+                          let val = e.target.value
+                            .replace(/[^0-9]/g, ''); // allow only digits (no dots)
+
+                          if (val !== '' && Number(val) > 100) {
+                            val = '100'; // cap at 100
+                          }
+
+                          e.target.value = val;
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    5. Key Skills - Keywords
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.key_skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.key_skills}>Key Skills</FormLabel>
                     <Controller
                       control={control}
-                      name='maxCTC'
-                      rules={{
-                        required: 'This field is required',
-                        validate: {
-                          isValidCTC: (value) => {
-
-                            // Remove commas from the value for proper numeric validation
-                            const sanitizedValue = value.replace(/,/g, '');
-
-                            // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
-                            if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
-                              return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
-                            }
-
-                            return true;
-                          },
-                        },
-                      }}
-                      render={({field}) => (
-                        <CustomTextField
-                          fullWidth
-                          {...field}
-                          error={!!errors?.maxCTC}
-                          helperText={errors?.maxCTC?.message}
-                          onInput={(e) => {
-                            e.target.value = e.target.value
-                            .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
-                            .replace(/^\./, '')                    // Remove leading dot
-                            .replace(/(\..*)\./g, '$1')            // Allow only first dot
-                            .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
-
-                          }}
-                          placeholder='2.5'
-                        />
+                      name='key_skills'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.key_skills && 'border-error'}`}>
+                          <EditorToolbar editor={keySkillsEditor} />
+                          <Divider className={errors?.key_skills && 'border-error'} />
+                          <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
+                        </div>
                       )}
                     />
-                    Lacs
-                  </Grid>
+                    {errors?.key_skills && <FormHelperText error>{errors?.key_skills?.message}</FormHelperText>}
+                  </FormControl>
                 </Grid>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </AccordionDetails>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    6. Companies to source from
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.company_sources ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.company_sources}>Company Sources</FormLabel>
+                    <Controller
+                      control={control}
+                      name='company_sources'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.company_sources && 'border-error'}`}>
+                          <EditorToolbar editor={companySourcesEditor} />
+                          <Divider className={errors?.company_sources && 'border-error'} />
+                          <EditorContent {...field} editor={companySourcesEditor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.company_sources && <FormHelperText error>{errors?.company_sources?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
+                      Annual Salary (in Lacs)
+                    </FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='min_salary'
+                          rules={{
+                            required: 'This field is required',
+                            validate: {
+                              isValidSalary: (value) => {
+
+                                // Remove commas from the value for proper numeric validation
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
+                                  return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              },
+                            },
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              error={!!errors?.minCTC}
+                              helperText={errors?.minCTC?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
+                                  .replace(/^\./, '')                    // Remove leading dot
+                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
+
+                              }}
+                              placeholder='1.5'
+                              {...field}
+                            />
+
+                          )}
+                        />
+                        to
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='max_salary'
+                          rules={{
+                            validate: {
+                              isValidSalary: (value) => {
+
+                                // Remove commas from the value for proper numeric validation
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+
+                                  return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              },
+                            },
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              {...field}
+                              error={!!errors?.maxCTC}
+                              helperText={errors?.maxCTC?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
+                                  .replace(/^\./, '')                    // Remove leading dot
+                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
+
+                              }}
+                              placeholder='2.5'
+                            />
+                          )}
+                        />
+                        Lacs
+                      </Grid>
+                    </Grid>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    7. Increment Criteria (in %)
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name="min_increment"
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return "Please enter a valid positive increment";
+                          }
+                          return true;
+                        },
+                        isLessThanMaxIncrement: (value) => {
+                          const maxIncrement = getValues("max_increment");
+                          if (maxIncrement && !isNaN(maxIncrement) && Number(value) >= Number(maxIncrement)) {
+                            return "Min increment must be less than Max increment";
+                          }
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={
+                          <>
+                            Min. Increment
+                          </>
+                        }
+                        error={!!errors?.min_increment}
+                        helperText={errors?.min_increment?.message}
+                        {...field}
+                        inputMode="numeric"
+                        onInput={(e) => {
+                          let val = e.target.value.replace(/[^0-9]/g, ""); // only digits
+                          val = val.slice(0, 7); // limit to 7 digits
+                          e.target.value = val;
+                          field.onChange(val);
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name="max_increment"
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return "Please enter a valid positive increment";
+                          }
+                          return true;
+                        },
+                        isGreaterThanMinIncrement: (value) => {
+                          const minIncrement = getValues("min_increment");
+                          if (minIncrement && !isNaN(minIncrement) && Number(value) <= Number(minIncrement)) {
+                            return "Max increment must be greater than Min increment";
+                          }
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={
+                          <>
+                            Max. Increment
+                          </>
+                        }
+                        error={!!errors?.max_increment}
+                        helperText={errors?.max_increment?.message}
+                        {...field}
+                        inputMode="numeric"
+                        onInput={(e) => {
+                          let val = e.target.value.replace(/[^0-9]/g, ""); // only digits
+                          val = val.slice(0, 7); // limit to 7 digits
+                          e.target.value = val;
+                          field.onChange(val);
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl error={Boolean(errors.checkbox)}>
+                    <Controller
+                      name='same_for_search'
+                      control={control}
+                      render={({ field }) => (
+                        <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Same for Search' />
+                      )}
+                    />
+                    {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </TabPanel>
+
+
+            {/* </CardContent> */}
+          </AccordionDetails>
+        </TabContext>
       </Accordion>
 
+
+      {/* </Card> */}
       {/* <Accordion expanded={expanded === 'panel2'} onChange={handleExpandChange('panel2')}> */}
+
+      {/* <TabPanel value='role_responsibility'> */}
       <Accordion>
         <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
           <Typography>Roles & Responsibility</Typography>
@@ -1333,8 +1954,10 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
           </Grid>
         </AccordionDetails>
       </Accordion>
+      {/* </TabPanel> */}
 
       {/* <Accordion expanded={expanded === 'panel3'} onChange={handleExpandChange('panel3')}> */}
+      {/* <TabPanel value='additional_details'> */}
       <Accordion>
         <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
           <Typography>Additional Details</Typography>
@@ -1378,7 +2001,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 )}
               />
             </Grid>
-            <Grid size={{ xs:12, sm: 6 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 control={control}
                 name="gender"
@@ -1403,6 +2026,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         <AccordionDetails className='flex gap-4 pbs-6'>
         </AccordionDetails>
       </Accordion>
+      {/* </TabPanel> */}
+      {/* <TabPanel value='assign_branches'> */}
       <Accordion>
         <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
           <Typography>Assign to Branches</Typography>
@@ -1468,13 +2093,17 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         <AccordionDetails className='flex gap-4 pbs-6'>
         </AccordionDetails>
       </Accordion>
+      {/* </TabPanel> */}
+      {/* <Divider />
+      <CardActions>
+      </CardActions> */}
       <Button type='submit' variant='contained'>
         Submit
       </Button>
       <Button type='reset' variant='tonal' color='secondary' onClick={() => reset()}>
         Reset
       </Button>
-    </form>
+    </form >
   )
 }
 
