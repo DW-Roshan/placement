@@ -302,6 +302,22 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       roleAndResponsibility: jobData?.role_responsibility || '',
       skills: jobData?.skills?.map(skill => skill?.id) || [],
       gender: jobData?.gender || 'all',
+      source_criteria: {
+        min_exp: jobData?.source_criteria?.min_exp || '',
+        max_exp: jobData?.source_criteria?.max_exp || '',
+        preferred_industry_ids: jobData?.source_criteria?.preferred_industry_ids || '',
+        preferred_industry: jobData?.source_criteria?.preferred_industry || '',
+        min_qualification: jobData?.source_criteria?.min_qualification || '',
+        min_age: jobData?.source_criteria?.min_age || '',
+        max_age: jobData?.source_criteria?.max_age || '',
+        key_skills: jobData?.source_criteria?.key_skills || '',
+        company_sources: jobData?.source_criteria?.company_sources || '',
+        min_salary: jobData?.source_criteria?.min_salary || '',
+        max_salary: jobData?.source_criteria?.max_salary || '',
+        min_increment: jobData?.source_criteria?.min_increment || '',
+        max_increment: jobData?.source_criteria?.max_increment || '',
+        same_for_search: jobData?.source_criteria?.same_for_search || false,
+      }
     }
   });
 
@@ -455,7 +471,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
     content: jobData?.source_criteria?.preferred_industry ?? ``,
     onUpdate: ({ editor }) => {
-      setValue('preferred_industry', editor.getHTML())
+      setValue('source_criteria.preferred_industry', editor.getHTML())
     }
   })
 
@@ -490,7 +506,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
     content: jobData?.source_criteria?.key_skills ?? ``,
     onUpdate: ({ editor }) => {
-      setValue('key_skills', editor.getHTML())
+      setValue('source_criteria.key_skills', editor.getHTML())
     }
   })
 
@@ -525,7 +541,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
     content: jobData?.source_criteria?.company_sources ?? ``,
     onUpdate: ({ editor }) => {
-      setValue('company_sources', editor.getHTML())
+      setValue('source_criteria.company_sources', editor.getHTML())
     }
   })
 
@@ -723,21 +739,27 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       {/* <Card> */}
       {/* <CardHeader title={jobId ? 'Edit Job' : 'Post New Job'} />
         <Divider /> */}
-        <Typography variant='h4' className='mbe-1'>{jobId ? 'Edit Job' : 'Post New Job'}</Typography>
+      <Typography variant='h4' className='mbe-1'>{jobId ? 'Edit Job' : 'Post New Job'}</Typography>
       <Accordion defaultExpanded>
-        <TabContext value={tabValue}>
-          <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
-            <TabList variant='scrollable' onChange={handleTabChange} className='border-be'>
-              <Tab label='Job Details' value='job_details' />
-              {/* <Tab label='Roles & Responsibility' value='role_responsibility' />
+        <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
+          <div
+            onClick={(e) => e.stopPropagation()} // prevent collapse on tab click
+          >
+            <TabContext value={tabValue}>
+              <TabList variant='scrollable' onChange={handleTabChange} className='border-be'>
+                <Tab label='Job Details' value='job_details' />
+                {/* <Tab label='Roles & Responsibility' value='role_responsibility' />
             <Tab label='Additional Details' value='additional_details' />
             <Tab label='Assign to Branches' value='assign_branches' /> */}
-              <Tab label='Source Criteria' value='source_criteria' />
-              <Tab label='Search Criteria' value='search_criteria' />
-            </TabList>
-          </AccordionSummary>
-          <Divider />
-          <AccordionDetails className='!pbs-6'>
+                <Tab label='Source Criteria' value='source_criteria' />
+                <Tab label='Search Criteria' value='search_criteria' />
+              </TabList>
+            </TabContext>
+          </div>
+        </AccordionSummary>
+        <Divider />
+        <AccordionDetails className='!pbs-6'>
+          <TabContext value={tabValue}>
             {/* <Accordion expanded={expanded === 'panel1'} onChange={handleExpandChange('panel1')}> */}
             {/* <CardContent> */}
             <TabPanel value='job_details'>
@@ -1445,7 +1467,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
                         <Controller
                           control={control}
-                          name='minExp'
+                          name='source_criteria.min_exp'
                           render={({ field }) => (
                             <Autocomplete
                               fullWidth
@@ -1462,8 +1484,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                               renderInput={(params) => (
                                 <CustomTextField
                                   {...params}
-                                  error={!!errors?.minExp}
-                                  helperText={errors?.minExp?.message}
+                                  error={!!errors?.source_criteria?.min_exp}
+                                  helperText={errors?.source_criteria?.min_exp?.message}
                                   placeholder='Min experience'
                                 />
                               )}
@@ -1476,7 +1498,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Controller
                           control={control}
-                          name='maxExp'
+                          name='source_criteria.max_exp'
                           render={({ field }) => (
                             <Autocomplete
                               fullWidth
@@ -1493,8 +1515,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                               renderInput={(params) => (
                                 <CustomTextField
                                   {...params}
-                                  error={!!errors?.maxExp}
-                                  helperText={errors?.maxExp?.message}
+                                  error={!!errors?.source_criteria?.max_exp}
+                                  helperText={errors?.source_criteria?.max_exp?.message}
                                   placeholder='Max experience'
                                 />
                               )}
@@ -1513,27 +1535,33 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 <Grid size={{ xs: 12 }}>
                   <Controller
                     control={control}
-                    name='preferred_industry_ids'
+                    name='source_criteria.preferred_industry_ids'
                     render={({ field }) => (
                       <Autocomplete
                         fullWidth
-                        {...field}
-                        options={maxExpData || []}
+                        multiple
                         value={
-                          yearsOpt.find(option => option.value === field.value) || null
+                          industries && industries?.filter(ind => field?.value?.includes(ind.id)) || []
                         }
-                        getOptionKey={option => option.value}
-                        getOptionLabel={(option) => option.label || ''}
-                        onChange={(event, value) => {
-                          field.onChange(value?.value || '')
+                        options={industries || []}
+                        groupBy={option => option.category || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, selectedOptions) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+                          const selectedNames = selectedOptions.map(opt => opt.name).join(', ');
+
+                          field.onChange(selectedIds); // update the array of selected IDs
+
+                          // Set the `preferred_industry` field with names
+                          setValue('source_criteria.preferred_industry', selectedNames);
                         }}
                         renderInput={(params) => (
                           <CustomTextField
                             {...params}
                             label='Select Industry'
-                            error={!!errors?.preferred_industry_ids}
-                            helperText={errors?.preferred_industry_ids?.message}
-                            placeholder='Select Industries'
+                            error={!!errors.source_criteria?.preferred_industry_ids}
+                            helperText={errors?.source_criteria?.preferred_industry_ids?.message}
                           />
                         )}
                       />
@@ -1542,19 +1570,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
-                    <FormLabel className={`${errors?.preferred_industry ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.preferred_industry}>Preferred Industry</FormLabel>
+                    <FormLabel className={`${errors?.source_criteria?.preferred_industry ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.preferred_industry}>Preferred Industry</FormLabel>
                     <Controller
                       control={control}
-                      name='preferred_industry'
+                      name='source_criteria.preferred_industry'
                       render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.preferred_industry && 'border-error'}`}>
+                        <div className={`border rounded-md ${errors?.source_criteria?.preferred_industry && 'border-error'}`}>
                           <EditorToolbar editor={preferredIndustryEditor} />
-                          <Divider className={errors?.preferred_industry && 'border-error'} />
+                          <Divider className={errors?.source_criteria?.preferred_industry && 'border-error'} />
                           <EditorContent {...field} editor={preferredIndustryEditor} className='overflow-y-auto p-3' />
                         </div>
                       )}
                     />
-                    {errors?.preferred_industry && <FormHelperText error>{errors?.preferred_industry?.message}</FormHelperText>}
+                    {errors?.source_criteria?.preferred_industry && <FormHelperText error>{errors?.source_criteria?.preferred_industry?.message}</FormHelperText>}
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
@@ -1565,15 +1593,15 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
                     control={control}
-                    name='min_qualification'
+                    name='source_criteria.min_qualification'
                     render={({ field }) => (
                       <CustomTextField
                         fullWidth
                         select
                         required={false}
                         label={<>Minimum Qualification</>}
-                        error={!!errors?.min_qualification}
-                        helperText={errors?.min_qualification?.message}
+                        error={!!errors?.source_criteria?.min_qualification}
+                        helperText={errors?.source_criteria?.min_qualification?.message}
                         {...field}
                       >
                         <MenuItem value='1'>10th</MenuItem>
@@ -1595,17 +1623,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
                     control={control}
-                    name='min_age'
+                    name='source_criteria.min_age'
                     rules={{
                       validate: {
                         isPositive: (value) => {
+                          if (!value) return true;
                           if (isNaN(value) || Number(value) <= 0) {
                             return 'Please enter a valid positive number';
                           }
                           return true;
                         },
                         isLessThanMaxAge: (value) => {
-                          const maxAge = getValues('max_age');
+                          if (!value) return true;
+                          const maxAge = getValues('source_criteria.max_age');
                           if (maxAge && !isNaN(maxAge) && Number(value) >= Number(maxAge)) {
                             return 'Min age must be less than Max age';
                           }
@@ -1617,16 +1647,12 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       <CustomTextField
                         fullWidth
                         label={<>Min. Age</>}
-                        error={!!errors?.min_age} helperText={errors?.min_age?.message}
+                        error={!!errors?.source_criteria?.min_age}
+                        helperText={errors?.source_criteria?.min_age?.message}
                         {...field}
                         onInput={(e) => {
-                          let val = e.target.value
-                            .replace(/[^0-9]/g, ''); // allow only digits (no dots)
-
-                          if (val !== '' && Number(val) > 100) {
-                            val = '100'; // cap at 100
-                          }
-
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+                          if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
                         }}
                       />
@@ -1636,17 +1662,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
                     control={control}
-                    name='max_age'
+                    name='source_criteria.max_age'
                     rules={{
                       validate: {
                         isPositive: (value) => {
+                          if (!value) return true;
                           if (isNaN(value) || Number(value) <= 0) {
                             return 'Please enter a valid positive number';
                           }
                           return true;
                         },
                         isGreaterThanMinAge: (value) => {
-                          const minAge = getValues('min_age');
+                          if (!value) return true;
+                          const minAge = getValues('source_criteria.min_age');
                           if (minAge && !isNaN(minAge) && Number(value) <= Number(minAge)) {
                             return 'Max age must be greater than Min age';
                           }
@@ -1658,16 +1686,12 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       <CustomTextField
                         fullWidth
                         label={<>Max. Age</>}
-                        error={!!errors?.max_age} helperText={errors?.max_age?.message}
+                        error={!!errors?.source_criteria?.max_age}
+                        helperText={errors?.source_criteria?.max_age?.message}
                         {...field}
                         onInput={(e) => {
-                          let val = e.target.value
-                            .replace(/[^0-9]/g, ''); // allow only digits (no dots)
-
-                          if (val !== '' && Number(val) > 100) {
-                            val = '100'; // cap at 100
-                          }
-
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+                          if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
                         }}
                       />
@@ -1675,94 +1699,80 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Typography variant='body2' className='font-medium'>
-                    5. Key Skills - Keywords
-                  </Typography>
+                  <Typography variant='body2' className='font-medium'>5. Key Skills - Keywords</Typography>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
-                    <FormLabel className={`${errors?.key_skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.key_skills}>Key Skills</FormLabel>
+                    <FormLabel className={`${errors?.source_criteria?.key_skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.source_criteria?.key_skills}>Key Skills</FormLabel>
                     <Controller
                       control={control}
-                      name='key_skills'
+                      name='source_criteria.key_skills'
                       render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.key_skills && 'border-error'}`}>
+                        <div className={`border rounded-md ${errors?.source_criteria?.key_skills && 'border-error'}`}>
                           <EditorToolbar editor={keySkillsEditor} />
-                          <Divider className={errors?.key_skills && 'border-error'} />
+                          <Divider className={errors?.source_criteria?.key_skills && 'border-error'} />
                           <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
                         </div>
                       )}
                     />
-                    {errors?.key_skills && <FormHelperText error>{errors?.key_skills?.message}</FormHelperText>}
+                    {errors?.source_criteria?.key_skills && <FormHelperText error>{errors?.source_criteria?.key_skills?.message}</FormHelperText>}
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Typography variant='body2' className='font-medium'>
-                    6. Companies to source from
-                  </Typography>
+                  <Typography variant='body2' className='font-medium'>6. Companies to source from</Typography>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
-                    <FormLabel className={`${errors?.company_sources ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.company_sources}>Company Sources</FormLabel>
+                    <FormLabel className={`${errors?.source_criteria?.company_sources ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.source_criteria?.company_sources}>Company Sources</FormLabel>
                     <Controller
                       control={control}
-                      name='company_sources'
+                      name='source_criteria.company_sources'
                       render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.company_sources && 'border-error'}`}>
+                        <div className={`border rounded-md ${errors?.source_criteria?.company_sources && 'border-error'}`}>
                           <EditorToolbar editor={companySourcesEditor} />
-                          <Divider className={errors?.company_sources && 'border-error'} />
+                          <Divider className={errors?.source_criteria?.company_sources && 'border-error'} />
                           <EditorContent {...field} editor={companySourcesEditor} className='overflow-y-auto p-3' />
                         </div>
                       )}
                     />
-                    {errors?.company_sources && <FormHelperText error>{errors?.company_sources?.message}</FormHelperText>}
+                    {errors?.source_criteria?.company_sources && <FormHelperText error>{errors?.source_criteria?.company_sources?.message}</FormHelperText>}
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
-                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
-                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
-                      Annual Salary (in Lacs)
-                    </FormLabel>
+                  <FormControl fullWidth error={Boolean(errors?.source_criteria?.min_salary)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Annual Salary (in Lacs)</FormLabel>
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
                         <Controller
                           control={control}
-                          name='min_salary'
+                          name='source_criteria.min_salary'
                           rules={{
-                            required: 'This field is required',
                             validate: {
                               isValidSalary: (value) => {
-
-                                // Remove commas from the value for proper numeric validation
+                                if (!value) return true;
                                 const sanitizedValue = value.replace(/,/g, '');
-
-                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
                                 if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
                                   return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
                                 }
-
                                 return true;
-                              },
-                            },
+                              }
+                            }
                           }}
                           render={({ field }) => (
                             <CustomTextField
                               fullWidth
-                              error={!!errors?.minCTC}
-                              helperText={errors?.minCTC?.message}
+                              error={!!errors?.source_criteria?.min_salary}
+                              helperText={errors?.source_criteria?.min_salary?.message}
                               onInput={(e) => {
                                 e.target.value = e.target.value
-                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
-                                  .replace(/^\./, '')                    // Remove leading dot
-                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
-                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
-
+                                  .replace(/[^0-9.]/g, '')
+                                  .replace(/^\./, '')
+                                  .replace(/(\..*)\./g, '$1')
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2');
                               }}
                               placeholder='1.5'
                               {...field}
                             />
-
                           )}
                         />
                         to
@@ -1770,37 +1780,31 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
                         <Controller
                           control={control}
-                          name='max_salary'
+                          name='source_criteria.max_salary'
                           rules={{
                             validate: {
                               isValidSalary: (value) => {
-
-                                // Remove commas from the value for proper numeric validation
+                                if (!value) return true;
                                 const sanitizedValue = value.replace(/,/g, '');
-
-                                // Validate the sanitized value to ensure it's a numeric value with an optional decimal part (up to 2 digits)
                                 if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
-
-                                  return 'Please enter a valid CTC (numeric value, optionally with 2 decimal places)';
+                                  return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
                                 }
-
                                 return true;
-                              },
-                            },
+                              }
+                            }
                           }}
                           render={({ field }) => (
                             <CustomTextField
                               fullWidth
                               {...field}
-                              error={!!errors?.maxCTC}
-                              helperText={errors?.maxCTC?.message}
+                              error={!!errors?.source_criteria?.max_salary}
+                              helperText={errors?.source_criteria?.max_salary?.message}
                               onInput={(e) => {
                                 e.target.value = e.target.value
-                                  .replace(/[^0-9.]/g, '')               // Remove non-digit and non-dot
-                                  .replace(/^\./, '')                    // Remove leading dot
-                                  .replace(/(\..*)\./g, '$1')            // Allow only first dot
-                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2'); // Limit to 2 decimal places
-
+                                  .replace(/[^0-9.]/g, '')
+                                  .replace(/^\./, '')
+                                  .replace(/(\..*)\./g, '$1')
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2');
                               }}
                               placeholder='2.5'
                             />
@@ -1812,24 +1816,24 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Typography variant='body2' className='font-medium'>
-                    7. Increment Criteria (in %)
-                  </Typography>
+                  <Typography variant='body2' className='font-medium'>7. Increment Criteria (in %)</Typography>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
                     control={control}
-                    name="min_increment"
+                    name="source_criteria.min_increment"
                     rules={{
                       validate: {
                         isPositive: (value) => {
+                          if (!value) return true;
                           if (isNaN(value) || Number(value) <= 0) {
                             return "Please enter a valid positive increment";
                           }
                           return true;
                         },
                         isLessThanMaxIncrement: (value) => {
-                          const maxIncrement = getValues("max_increment");
+                          if (!value) return true;
+                          const maxIncrement = getValues("source_criteria.max_increment");
                           if (maxIncrement && !isNaN(maxIncrement) && Number(value) >= Number(maxIncrement)) {
                             return "Min increment must be less than Max increment";
                           }
@@ -1840,18 +1844,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     render={({ field }) => (
                       <CustomTextField
                         fullWidth
-                        label={
-                          <>
-                            Min. Increment
-                          </>
-                        }
-                        error={!!errors?.min_increment}
-                        helperText={errors?.min_increment?.message}
+                        label="Min. Increment"
+                        error={!!errors?.source_criteria?.min_increment}
+                        helperText={errors?.source_criteria?.min_increment?.message}
                         {...field}
                         inputMode="numeric"
                         onInput={(e) => {
-                          let val = e.target.value.replace(/[^0-9]/g, ""); // only digits
-                          val = val.slice(0, 7); // limit to 7 digits
+                          let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
                           e.target.value = val;
                           field.onChange(val);
                         }}
@@ -1862,17 +1861,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Controller
                     control={control}
-                    name="max_increment"
+                    name="source_criteria.max_increment"
                     rules={{
                       validate: {
                         isPositive: (value) => {
+                          if (!value) return true;
                           if (isNaN(value) || Number(value) <= 0) {
                             return "Please enter a valid positive increment";
                           }
                           return true;
                         },
                         isGreaterThanMinIncrement: (value) => {
-                          const minIncrement = getValues("min_increment");
+                          if (!value) return true;
+                          const minIncrement = getValues("source_criteria.min_increment");
                           if (minIncrement && !isNaN(minIncrement) && Number(value) <= Number(minIncrement)) {
                             return "Max increment must be greater than Min increment";
                           }
@@ -1883,18 +1884,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     render={({ field }) => (
                       <CustomTextField
                         fullWidth
-                        label={
-                          <>
-                            Max. Increment
-                          </>
-                        }
-                        error={!!errors?.max_increment}
-                        helperText={errors?.max_increment?.message}
+                        label="Max. Increment"
+                        error={!!errors?.source_criteria?.max_increment}
+                        helperText={errors?.source_criteria?.max_increment?.message}
                         {...field}
                         inputMode="numeric"
                         onInput={(e) => {
-                          let val = e.target.value.replace(/[^0-9]/g, ""); // only digits
-                          val = val.slice(0, 7); // limit to 7 digits
+                          let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
                           e.target.value = val;
                           field.onChange(val);
                         }}
@@ -1903,15 +1899,20 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <FormControl error={Boolean(errors.checkbox)}>
+                  <FormControl error={Boolean(errors?.source_criteria?.same_for_search)}>
                     <Controller
-                      name='same_for_search'
+                      name='source_criteria.same_for_search'
                       control={control}
                       render={({ field }) => (
-                        <FormControlLabel control={<Checkbox {...field} checked={field.value} />} label='Same for Search' />
+                        <FormControlLabel
+                          control={<Checkbox {...field} checked={field.value} />}
+                          label='Same for Search'
+                        />
                       )}
                     />
-                    {errors.createAccount && <FormHelperText error>{errors.createAccount}</FormHelperText>}
+                    {errors?.source_criteria?.same_for_search && (
+                      <FormHelperText error>{errors?.source_criteria?.same_for_search?.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
               </Grid>
@@ -1919,8 +1920,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
 
             {/* </CardContent> */}
-          </AccordionDetails>
-        </TabContext>
+          </TabContext>
+        </AccordionDetails>
       </Accordion>
 
 
