@@ -127,6 +127,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
 
   const getMatchedCandidates = async () => {
 
+    console.log("sdfa")
     if(!token || !job.id) return
 
     setMatchedCandidateLoading(true);
@@ -161,11 +162,11 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
   const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (job.id && !fetchedRef.current) {
+    if (token && job.id && !fetchedRef.current) {
       fetchedRef.current = true;
       getMatchedCandidates();
     }
-  }, [job.id]);
+  }, [job.id, token]);
 
   return (
     <Card variant='outlined'>
@@ -238,10 +239,10 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
                     <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
                     <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
                   </> : <>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.length == 0 || matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.length == 0 || matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.length == 0 || matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.length == 0 || matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length || 0})</Button>
                 </>}
               </div>
             </Grid>

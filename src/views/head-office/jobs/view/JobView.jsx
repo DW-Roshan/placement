@@ -20,6 +20,7 @@ import CustomChip from "@/@core/components/mui/Chip";
 import DialogsConfirmation from "../DialogConfirmation";
 import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
+import SourceCriteriaDialog from "@/components/SourceCriteriaDialog";
 
 const JobView = ({ job, isCandidate }) => {
 
@@ -27,6 +28,7 @@ const JobView = ({ job, isCandidate }) => {
   const [openApply, setOpenApply] = useState(false);
   const [saved, setSaved] = useState(false);
   const [openSave, setOpenSave] = useState(false);
+  const [openSourceCriteria, setOpenSourceCriteria] = useState(false);
 
   const {data: session, status} = useSession();
   const token = session?.user?.token;
@@ -56,6 +58,9 @@ const JobView = ({ job, isCandidate }) => {
                 <div className="flex-1">
                   <Typography variant="h5" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
                 </div>
+                <Button disabled={!job?.source_criteria} variant='contained' className='flex gap-2' onClick={() => setOpenSourceCriteria(true)}>
+                  Source Criteria
+                </Button>
                 <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
                   Go Back
                 </Button>
@@ -179,6 +184,7 @@ const JobView = ({ job, isCandidate }) => {
       </CardContent>
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
+      {openSourceCriteria && <SourceCriteriaDialog open={openSourceCriteria} handleClose={() => setOpenSourceCriteria(false)} data={job?.source_criteria} />}
     </Card>
   )
 }

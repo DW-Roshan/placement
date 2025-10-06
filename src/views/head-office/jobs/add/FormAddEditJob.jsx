@@ -37,16 +37,17 @@ import { Placeholder } from '@tiptap/extension-placeholder'
 
 import { TextAlign } from '@tiptap/extension-text-align'
 
-import CustomTextField from '@core/components/mui/TextField'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 
+import CustomTextField from '@core/components/mui/TextField'
 
 import CustomIconButton from '@/@core/components/mui/IconButton'
 
 import { getLocalizedUrl } from '@/utils/i18n'
 
-import { yearsOpt } from '@/configs/customDataConfig'
+import { qualificationData, yearsOpt } from '@/configs/customDataConfig'
+
 import LocationAutocomplete from './LocationAutoComplete'
-import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 // Vars
 const data = [
@@ -273,6 +274,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   //   }
   // }, [])
 
+  console.log("job data:", jobData);
+
 
   const { control, handleSubmit, reset, setValue, watch, getValues, setError, formState: { errors } } = useForm({
     values: {
@@ -303,9 +306,9 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       skills: jobData?.skills?.map(skill => skill?.id) || [],
       gender: jobData?.gender || 'all',
       source_criteria: {
-        min_exp: jobData?.source_criteria?.min_exp || '',
-        max_exp: jobData?.source_criteria?.max_exp || '',
-        preferred_industry_ids: jobData?.source_criteria?.preferred_industry_ids || '',
+        min_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.min_exp)?.value || '',
+        max_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.max_exp)?.value || '',
+        preferred_industry_ids: jobData?.source_criteria?.preferred_industry_ids && JSON.parse(jobData?.source_criteria?.preferred_industry_ids) || '',
         preferred_industry: jobData?.source_criteria?.preferred_industry || '',
         min_qualification: jobData?.source_criteria?.min_qualification || '',
         min_age: jobData?.source_criteria?.min_age || '',
@@ -1532,7 +1535,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     2. Preferred Industry
                   </Typography>
                 </Grid>
-                <Grid size={{ xs: 12 }}>
+                {/* <Grid size={{ xs: 12 }}>
                   <Controller
                     control={control}
                     name='source_criteria.preferred_industry_ids'
@@ -1584,7 +1587,124 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     />
                     {errors?.source_criteria?.preferred_industry && <FormHelperText error>{errors?.source_criteria?.preferred_industry?.message}</FormHelperText>}
                   </FormControl>
+                </Grid> */}
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='source_criteria.preferred_industry_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        multiple
+                        value={industries?.filter(ind => field?.value?.includes(ind.id)) || []}
+                        options={industries || []}
+                        groupBy={option => option.category || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, selectedOptions, reason, details) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+                          const selectedNames = selectedOptions.map(opt => opt.name);
+
+                          // Update the selected IDs in form
+                          field.onChange(selectedIds);
+
+                          if (!preferredIndustryEditor) return;
+
+                          // When user adds an industry
+                          if (reason === 'selectOption' && details?.option?.name) {
+                            const newlyAdded = details.option.name;
+                            const { from } = preferredIndustryEditor.state.selection;
+                            const textBefore = preferredIndustryEditor.state.doc.textBetween(0, from, '\n');
+                            const prefix = textBefore.trim().length > 0 ? ', ' : '';
+
+                            preferredIndustryEditor
+                              .chain()
+                              .focus()
+                              .insertContent(`${prefix}${newlyAdded}`)
+                              .run();
+                          }
+
+                          // When user removes one
+                          else if (reason === 'removeOption' && details?.option?.name) {
+                            const removedName = details.option.name;
+
+                            // Get the current editor content
+                            const currentContent = preferredIndustryEditor.getText();
+
+                            // Create a regex to safely remove that name (case insensitive, with optional comma/space)
+                            const updatedText = currentContent
+                              .replace(new RegExp(`\\b${removedName}\\b,?\\s*`, 'gi'), '')
+                              .trim()
+                              .replace(/(^,|,$)/g, '')
+                              .trim();
+
+                            // Replace editor content with updated text
+                            preferredIndustryEditor.commands.setContent(updatedText);
+                          }
+
+                          // When user clears all
+                          else if (reason === 'clear') {
+                            preferredIndustryEditor.commands.clearContent();
+                          }
+                        }}
+
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Select Industry'
+                            error={!!errors.source_criteria?.preferred_industry_ids}
+                            helperText={errors?.source_criteria?.preferred_industry_ids?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
                 </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel
+                      className={`${
+                        errors?.source_criteria?.preferred_industry
+                          ? 'text-error'
+                          : 'text-[var(--mui-palette-text-primary)]'
+                      } text-sm`}
+                    >
+                      Preferred Industry
+                    </FormLabel>
+
+                    <Controller
+                      control={control}
+                      name='source_criteria.preferred_industry'
+                      render={({ field }) => (
+                        <div
+                          className={`border rounded-md ${
+                            errors?.source_criteria?.preferred_industry && 'border-error'
+                          }`}
+                        >
+                          <EditorToolbar editor={preferredIndustryEditor} />
+                          <Divider
+                            className={
+                              errors?.source_criteria?.preferred_industry && 'border-error'
+                            }
+                          />
+                          <EditorContent
+                            {...field}
+                            editor={preferredIndustryEditor}
+                            className='overflow-y-auto p-3'
+                          />
+                        </div>
+                      )}
+                    />
+
+                    {errors?.source_criteria?.preferred_industry && (
+                      <FormHelperText error>
+                        {errors.source_criteria.preferred_industry.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+
                 <Grid size={{ xs: 12 }}>
                   <Typography variant='body2' className='font-medium'>
                     3. Educational Qualification
@@ -1604,13 +1724,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         helperText={errors?.source_criteria?.min_qualification?.message}
                         {...field}
                       >
+                        {qualificationData.map((qual) => (
+                          <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                        ))}
+
+                        {/*
                         <MenuItem value='1'>10th</MenuItem>
                         <MenuItem value='2'>12th</MenuItem>
                         <MenuItem value='3'>Diploma</MenuItem>
                         <MenuItem value='4'>Graduate</MenuItem>
                         <MenuItem value='5'>UG</MenuItem>
                         <MenuItem value='6'>PG</MenuItem>
-                        <MenuItem value='7'>PHD</MenuItem>
+                        <MenuItem value='7'>PHD</MenuItem>*/}
+
                       </CustomTextField>
                     )}
                   />
@@ -1628,17 +1754,22 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       validate: {
                         isPositive: (value) => {
                           if (!value) return true;
+
                           if (isNaN(value) || Number(value) <= 0) {
                             return 'Please enter a valid positive number';
                           }
+
                           return true;
                         },
                         isLessThanMaxAge: (value) => {
                           if (!value) return true;
+
                           const maxAge = getValues('source_criteria.max_age');
+
                           if (maxAge && !isNaN(maxAge) && Number(value) >= Number(maxAge)) {
                             return 'Min age must be less than Max age';
                           }
+
                           return true;
                         }
                       }
@@ -1652,6 +1783,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         {...field}
                         onInput={(e) => {
                           let val = e.target.value.replace(/[^0-9]/g, '');
+
                           if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
                         }}
@@ -1667,17 +1799,22 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       validate: {
                         isPositive: (value) => {
                           if (!value) return true;
+
                           if (isNaN(value) || Number(value) <= 0) {
                             return 'Please enter a valid positive number';
                           }
+
                           return true;
                         },
                         isGreaterThanMinAge: (value) => {
                           if (!value) return true;
+
                           const minAge = getValues('source_criteria.min_age');
+
                           if (minAge && !isNaN(minAge) && Number(value) <= Number(minAge)) {
                             return 'Max age must be greater than Min age';
                           }
+
                           return true;
                         }
                       }
@@ -1691,6 +1828,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         {...field}
                         onInput={(e) => {
                           let val = e.target.value.replace(/[^0-9]/g, '');
+
                           if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
                         }}
@@ -1751,9 +1889,11 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                               isValidSalary: (value) => {
                                 if (!value) return true;
                                 const sanitizedValue = value.replace(/,/g, '');
+
                                 if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
                                   return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
                                 }
+
                                 return true;
                               }
                             }
@@ -1786,9 +1926,11 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                               isValidSalary: (value) => {
                                 if (!value) return true;
                                 const sanitizedValue = value.replace(/,/g, '');
+
                                 if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
                                   return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
                                 }
+
                                 return true;
                               }
                             }
@@ -1826,17 +1968,21 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       validate: {
                         isPositive: (value) => {
                           if (!value) return true;
+
                           if (isNaN(value) || Number(value) <= 0) {
                             return "Please enter a valid positive increment";
                           }
+
                           return true;
                         },
                         isLessThanMaxIncrement: (value) => {
                           if (!value) return true;
                           const maxIncrement = getValues("source_criteria.max_increment");
+
                           if (maxIncrement && !isNaN(maxIncrement) && Number(value) >= Number(maxIncrement)) {
                             return "Min increment must be less than Max increment";
                           }
+
                           return true;
                         }
                       }
@@ -1849,10 +1995,18 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         helperText={errors?.source_criteria?.min_increment?.message}
                         {...field}
                         inputMode="numeric"
+                        
+                        // onInput={(e) => {
+                        //   let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
+                        //   e.target.value = val;
+                        //   field.onChange(val);
+                        // }}
+
                         onInput={(e) => {
-                          let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+
+                          if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
-                          field.onChange(val);
                         }}
                       />
                     )}
@@ -1866,17 +2020,21 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       validate: {
                         isPositive: (value) => {
                           if (!value) return true;
+
                           if (isNaN(value) || Number(value) <= 0) {
                             return "Please enter a valid positive increment";
                           }
+
                           return true;
                         },
                         isGreaterThanMinIncrement: (value) => {
                           if (!value) return true;
                           const minIncrement = getValues("source_criteria.min_increment");
+                          
                           if (minIncrement && !isNaN(minIncrement) && Number(value) <= Number(minIncrement)) {
                             return "Max increment must be greater than Min increment";
                           }
+
                           return true;
                         }
                       }
@@ -1889,10 +2047,18 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         helperText={errors?.source_criteria?.max_increment?.message}
                         {...field}
                         inputMode="numeric"
+                        
+                        // onInput={(e) => {
+                        //   let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
+                        //   e.target.value = val;
+                        //   field.onChange(val);
+                        // }}
+
                         onInput={(e) => {
-                          let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+
+                          if (val !== '' && Number(val) > 100) val = '100';
                           e.target.value = val;
-                          field.onChange(val);
                         }}
                       />
                     )}
@@ -1906,7 +2072,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       render={({ field }) => (
                         <FormControlLabel
                           control={<Checkbox {...field} checked={field.value} />}
-                          label='Same for Search'
+                          label='Source Criteria Same for Search Criteria'
                         />
                       )}
                     />

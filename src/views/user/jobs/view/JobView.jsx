@@ -22,6 +22,7 @@ import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
 import RegisterCandidate from "@/views/RegisterCandidate";
 import JobStepper from "@/components/job-stepper/JobStepper";
+import SourceCriteriaDialog from "@/components/SourceCriteriaDialog";
 
 const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
 
@@ -31,6 +32,7 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
   const [saved, setSaved] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
+  const [openSourceCriteria, setOpenSourceCriteria] = useState(false);
 
   const {data: session, status} = useSession();
   const token = session?.user?.token;
@@ -60,6 +62,10 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
                 <div className="flex-1">
                   <Typography variant="h5" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
                 </div>
+                {!isCandidate && 
+                <Button disabled={!job?.source_criteria} variant='contained' className='flex gap-2' onClick={() => setOpenSourceCriteria(true)}>
+                  Source Criteria
+                </Button>}
                 <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
                   Go Back
                 </Button>
@@ -199,6 +205,7 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
       <RegisterCandidate open={openRegister} handleClose={() => setOpenRegister(false)} jobId={job?.id} jobUuid={jobUuid} setAppliedSuccess={setAppliedSuccess} />
+      {openSourceCriteria && <SourceCriteriaDialog open={openSourceCriteria} handleClose={() => setOpenSourceCriteria(false)} data={job?.source_criteria} />}
     </Card>
   )
 }

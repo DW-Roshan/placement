@@ -57,7 +57,7 @@ const JobCard = ({job, isCandidate}) => {
   const [openAppliedCandidate, setOpenAppliedCandidate] = useState(false);
   const [openInviteCandidate, setOpenInviteCandidate] = useState(false);
   const [matchedCandidates, setMatchedCandidates] = useState([]);
-  const [matchedCandidateLoading, setMatchedCandidateLoading] = useState(true);
+  const [matchedCandidateLoading, setMatchedCandidateLoading] = useState(false);
   const [openApply, setOpenApply] = useState(false);
   const [openSave, setOpenSave] = useState(false);
   const [tabOpen, setTabOpen] = useState(null);
@@ -183,10 +183,10 @@ const JobCard = ({job, isCandidate}) => {
                     <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
                     <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
                   </> : <>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length})</Button>
-                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length || 0})</Button>
+                  <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length || 0})</Button>
                 </>}
               </div>
             </Grid>

@@ -103,3 +103,13 @@ export const experienceData = [
   '20',
   '20+'
 ];
+
+export const qualificationData = [
+  { value: '1', label: '10th'},
+  { value: '2', label: '12th'},
+  { value: '3', label: 'Diploma'},
+  { value: '4', label: 'Graduate'},
+  { value: '5', label: 'UG'},
+  { value: '6', label: 'PG'},
+  { value: '7', label: 'PHD'},
+];
