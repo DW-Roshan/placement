@@ -5,6 +5,7 @@ import { Card, CardHeader, Chip, IconButton, Typography } from "@mui/material"
 import { format } from "date-fns";
 
 import tableStyles from '@core/styles/table.module.css'
+import { qualificationData } from "@/configs/customDataConfig";
 
 const Education = ({ data, setOpenEduForm }) => {
 
@@ -36,7 +37,7 @@ const Education = ({ data, setOpenEduForm }) => {
                 <td className='pis-6 pli-2 plb-3'>
                   <div className='flex items-center gap-4'>
                     <div className='flex flex-col'>
-                      <Typography color='text.primary'>{row?.education_level}</Typography>
+                      <Typography color='text.primary'>{row?.education_level ? qualificationData.find(qual => qual.value === row?.education_level)?.label : ''}</Typography>
                     </div>
                   </div>
                 </td>

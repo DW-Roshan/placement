@@ -305,7 +305,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       roleAndResponsibility: jobData?.role_responsibility || '',
       skills: jobData?.skills?.map(skill => skill?.id) || [],
       gender: jobData?.gender || 'all',
-      source_criteria: {
+      source_criteria: jobData?.source_criteria ? {
         min_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.min_exp)?.value || '',
         max_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.max_exp)?.value || '',
         preferred_industry_ids: jobData?.source_criteria?.preferred_industry_ids && JSON.parse(jobData?.source_criteria?.preferred_industry_ids) || '',
@@ -313,14 +313,31 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         min_qualification: jobData?.source_criteria?.min_qualification || '',
         min_age: jobData?.source_criteria?.min_age || '',
         max_age: jobData?.source_criteria?.max_age || '',
-        key_skills: jobData?.source_criteria?.key_skills || '',
+        skills: jobData?.source_criteria?.skills || '',
+        skill_ids: jobData?.source_criteria?.skill_ids && JSON.parse(jobData?.source_criteria?.skill_ids) || '',
         company_sources: jobData?.source_criteria?.company_sources || '',
+        preferred_location_ids: jobData?.source_criteria?.preferred_location_ids && JSON.parse(jobData?.source_criteria?.preferred_location_ids) || '',
         min_salary: jobData?.source_criteria?.min_salary || '',
         max_salary: jobData?.source_criteria?.max_salary || '',
         min_increment: jobData?.source_criteria?.min_increment || '',
         max_increment: jobData?.source_criteria?.max_increment || '',
         same_for_search: jobData?.source_criteria?.same_for_search || false,
-      }
+      } : {},
+      search_criteria: jobData?.search_criteria ? {
+        min_exp: yearsOpt?.find(exp => exp?.value == jobData?.search_criteria?.min_exp)?.value || '',
+        max_exp: yearsOpt?.find(exp => exp?.value == jobData?.search_criteria?.max_exp)?.value || '',
+        preferred_industry_ids: jobData?.search_criteria?.preferred_industry_ids && JSON.parse(jobData?.search_criteria?.preferred_industry_ids) || '',
+        preferred_industry: jobData?.search_criteria?.preferred_industry || '',
+        min_qualification: jobData?.search_criteria?.min_qualification || '',
+        min_age: jobData?.search_criteria?.min_age || '',
+        max_age: jobData?.search_criteria?.max_age || '',
+        skills: jobData?.search_criteria?.skills || '',
+        skill_ids: jobData?.search_criteria?.skill_ids && JSON.parse(jobData?.search_criteria?.skill_ids) || '',
+        company_sources: jobData?.search_criteria?.company_sources || '',
+        preferred_location_ids: jobData?.search_criteria?.preferred_location_ids && JSON.parse(jobData?.search_criteria?.preferred_location_ids) || '',
+        min_salary: jobData?.search_criteria?.min_salary || '',
+        max_salary: jobData?.search_criteria?.max_salary || '',
+      } : {},
     }
   });
 
@@ -507,9 +524,9 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       Underline,
     ],
 
-    content: jobData?.source_criteria?.key_skills ?? ``,
+    content: jobData?.source_criteria?.skills ?? ``,
     onUpdate: ({ editor }) => {
-      setValue('source_criteria.key_skills', editor.getHTML())
+      setValue('source_criteria.skills', editor.getHTML())
     }
   })
 
@@ -554,6 +571,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   const onSubmit = async (data) => {
 
     console.log("submitted data:", data)
+
+    // return
 
     if (jobId) {
 
@@ -735,6 +754,12 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue)
+  }
+
+  const handleSameForSearch = (e) => {
+    const isChecked = e.target.checked;
+    
+    setValue('search_criteria', { ...getValues('source_criteria'), same_for_search: isChecked });
   }
 
   return (
@@ -1248,13 +1273,16 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                           }
                         }}
                       >
-                        <MenuItem value='10th'>10th</MenuItem>
+                        {qualificationData.map((qual) => (
+                          <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                        ))}
+                        {/* <MenuItem value='10th'>10th</MenuItem>
                         <MenuItem value='12th'>12th</MenuItem>
                         <MenuItem value='Diploma'>Diploma</MenuItem>
                         <MenuItem value='Graduate'>Graduate</MenuItem>
                         <MenuItem value='UG'>UG</MenuItem>
                         <MenuItem value='PG'>PG</MenuItem>
-                        <MenuItem value='PHD'>PHD</MenuItem>
+                        <MenuItem value='PHD'>PHD</MenuItem> */}
                       </CustomTextField>
 
                       // <Autocomplete
@@ -1841,19 +1869,19 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
-                    <FormLabel className={`${errors?.source_criteria?.key_skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.source_criteria?.key_skills}>Key Skills</FormLabel>
+                    <FormLabel className={`${errors?.source_criteria?.skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.source_criteria?.skills}>Key Skills</FormLabel>
                     <Controller
                       control={control}
-                      name='source_criteria.key_skills'
+                      name='source_criteria.skills'
                       render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.source_criteria?.key_skills && 'border-error'}`}>
+                        <div className={`border rounded-md ${errors?.source_criteria?.skills && 'border-error'}`}>
                           <EditorToolbar editor={keySkillsEditor} />
-                          <Divider className={errors?.source_criteria?.key_skills && 'border-error'} />
+                          <Divider className={errors?.source_criteria?.skills && 'border-error'} />
                           <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
                         </div>
                       )}
                     />
-                    {errors?.source_criteria?.key_skills && <FormHelperText error>{errors?.source_criteria?.key_skills?.message}</FormHelperText>}
+                    {errors?.source_criteria?.skills && <FormHelperText error>{errors?.source_criteria?.skills?.message}</FormHelperText>}
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
@@ -1875,6 +1903,40 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     />
                     {errors?.source_criteria?.company_sources && <FormHelperText error>{errors?.source_criteria?.company_sources?.message}</FormHelperText>}
                   </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='source_criteria.preferred_location_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        multiple
+                        loading={locationOptions.length === 0}
+                        value={locationOptions?.filter(loc => field?.value?.includes(loc.id)) || []}
+                        options={locationOptions || []}
+                        groupBy={option => option?.state_name || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(location) => location.city_name || ''}
+                        onChange={(event, selectedOptions, reason, details) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+
+                          // Update the selected IDs in form
+                          field.onChange(selectedIds);
+
+                        }}
+
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Preferred Locations'
+                            error={!!errors.source_criteria?.preferred_location_ids}
+                            helperText={errors?.source_criteria?.preferred_location_ids?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <FormControl fullWidth error={Boolean(errors?.source_criteria?.min_salary)}>
@@ -1995,7 +2057,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         helperText={errors?.source_criteria?.min_increment?.message}
                         {...field}
                         inputMode="numeric"
-                        
+
                         // onInput={(e) => {
                         //   let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
                         //   e.target.value = val;
@@ -2030,7 +2092,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         isGreaterThanMinIncrement: (value) => {
                           if (!value) return true;
                           const minIncrement = getValues("source_criteria.min_increment");
-                          
+
                           if (minIncrement && !isNaN(minIncrement) && Number(value) <= Number(minIncrement)) {
                             return "Max increment must be greater than Min increment";
                           }
@@ -2047,7 +2109,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                         helperText={errors?.source_criteria?.max_increment?.message}
                         {...field}
                         inputMode="numeric"
-                        
+
                         // onInput={(e) => {
                         //   let val = e.target.value.replace(/[^0-9]/g, "").slice(0, 7);
                         //   e.target.value = val;
@@ -2071,7 +2133,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<Checkbox {...field} checked={field.value} />}
+                          control={<Checkbox {...field} checked={field.value} onChange={e => {handleSameForSearch(e); field.onChange(e);}} />}
                           label='Source Criteria Same for Search Criteria'
                         />
                       )}
@@ -2079,6 +2141,491 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                     {errors?.source_criteria?.same_for_search && (
                       <FormHelperText error>{errors?.source_criteria?.same_for_search?.message}</FormHelperText>
                     )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </TabPanel>
+            <TabPanel value='search_criteria'>
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    1. Experience
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.minExp || errors?.minExp)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>
+                      Experience
+                    </FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='search_criteria.min_exp'
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={minExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
+                              }
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.search_criteria?.min_exp}
+                                  helperText={errors?.search_criteria?.min_exp?.message}
+                                  placeholder='Min experience'
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                        to
+                      </Grid>
+                      {/* <Grid size={{ xs: 12, sm: 0 }}>to</Grid> */}
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Controller
+                          control={control}
+                          name='search_criteria.max_exp'
+                          render={({ field }) => (
+                            <Autocomplete
+                              fullWidth
+                              {...field}
+                              options={maxExpData || []}
+                              value={
+                                yearsOpt.find(option => option.value === field.value) || null
+                              }
+                              getOptionKey={option => option.value}
+                              getOptionLabel={(option) => option.label || ''}
+                              onChange={(event, value) => {
+                                field.onChange(value?.value || '')
+                              }}
+                              renderInput={(params) => (
+                                <CustomTextField
+                                  {...params}
+                                  error={!!errors?.search_criteria?.max_exp}
+                                  helperText={errors?.search_criteria?.max_exp?.message}
+                                  placeholder='Max experience'
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      </Grid>
+                    </Grid>
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    2. Preferred Industry
+                  </Typography>
+                </Grid>
+                {/* <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='source_criteria.preferred_industry_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        multiple
+                        value={
+                          industries && industries?.filter(ind => field?.value?.includes(ind.id)) || []
+                        }
+                        options={industries || []}
+                        groupBy={option => option.category || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, selectedOptions) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+                          const selectedNames = selectedOptions.map(opt => opt.name).join(', ');
+
+                          field.onChange(selectedIds); // update the array of selected IDs
+
+                          // Set the `preferred_industry` field with names
+                          setValue('source_criteria.preferred_industry', selectedNames);
+                        }}
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Select Industry'
+                            error={!!errors.source_criteria?.preferred_industry_ids}
+                            helperText={errors?.source_criteria?.preferred_industry_ids?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.source_criteria?.preferred_industry ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={errors?.preferred_industry}>Preferred Industry</FormLabel>
+                    <Controller
+                      control={control}
+                      name='source_criteria.preferred_industry'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.source_criteria?.preferred_industry && 'border-error'}`}>
+                          <EditorToolbar editor={preferredIndustryEditor} />
+                          <Divider className={errors?.source_criteria?.preferred_industry && 'border-error'} />
+                          <EditorContent {...field} editor={preferredIndustryEditor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.source_criteria?.preferred_industry && <FormHelperText error>{errors?.source_criteria?.preferred_industry?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid> */}
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='search_criteria.preferred_industry_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        multiple
+                        value={industries?.filter(ind => field?.value?.includes(ind.id)) || []}
+                        options={industries || []}
+                        groupBy={option => option.category || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(industry) => industry.name || ''}
+                        onChange={(event, selectedOptions, reason, details) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+                          const selectedNames = selectedOptions.map(opt => opt.name);
+
+                          // Update the selected IDs in form
+                          field.onChange(selectedIds);
+
+                          if (!preferredIndustryEditor) return;
+
+                          // When user adds an industry
+                          if (reason === 'selectOption' && details?.option?.name) {
+                            const newlyAdded = details.option.name;
+                            const { from } = preferredIndustryEditor.state.selection;
+                            const textBefore = preferredIndustryEditor.state.doc.textBetween(0, from, '\n');
+                            const prefix = textBefore.trim().length > 0 ? ', ' : '';
+
+                            preferredIndustryEditor
+                              .chain()
+                              .focus()
+                              .insertContent(`${prefix}${newlyAdded}`)
+                              .run();
+                          }
+
+                          // When user removes one
+                          else if (reason === 'removeOption' && details?.option?.name) {
+                            const removedName = details.option.name;
+
+                            // Get the current editor content
+                            const currentContent = preferredIndustryEditor.getText();
+
+                            // Create a regex to safely remove that name (case insensitive, with optional comma/space)
+                            const updatedText = currentContent
+                              .replace(new RegExp(`\\b${removedName}\\b,?\\s*`, 'gi'), '')
+                              .trim()
+                              .replace(/(^,|,$)/g, '')
+                              .trim();
+
+                            // Replace editor content with updated text
+                            preferredIndustryEditor.commands.setContent(updatedText);
+                          }
+
+                          // When user clears all
+                          else if (reason === 'clear') {
+                            preferredIndustryEditor.commands.clearContent();
+                          }
+                        }}
+
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Select Industry'
+                            error={!!errors.search_criteria?.preferred_industry_ids}
+                            helperText={errors?.search_criteria?.preferred_industry_ids?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    3. Educational Qualification
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='search_criteria.min_qualification'
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        select
+                        required={false}
+                        label={<>Minimum Qualification</>}
+                        error={!!errors?.search_criteria?.min_qualification}
+                        helperText={errors?.search_criteria?.min_qualification?.message}
+                        {...field}
+                      >
+                        {qualificationData.map((qual) => (
+                          <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                        ))}
+                      </CustomTextField>
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>
+                    4. Age Criteria
+                  </Typography>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='search_criteria.min_age'
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (!value) return true;
+
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return 'Please enter a valid positive number';
+                          }
+
+                          return true;
+                        },
+                        isLessThanMaxAge: (value) => {
+                          if (!value) return true;
+
+                          const maxAge = getValues('search_criteria.max_age');
+
+                          if (maxAge && !isNaN(maxAge) && Number(value) >= Number(maxAge)) {
+                            return 'Min age must be less than Max age';
+                          }
+
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Min. Age</>}
+                        error={!!errors?.search_criteria?.min_age}
+                        helperText={errors?.search_criteria?.min_age?.message}
+                        {...field}
+                        onInput={(e) => {
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+
+                          if (val !== '' && Number(val) > 100) val = '100';
+                          e.target.value = val;
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <Controller
+                    control={control}
+                    name='search_criteria.max_age'
+                    rules={{
+                      validate: {
+                        isPositive: (value) => {
+                          if (!value) return true;
+
+                          if (isNaN(value) || Number(value) <= 0) {
+                            return 'Please enter a valid positive number';
+                          }
+
+                          return true;
+                        },
+                        isGreaterThanMinAge: (value) => {
+                          if (!value) return true;
+
+                          const minAge = getValues('search_criteria.min_age');
+
+                          if (minAge && !isNaN(minAge) && Number(value) <= Number(minAge)) {
+                            return 'Max age must be greater than Min age';
+                          }
+
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field }) => (
+                      <CustomTextField
+                        fullWidth
+                        label={<>Max. Age</>}
+                        error={!!errors?.search_criteria?.max_age}
+                        helperText={errors?.search_criteria?.max_age?.message}
+                        {...field}
+                        onInput={(e) => {
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+
+                          if (val !== '' && Number(val) > 100) val = '100';
+                          e.target.value = val;
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>5. Key Skills - Keywords</Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.search_criteria?.skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.search_criteria?.skills}>Key Skills</FormLabel>
+                    <Controller
+                      control={control}
+                      name='search_criteria.skills'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.search_criteria?.skills && 'border-error'}`}>
+                          <EditorToolbar editor={keySkillsEditor} />
+                          <Divider className={errors?.search_criteria?.skills && 'border-error'} />
+                          <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.search_criteria?.skills && <FormHelperText error>{errors?.search_criteria?.skills?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='body2' className='font-medium'>6. Companies to source from</Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <FormControl fullWidth>
+                    <FormLabel className={`${errors?.search_criteria?.company_sources ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.search_criteria?.company_sources}>Company Sources</FormLabel>
+                    <Controller
+                      control={control}
+                      name='search_criteria.company_sources'
+                      render={({ field }) => (
+                        <div className={`border rounded-md ${errors?.search_criteria?.company_sources && 'border-error'}`}>
+                          <EditorToolbar editor={companySourcesEditor} />
+                          <Divider className={errors?.search_criteria?.company_sources && 'border-error'} />
+                          <EditorContent {...field} editor={companySourcesEditor} className='overflow-y-auto p-3' />
+                        </div>
+                      )}
+                    />
+                    {errors?.search_criteria?.company_sources && <FormHelperText error>{errors?.search_criteria?.company_sources?.message}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Controller
+                    control={control}
+                    name='search_criteria.preferred_location_ids'
+                    render={({ field }) => (
+                      <Autocomplete
+                        fullWidth
+                        multiple
+                        loading={locationOptions.length === 0}
+                        value={locationOptions?.filter(loc => field?.value?.includes(loc.id)) || []}
+                        options={locationOptions || []}
+                        groupBy={option => option?.state_name || ''}
+                        getOptionKey={option => option.id}
+                        getOptionLabel={(location) => location.city_name || ''}
+                        onChange={(event, selectedOptions, reason, details) => {
+                          const selectedIds = selectedOptions.map(opt => opt.id);
+
+                          // Update the selected IDs in form
+                          field.onChange(selectedIds);
+
+                        }}
+
+                        renderInput={(params) => (
+                          <CustomTextField
+                            {...params}
+                            label='Preferred Locations'
+                            error={!!errors.search_criteria?.preferred_location_ids}
+                            helperText={errors?.search_criteria?.preferred_location_ids?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <FormControl fullWidth error={Boolean(errors?.search_criteria?.min_salary)}>
+                    <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Annual Salary (in Lacs)</FormLabel>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='search_criteria.min_salary'
+                          rules={{
+                            validate: {
+                              isValidSalary: (value) => {
+                                if (!value) return true;
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+                                  return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              }
+                            }
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              error={!!errors?.search_criteria?.min_salary}
+                              helperText={errors?.search_criteria?.min_salary?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')
+                                  .replace(/^\./, '')
+                                  .replace(/(\..*)\./g, '$1')
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2');
+                              }}
+                              placeholder='1.5'
+                              {...field}
+                            />
+                          )}
+                        />
+                        to
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }} className='flex' gap={2} alignItems='center'>
+                        <Controller
+                          control={control}
+                          name='search_criteria.max_salary'
+                          rules={{
+                            validate: {
+                              isValidSalary: (value) => {
+                                if (!value) return true;
+                                const sanitizedValue = value.replace(/,/g, '');
+
+                                if (!/^\d+(\.\d{1,2})?$/.test(sanitizedValue)) {
+                                  return 'Please enter a valid salary (numeric value, optionally with 2 decimal places)';
+                                }
+
+                                return true;
+                              }
+                            }
+                          }}
+                          render={({ field }) => (
+                            <CustomTextField
+                              fullWidth
+                              {...field}
+                              error={!!errors?.search_criteria?.max_salary}
+                              helperText={errors?.search_criteria?.max_salary?.message}
+                              onInput={(e) => {
+                                e.target.value = e.target.value
+                                  .replace(/[^0-9.]/g, '')
+                                  .replace(/^\./, '')
+                                  .replace(/(\..*)\./g, '$1')
+                                  .replace(/^(\d+)(\.\d{0,2})?.*$/, '$1$2');
+                              }}
+                              placeholder='2.5'
+                            />
+                          )}
+                        />
+                        Lacs
+                      </Grid>
+                    </Grid>
                   </FormControl>
                 </Grid>
               </Grid>

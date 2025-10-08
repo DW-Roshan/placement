@@ -36,6 +36,8 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 import DialogCloseButton from '@/components/dialogs/DialogCloseButton'
 import CustomTextField from '@core/components/mui/TextField'
 
+import { qualificationData } from '@/configs/customDataConfig'
+
 const EducationForm = ({ setData, open, data, handleClose }) => {
 
   const [loading, setLoading] = useState(false)
@@ -216,13 +218,16 @@ const EducationForm = ({ setData, open, data, handleClose }) => {
                               helperText={errors?.educations?.[index]?.educationLevel?.message}
                               {...field}
                             >
-                              <MenuItem value='10th'>10th</MenuItem>
+                              {qualificationData.map((qual) => (
+                                <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                              ))}
+                              {/* <MenuItem value='10th'>10th</MenuItem>
                               <MenuItem value='12th'>12th</MenuItem>
                               <MenuItem value='Diploma'>Diploma</MenuItem>
                               <MenuItem value='Graduate'>Graduate</MenuItem>
                               <MenuItem value='UG'>UG</MenuItem>
                               <MenuItem value='PG'>PG</MenuItem>
-                              <MenuItem value='PHD'>PHD</MenuItem>
+                              <MenuItem value='PHD'>PHD</MenuItem> */}
                             </CustomTextField>
                           )}
                         />

@@ -38,7 +38,7 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 // import { getCookie } from '@/utils/cookies'
 
-import { experienceData, MenuProps, monthsOpt, yearsOpt } from '@/configs/customDataConfig'
+import { experienceData, MenuProps, monthsOpt, qualificationData, yearsOpt } from '@/configs/customDataConfig'
 
 import { formatCTC } from '@/utils/formatCTC'
 
@@ -257,7 +257,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        
+
         // setCities(null);
 
         setIndustries(null);
@@ -1224,13 +1224,16 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                                 helperText={errors?.educations?.[index]?.educationLevel?.message}
                                 {...field}
                               >
-                                <MenuItem value='10th'>10th</MenuItem>
+                                {qualificationData.map((qual) => (
+                                  <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                                ))}
+                                {/* <MenuItem value='10th'>10th</MenuItem>
                                 <MenuItem value='12th'>12th</MenuItem>
                                 <MenuItem value='Diploma'>Diploma</MenuItem>
                                 <MenuItem value='Graduate'>Graduate</MenuItem>
                                 <MenuItem value='UG'>UG</MenuItem>
                                 <MenuItem value='PG'>PG</MenuItem>
-                                <MenuItem value='PHD'>PHD</MenuItem>
+                                <MenuItem value='PHD'>PHD</MenuItem> */}
                               </CustomTextField>
                             )}
                           />

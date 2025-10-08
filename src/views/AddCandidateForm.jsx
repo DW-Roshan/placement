@@ -38,7 +38,7 @@ import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
 // import { getCookie } from '@/utils/cookies'
 
-import { experienceData, MenuProps, monthsOpt, yearsOpt } from '@/configs/customDataConfig'
+import { experienceData, MenuProps, monthsOpt, qualificationData, yearsOpt } from '@/configs/customDataConfig'
 
 import { formatCTC } from '@/utils/formatCTC'
 
@@ -966,8 +966,8 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
                   render={({ field }) => (
                     <AppReactDatepicker
                       selected={field.value} onChange={field.onChange}
-                      showYearDropdown showMonthDropdown dateFormat="yyyy/MM/dd"
-                      placeholderText="YYYY/MM/DD"
+                      showYearDropdown showMonthDropdown dateFormat="dd/MM/yyyy"
+                      placeholderText="DD/MM/YYYY"
                       customInput={
                         <CustomTextField fullWidth label='Date of Birth'
                           error={!!errors.dateOfBirth} helperText={errors?.dateOfBirth?.message} />
@@ -1193,13 +1193,16 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
                                 helperText={errors?.educations?.[index]?.educationLevel?.message}
                                 {...field}
                               >
-                                <MenuItem value='10th'>10th</MenuItem>
+                                {qualificationData.map((qual) => (
+                                  <MenuItem key={qual.value} value={qual.value}>{qual.label}</MenuItem>
+                                ))}
+                                {/* <MenuItem value='10th'>10th</MenuItem>
                                 <MenuItem value='12th'>12th</MenuItem>
                                 <MenuItem value='Diploma'>Diploma</MenuItem>
                                 <MenuItem value='Graduate'>Graduate</MenuItem>
                                 <MenuItem value='UG'>UG</MenuItem>
                                 <MenuItem value='PG'>PG</MenuItem>
-                                <MenuItem value='PHD'>PHD</MenuItem>
+                                <MenuItem value='PHD'>PHD</MenuItem> */}
                               </CustomTextField>
                             )}
                           />
