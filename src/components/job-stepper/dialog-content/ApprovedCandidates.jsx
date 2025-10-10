@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton'
 
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 
-import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, FormControlLabel, FormGroup, MenuItem, Tab, TablePagination, Tooltip, Typography } from "@mui/material";
+import { Button, Checkbox, Chip, CircularProgress, Dialog, DialogContent, DialogTitle, FormControlLabel, FormGroup, Icon, MenuItem, Tab, TablePagination, Tooltip, Typography } from "@mui/material";
 
 
 import { rankItem } from '@tanstack/match-sorter-utils'
@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCandidateIds, jobId}) => {
+const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCandidateIds, notApprovedCandidateIds, jobId}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -116,19 +116,19 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   const { data: session } = useSession()
   const token = session?.user?.token
 
-  useEffect(() => {
-    if (candidateData && approvedCandidateIds.length > 0) {
+  // useEffect(() => {
+  //   if (candidateData && approvedCandidateIds.length > 0) {
 
-      const selected = {};
+  //     const selected = {};
 
-      candidateData.forEach(candidate => {
-        if (approvedCandidateIds.includes(candidate.id)) {
-          selected[candidate.id] = true;
-        }
-      });
-      setRowSelection(selected);
-    }
-  }, [candidateData, approvedCandidateIds]);
+  //     candidateData.forEach(candidate => {
+  //       if (approvedCandidateIds.includes(candidate.id)) {
+  //         selected[candidate.id] = true;
+  //       }
+  //     });
+  //     setRowSelection(selected);
+  //   }
+  // }, [candidateData, approvedCandidateIds]);
 
   // useEffect(() => {
 
@@ -185,6 +185,11 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
           />
         ),
         cell: ({ row }) => (
+          approvedCandidateIds.includes(row.original.id) ? (
+            <CustomAvatar color="success" size={24}><i className='tabler-check text-sm' /></CustomAvatar>
+          ) : notApprovedCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="error" size={24}><i className='tabler-x text-sm' /></CustomAvatar>
+          ) :
           <Checkbox
             {...{
               checked: row.getIsSelected(),
@@ -357,7 +362,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
+    enableRowSelection: row => !approvedCandidateIds.includes(row.original.id) && !notApprovedCandidateIds.includes(row.original.id), // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -382,7 +387,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
 
   console.log("selected id:", selectedIds);
 
-  const handleApproveCandidate = async (inviteTypes) => {
+  const handleApproveCandidate = async (inviteTypes, isReject) => {
 
     // setRowSelection({});
 
@@ -400,7 +405,8 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
-          inviteTypes
+          inviteTypes,
+          reject: isReject
         })
       });
 
@@ -444,7 +450,7 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
   return (
     <>
       <DialogTitle>
-        Applied Candidates
+        Approve Candidates
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>
@@ -474,6 +480,16 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
             >
               Export
             </Button> */}
+            <Button
+              color='error'
+              variant='contained'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-x' />}
+              className='max-sm:is-full'
+              disabled={newSelectedIds.length <= 0 || loading || inviteTypes.length === 0}
+              onClick={() => handleApproveCandidate(inviteTypes, true)}
+            >
+              {loading ? 'Not Approving...' : 'Not Approve'}
+            </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'

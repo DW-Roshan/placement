@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
+const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData, cvSharedCandidateIds, cvNotSharedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -171,6 +171,11 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
           />
         ),
         cell: ({ row }) => (
+          cvSharedCandidateIds.includes(row.original.id) ? (
+            <CustomAvatar color="success" size={24}><i className='tabler-check text-sm' /></CustomAvatar>
+          ) : cvNotSharedCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="error" size={24}><i className='tabler-x text-sm' /></CustomAvatar>
+          ) :
           <Checkbox
             {...{
               checked: row.getIsSelected(),
@@ -342,7 +347,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original?.age? > 18, // or enable row selection conditionally per row
+    enableRowSelection: row => !cvSharedCandidateIds.includes(row.original.id) && !cvNotSharedCandidateIds.includes(row.original.id), // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -362,7 +367,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
 
   console.log("selected id:", selectedIds);
 
-  const handleCVShare = async (inviteTypes) => {
+  const handleCVShare = async (inviteTypes, isReject) => {
 
     // setRowSelection({});
 
@@ -380,7 +385,8 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
-          inviteTypes
+          inviteTypes,
+          reject: isReject
         })
       });
 
@@ -439,6 +445,8 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
             <MenuItem value='25'>25</MenuItem>
             <MenuItem value='50'>50</MenuItem>
           </CustomTextField>
+          <Typography variant="h6">CV Shared: {cvSharedCandidateIds.length}</Typography>
+          <Typography variant="h6">CV Not Shared: {cvNotSharedCandidateIds.length}</Typography>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
             <DebouncedInput
               value={globalFilter ?? ''}
@@ -454,6 +462,16 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData}) => {
             >
               Export
             </Button> */}
+            <Button
+              color='error'
+              variant='contained'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-x' />}
+              className='max-sm:is-full'
+              disabled={selectedIds.length <= 0 || loading}
+              onClick={() => handleCVShare(inviteTypes, true)}
+            >
+              {loading ? 'Not Sharing...' : 'CV Not Share'}
+            </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'

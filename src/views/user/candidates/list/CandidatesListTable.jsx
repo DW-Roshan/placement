@@ -59,6 +59,8 @@ import { getLocalizedUrl } from '@/utils/i18n'
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
 import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
+import { Tooltip } from '@mui/material'
+import CandidateInfo from '@/components/CandidateInfo'
 
 // Styled Components
 const Icon = styled('i')({})
@@ -249,6 +251,7 @@ const CandidatesListTable = ({ tableData }) => {
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
                 {row.original?.full_name}
+                <CandidateInfo info={row.original?.status_info} />
               </Typography>
               <Typography variant='body2'>{row.original?.profile_title}</Typography>
             </div>

@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, selectedCandidateIds}) => {
+const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, selectedCandidateIds, absentCandidateIds, notSelectedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -349,7 +349,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    enableRowSelection: row => !row.original?.pivot?.selected, // or enable row selection conditionally per row
+    enableRowSelection: row => !row.original?.pivot?.selected && !absentCandidateIds.includes(row.original.id) && !notSelectedCandidateIds.includes(row.original.id), // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -374,7 +374,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
 
   console.log("selected id:", selectedIds);
 
-  const handleCandidateSelection = async () => {
+  const handleCandidateSelection = async (action = 'select') => {
 
     // setRowSelection({});
 
@@ -392,6 +392,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
+          actionType: action
         })
       });
 
@@ -467,6 +468,26 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
             >
               Export
             </Button> */}
+            <Button
+              color='warning'
+              variant='outlined'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-alert-circle' />}
+              className='max-sm:is-full'
+              disabled={newSelectedIds.length <= 0 || loading}
+              onClick={() => {handleCandidateSelection('absent')}}
+            >
+              {loading ? 'Updating...' : 'Absent'}
+            </Button>
+            <Button
+              color='error'
+              variant='contained'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-x' />}
+              className='max-sm:is-full'
+              disabled={newSelectedIds.length <= 0 || loading}
+              onClick={() => {handleCandidateSelection('not_selected')}}
+            >
+              {loading ? 'Not Selecting...' : 'Not Selected Candidate'}
+            </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'

@@ -31,7 +31,7 @@ const steps = {
   invite: "Invited Candidates",
   applied: "Applied",
   cv_shared: "CV Shared",
-  hr_review: "HR reviews and approves the profile",
+  hr_review: "HR approves the profile",
   interview_scheduled: "Interview Lined up",
   selected: "Candidate Selected / Job selection",
   offer_accepted: "Accepting the offer letter",
@@ -74,7 +74,7 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "applied":
         return (
-          <AppliedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.candidates} jobId={job?.id} />
+          <AppliedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.candidates} jobId={job?.id} cvSharedCandidateIds={job?.cv_shared_candidates?.map(c => c.id) || []} cvNotSharedCandidateIds={job?.rejected_candidates?.filter(c => c.pivot.status_type === 11)?.map(c => c.id) || []} />
         );
       case "cv_shared":
         return (
@@ -82,7 +82,7 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "hr_review":
         return (
-          <ApprovedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.cv_shared_candidates} approvedCandidateIds={job?.approved_candidates?.map(c => c.id) || []} jobId={job?.id}  />
+          <ApprovedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.cv_shared_candidates} approvedCandidateIds={job?.approved_candidates?.map(c => c.id) || []} jobId={job?.id} notApprovedCandidateIds={job?.rejected_candidates?.map(c => c.id) || []} />
         );
       case "interview_scheduled":
         return (
@@ -90,7 +90,7 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "selected":
         return (
-          <SelectedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.interview_scheduled_candidates} selectedCandidateIds={job?.selected_candidates?.map(c => c.id) || []} jobId={job?.id} />
+          <SelectedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.interview_scheduled_candidates} selectedCandidateIds={job?.selected_candidates?.map(c => c.id) || []} jobId={job?.id} absentCandidateIds={job?.rejected_candidates?.filter(c => c.pivot.status_type === 13)?.map(c => c.id) || []} notSelectedCandidateIds={job?.rejected_candidates?.filter(c => c.pivot.status_type === 14)?.map(c => c.id) || []} />
         );
       case "offer_accepted":
         return (
