@@ -94,7 +94,7 @@ const Login = ({ mode, isCandidate }) => {
 
   // const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
   // const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
-  
+
   const borderedDarkIllustration = '/images/illustrations/auth/hire-login-page-illustration.png'
   const borderedLightIllustration = '/images/illustrations/auth/hire-login-page-illustration.png'
 
@@ -302,6 +302,10 @@ const Login = ({ mode, isCandidate }) => {
               {loading && <CircularProgress size={20} color='inherit' />}
               { jobApply ? 'Login & Apply' : 'Login' }
             </Button>
+            {!isCandidate &&
+            <Button fullWidth variant='outlined' className='gap-2' onClick={() => router.replace(getLocalizedUrl('candidate/login', locale))}>
+              Candidate Login
+            </Button>}
             {jobApply &&
               <div className='flex justify-center items-center flex-wrap gap-2'>
                 <Typography>New on our platform?</Typography>

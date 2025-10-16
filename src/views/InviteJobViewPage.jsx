@@ -22,7 +22,7 @@ const InviteJobViewPage = ({ data, id }) => {
 
   return (
     <section className={classNames('plb-6', frontCommonStyles.layoutSpacing)}>
-      <JobView job={data?.job} isCandidate={data?.isCandidate} jobUuid={id} setAppliedSuccess={setAppliedSuccess} registered={data?.registered} />
+      <JobView jobData={data?.job} isCandidate={data?.isCandidate} jobUuid={id} setAppliedSuccess={setAppliedSuccess} registered={data?.registered} isInvite={true} />
     </section>
   )
 

@@ -27,7 +27,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 import { signIn, useSession } from 'next-auth/react'
 
-import { format, parse } from 'date-fns'
+import { format, isValid, parse } from 'date-fns'
 
 import { toast } from 'react-toastify'
 
@@ -65,21 +65,74 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
   const [matchedDepartment, setMatchedDepartment] = useState(null);
   const [matchedCity, setMatchedCity] = useState(null);
 
+  // function getAllMonths(start, end) {
+  //   const months = [];
+  //   const formats = ['dd-MM-yyyy', 'MM-yyyy', 'yyyy-MM-dd', 'yyyy-MM'];
+
+  //   const parsedStartDate = formats.reduce((acc, format) => {
+  //     const parsed = parse(start, format, new Date());
+
+  //     return isNaN(parsed) ? acc : parsed;
+  //   }, new Date());
+
+  //   const parsedEndDate = end && end != 'current_time' ? formats.reduce((acc, format) => {
+  //     const parsed = parse(end, format, new Date());
+
+  //     return isNaN(parsed) ? acc : parsed;
+  //   }, new Date()) : new Date();
+
+  //   const date = new Date(parsedStartDate);
+
+  //   while (date <= parsedEndDate) {
+  //     months.push(format(date, 'yyyy-MM'));
+  //     date.setMonth(date.getMonth() + 1);
+  //   }
+
+  //   return months;
+  // }
+
   function getAllMonths(start, end) {
     const months = [];
     const formats = ['dd-MM-yyyy', 'MM-yyyy', 'yyyy-MM-dd', 'yyyy-MM'];
 
+    // ✅ Early exit if start is missing
+    if (!start) {
+
+      // console.error('Start date is required');
+
+      return months;
+    }
+
+    // ✅ Parse start date
     const parsedStartDate = formats.reduce((acc, format) => {
       const parsed = parse(start, format, new Date());
 
-      return isNaN(parsed) ? acc : parsed;
-    }, new Date());
+      return isValid(parsed) ? parsed : acc;
+    }, null);
 
-    const parsedEndDate = end && end != 'current_time' ? formats.reduce((acc, format) => {
-      const parsed = parse(end, format, new Date());
+    if (!parsedStartDate) {
 
-      return isNaN(parsed) ? acc : parsed;
-    }, new Date()) : new Date();
+      // console.error('Invalid start date:', start);
+
+      return months;
+    }
+
+    // ✅ Parse end date or use current date
+    const parsedEndDate =
+      end && end !== 'current_time'
+        ? formats.reduce((acc, format) => {
+            const parsed = parse(end, format, new Date());
+            
+            return isValid(parsed) ? parsed : acc;
+          }, null)
+        : new Date();
+
+    if (!parsedEndDate) {
+
+      // console.error('Invalid end date:', end);
+
+      return months;
+    }
 
     const date = new Date(parsedStartDate);
 
@@ -268,7 +321,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
           if(!matched){
             matched = industries ? industries.find(industry =>
-              industry?.name?.toLowerCase().includes(candidateData?.industry?.name?.trim()?.toLowerCase() || '')
+              industry?.name?.toLowerCase().includes(candidateData?.industry?.trim()?.toLowerCase() || 'any')
             ) : '';
           }
 
@@ -284,7 +337,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
           if(!matched){
             matched = departments ? departments.find(department =>
-              department?.name?.toLowerCase().includes(candidateData?.department?.name?.trim()?.toLowerCase() || '')
+              department?.name?.toLowerCase().includes(candidateData?.department?.trim()?.toLowerCase() || 'other')
             ) : '';
           }
 
@@ -299,12 +352,58 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
           if(!matched){
             matched = cities ? cities.find(city =>
-              city?.name?.toLowerCase().includes(candidateData?.city?.city_name?.trim()?.toLowerCase() || '')
+              city?.city_name?.toLowerCase().includes(candidateData?.city?.trim()?.toLowerCase() || 'Anywhere in India')
             ) : '';
           }
 
           setMatchedCity(matched || null);
         }
+
+        // if( industries ){
+
+        //   let matched = industries ? industries.find(
+        //     (industry) => industry?.name?.toLowerCase() === (candidateData?.industry?.name || '')?.toLowerCase()
+        //   ) : '';
+
+        //   if(!matched){
+        //     matched = industries ? industries.find(industry =>
+        //       industry?.name?.toLowerCase().includes(candidateData?.industry?.name?.trim()?.toLowerCase() || '')
+        //     ) : '';
+        //   }
+
+        //   setMatchedIndustry(matched || null);
+
+        // }
+
+        // if( departments ){
+
+        //   let matched = departments ? departments.find(
+        //     (department) => department?.name?.toLowerCase() === (candidateData?.department?.name || '')?.toLowerCase()
+        //   ) : '';
+
+        //   if(!matched){
+        //     matched = departments ? departments.find(department =>
+        //       department?.name?.toLowerCase().includes(candidateData?.department?.name?.trim()?.toLowerCase() || '')
+        //     ) : '';
+        //   }
+
+        //   setMatchedDepartment(matched || 'Other');
+
+        // }
+
+        // if( cities ) {
+        //   let matched = cities ? cities.find(
+        //     (city) => city?.city_name?.toLowerCase() === (candidateData?.city?.city_name || '')?.toLowerCase()
+        //   ) : '';
+
+        //   if(!matched){
+        //     matched = cities ? cities.find(city =>
+        //       city?.name?.toLowerCase().includes(candidateData?.city?.city_name?.trim()?.toLowerCase() || '')
+        //     ) : '';
+        //   }
+
+        //   setMatchedCity(matched || null);
+        // }
 
       }
 
@@ -336,7 +435,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
           company: exp.company_name || '',
           jobTitle: exp.job_title || '',
           location: exp.location || '',
-          startDate: exp.start_date ? new Date(exp.start_date) : null,
+          startDate: exp?.start_date ? new Date(exp.start_date) : null,
           endDate: exp.end_date ? new Date(exp.end_date) : null,
           isCurrent: exp.is_current || false
         }))
@@ -345,7 +444,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
           company: exp.company || '',
           jobTitle: exp.job_title || '',
           location: exp.location || '',
-          startDate: exp.start_date ? parseDateFromString(exp.start_date) : null,
+          startDate: exp?.start_date ? parseDateFromString(exp.start_date) : null,
           endDate: exp.end_date != 'current_time' ? parseDateFromString(exp.end_date) : null,
           isCurrent: exp.is_current || false
         })) :
@@ -409,6 +508,16 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
     control,
     name: 'experiences',
   });
+
+  function normalizeMobile(mobile) {
+    if (!mobile) return null;
+
+    // Remove all non-digit characters
+    const digits = mobile.replace(/\D/g, '');
+
+    // Return the last 10 digits
+    return digits.slice(-10);
+  }
 
   const onSubmit = async (data) => {
 
@@ -512,10 +621,11 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
       // sessionStorage.setItem('success', result.message);
 
+      const normalizedMobile = normalizeMobile(data.mobileNo);
 
       const res = await signIn('credentials', {
-        email: data.mobileNo,
-        password: data.mobileNo,
+        email: normalizedMobile,
+        password: normalizedMobile,
         isCandidate: true,
         redirect: false
       })

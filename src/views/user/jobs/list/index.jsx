@@ -12,12 +12,12 @@ import CardSkeletons from '@/components/skeletons/CardSkeletons';
 import JobsListSkeleton from '@/components/skeletons/JobsListSkeleton';
 
 
-const JobsList = ({token, isCandidate, hideSearch}) => {
+const JobsList = ({token, isCandidate, hideSearch, isApplied}) => {
 
   const [jobsData, setJobsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+
   const getJobsData = async () => {
     try {
       if (!token) {
@@ -29,20 +29,40 @@ const JobsList = ({token, isCandidate, hideSearch}) => {
       setLoading(true) // start loading
 
       if(isCandidate) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+
+        if(isApplied){
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs/applied`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+          if (res.ok) {
+            const data = await res.json()
+
+            setJobsData(data.data)
+          } else {
+            setJobsData([])
           }
-        })
 
-        if (res.ok) {
-          const data = await res.json()
-
-          setJobsData(data.data)
         } else {
-          setJobsData([])
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/candidate/jobs`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+          if (res.ok) {
+            const data = await res.json()
+
+            setJobsData(data.data)
+          } else {
+            setJobsData([])
+          }
         }
       } else {
 
@@ -80,7 +100,7 @@ const JobsList = ({token, isCandidate, hideSearch}) => {
   if(loading) {
     return <JobsListSkeleton totalCards={3}/>
   }
-  
+
 
   return (
     <Grid container spacing={6}>

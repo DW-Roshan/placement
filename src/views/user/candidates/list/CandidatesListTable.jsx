@@ -58,8 +58,9 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+
 import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
-import { Tooltip } from '@mui/material'
+
 import CandidateInfo from '@/components/CandidateInfo'
 
 // Styled Components
@@ -214,7 +215,7 @@ const CandidatesListTable = ({ tableData }) => {
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target='blank' href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -251,7 +252,9 @@ const CandidatesListTable = ({ tableData }) => {
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
                 {row.original?.full_name}
-                <CandidateInfo info={row.original?.status_info} />
+                {row.original?.status_info?.length > 0 && (
+                  <CandidateInfo info={row.original?.status_info?.[0]} />
+                )}
               </Typography>
               <Typography variant='body2'>{row.original?.profile_title}</Typography>
             </div>

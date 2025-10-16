@@ -110,11 +110,12 @@ const JobCard = ({job, isCandidate}) => {
   const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (job.id && !fetchedRef.current) {
+    
+    if (job.id && !fetchedRef.current && token) {
       fetchedRef.current = true;
       getMatchedCandidates();
     }
-  }, [job.id]);
+  }, [job.id, token]);
 
   return (
     <Card variant='outlined'>
@@ -227,8 +228,8 @@ const JobCard = ({job, isCandidate}) => {
           </Grid>
         </Grid>
       </CardActions>
-      {openMatchedCandidate && <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={matchedCandidates} jobId={job?.id} selectValue={tabOpen} />}
-      {openAppliedCandidate && <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true}  />}
+      {openMatchedCandidate && <MatchedCandidateDialog open={openMatchedCandidate} handleClose={() => {setOpenMatchedCandidate(!openMatchedCandidate); setTabOpen(null)}} candidateData={matchedCandidates} jobId={job?.id} selectValue={tabOpen} jobTitle={job?.job_title} />}
+      {openAppliedCandidate && <MatchedCandidateDialog open={openAppliedCandidate} handleClose={() => {setOpenAppliedCandidate(!openAppliedCandidate); }} candidateData={job?.candidates} appliedCandidates={true} jobTitle={job?.job_title} />}
       <DialogsConfirmation open={openApply} jobId={job?.id} token={token} applied={applied} setApplied={setApplied} handleClose={() => setOpenApply(!openApply)} />
       <DialogsConfirmation isSave={true} open={openSave} jobId={job?.id} token={token} saved={saved} applied={applied} setSaved={setSaved} handleClose={() => setOpenSave(!openSave)} />
       <InviteCandidateDialog open={openInviteCandidate} handleClose={() => setOpenInviteCandidate(!openInviteCandidate)} jobId={job?.id} />

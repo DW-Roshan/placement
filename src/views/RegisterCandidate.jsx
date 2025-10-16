@@ -39,7 +39,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
   // Hooks
   const { getRootProps, getInputProps } = useDropzone({
     multiple: false,
-    maxSize: 2000000, // 2 MB
+    maxSize: 5000000, // 5 MB
     accept: {
       'application/pdf': ['.pdf']
     },

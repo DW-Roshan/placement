@@ -48,6 +48,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 import { qualificationData, yearsOpt } from '@/configs/customDataConfig'
 
 import LocationAutocomplete from './LocationAutoComplete'
+import SkillSearchOnly from '@/components/SkillSearchOnly'
 
 // Vars
 const data = [
@@ -210,6 +211,8 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
   const [maxExpData, setMaxExpData] = useState(yearsOpt || null);
   const [fallbackSelected, setFallbackSelected] = useState([]);
   const [tabValue, setTabValue] = useState('job_details')
+  const [selectedSourceSkills, setSelectedSourceSkills] = useState([]);
+  const [selectedSearchSkills, setSelectedSearchSkills] = useState([]);
 
   const [locationOptions, setLocationOptions] = useState(locations || []);
   const [loading, setLoading] = useState(false);
@@ -217,6 +220,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
   // const [industries, setIndustries] = useState(indu);
   const [departmentsData, setDepartments] = useState(departments);
+
+  useEffect(() => {
+
+    setSelectedSourceSkills(jobData?.source_criteria?.skill_ids ? skillsData.filter(skill => JSON.parse(jobData?.source_criteria?.skill_ids).includes(skill.id)) : [])
+    setSelectedSearchSkills(jobData?.search_criteria?.skill_ids ? skillsData.filter(skill => JSON.parse(jobData?.search_criteria?.skill_ids).includes(skill.id)) : [])
+
+  }, [skillsData])
 
   // const [jobData, setJobData] = useState(jobData);
 
@@ -305,6 +315,7 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       roleAndResponsibility: jobData?.role_responsibility || '',
       skills: jobData?.skills?.map(skill => skill?.id) || [],
       gender: jobData?.gender || 'all',
+      additional_benefits: jobData?.additional_benefits || '',
       source_criteria: jobData?.source_criteria ? {
         min_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.min_exp)?.value || '',
         max_exp: yearsOpt?.find(exp => exp?.value == jobData?.source_criteria?.max_exp)?.value || '',
@@ -313,7 +324,6 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         min_qualification: jobData?.source_criteria?.min_qualification || '',
         min_age: jobData?.source_criteria?.min_age || '',
         max_age: jobData?.source_criteria?.max_age || '',
-        skills: jobData?.source_criteria?.skills || '',
         skill_ids: jobData?.source_criteria?.skill_ids && JSON.parse(jobData?.source_criteria?.skill_ids) || '',
         company_sources: jobData?.source_criteria?.company_sources || '',
         preferred_location_ids: jobData?.source_criteria?.preferred_location_ids && JSON.parse(jobData?.source_criteria?.preferred_location_ids) || '',
@@ -331,7 +341,6 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
         min_qualification: jobData?.search_criteria?.min_qualification || '',
         min_age: jobData?.search_criteria?.min_age || '',
         max_age: jobData?.search_criteria?.max_age || '',
-        skills: jobData?.search_criteria?.skills || '',
         skill_ids: jobData?.search_criteria?.skill_ids && JSON.parse(jobData?.search_criteria?.skill_ids) || '',
         company_sources: jobData?.search_criteria?.company_sources || '',
         preferred_location_ids: jobData?.search_criteria?.preferred_location_ids && JSON.parse(jobData?.search_criteria?.preferred_location_ids) || '',
@@ -459,6 +468,39 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
     }
   })
 
+  const additionalBenefitsEditor = useEditor({
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: 'outline-none'
+      }
+    },
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: 'pl-6'
+          }
+        }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      }),
+      Underline,
+    ],
+    content: jobData?.additional_benefits ?? ``,
+    onUpdate: ({ editor }) => {
+      setValue('additional_benefits', editor.getHTML())
+    }
+  })
 
   const preferredIndustryEditor = useEditor({
     immediatelyRender: false,
@@ -758,8 +800,9 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
 
   const handleSameForSearch = (e) => {
     const isChecked = e.target.checked;
-    
+
     setValue('search_criteria', { ...getValues('source_criteria'), same_for_search: isChecked });
+    setSelectedSearchSkills(selectedSourceSkills);
   }
 
   return (
@@ -1868,21 +1911,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   <Typography variant='body2' className='font-medium'>5. Key Skills - Keywords</Typography>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <FormControl fullWidth>
-                    <FormLabel className={`${errors?.source_criteria?.skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.source_criteria?.skills}>Key Skills</FormLabel>
-                    <Controller
-                      control={control}
-                      name='source_criteria.skills'
-                      render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.source_criteria?.skills && 'border-error'}`}>
-                          <EditorToolbar editor={keySkillsEditor} />
-                          <Divider className={errors?.source_criteria?.skills && 'border-error'} />
-                          <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
-                        </div>
-                      )}
-                    />
-                    {errors?.source_criteria?.skills && <FormHelperText error>{errors?.source_criteria?.skills?.message}</FormHelperText>}
-                  </FormControl>
+                  <SkillSearchOnly
+                    control={control}
+                    name='source_criteria.skill_ids'
+                    errors={errors}
+                    selectedSkills={selectedSourceSkills}
+                    setSelectedSkills={setSelectedSourceSkills}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Typography variant='body2' className='font-medium'>6. Companies to source from</Typography>
@@ -2477,21 +2512,13 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
                   <Typography variant='body2' className='font-medium'>5. Key Skills - Keywords</Typography>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <FormControl fullWidth>
-                    <FormLabel className={`${errors?.search_criteria?.skills ?? 'text-[var(--mui-palette-text-primary)]'} text-sm`} error={!!errors?.search_criteria?.skills}>Key Skills</FormLabel>
-                    <Controller
-                      control={control}
-                      name='search_criteria.skills'
-                      render={({ field }) => (
-                        <div className={`border rounded-md ${errors?.search_criteria?.skills && 'border-error'}`}>
-                          <EditorToolbar editor={keySkillsEditor} />
-                          <Divider className={errors?.search_criteria?.skills && 'border-error'} />
-                          <EditorContent {...field} editor={keySkillsEditor} className='overflow-y-auto p-3' />
-                        </div>
-                      )}
-                    />
-                    {errors?.search_criteria?.skills && <FormHelperText error>{errors?.search_criteria?.skills?.message}</FormHelperText>}
-                  </FormControl>
+                  <SkillSearchOnly
+                    control={control}
+                    name='search_criteria.skill_ids'
+                    errors={errors}
+                    selectedSkills={selectedSearchSkills}
+                    setSelectedSkills={setSelectedSearchSkills}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Typography variant='body2' className='font-medium'>6. Companies to source from</Typography>
@@ -2742,6 +2769,51 @@ const FormAddEditJob = ({ jobId, branchData, skillsData, industries, departments
       </Accordion>
       {/* </TabPanel> */}
       {/* <TabPanel value='assign_branches'> */}
+      <Accordion>
+        <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
+          <Typography>Additional Benefits</Typography>
+        </AccordionSummary>
+        <Divider />
+        <AccordionDetails className='!pbs-6'>
+          <Grid container spacing={6}>
+            <Grid size={{ xs: 12 }}>
+              <FormControl fullWidth>
+              <FormLabel className='text-[var(--mui-palette-text-primary)] text-sm'>Additional Benefits</FormLabel>
+              <Controller
+                name='additional_benefits'
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <div className='border rounded-md'>
+                      <EditorToolbar editor={additionalBenefitsEditor} />
+                      <Divider />
+                      <EditorContent {...field} editor={additionalBenefitsEditor} className='overflow-y-auto p-3' />
+                    </div>
+                  )
+                }}
+              />
+            </FormControl>
+              {/* <Controller
+                control={control}
+                name='additional_benefits'
+                render={({ field }) => (
+                  <CustomTextField
+                    fullWidth
+                    multiline
+                    maxRows={6}
+                    label='Additional Benefits'
+                    error={!!errors?.additional_benefits} helperText={errors?.additional_benefits?.message}
+                    {...field}
+                  />
+                )}
+              /> */}
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+        <Divider />
+        <AccordionDetails className='flex gap-4 pbs-6'>
+        </AccordionDetails>
+      </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<i className='tabler-chevron-right' />}>
           <Typography>Assign to Branches</Typography>

@@ -32,6 +32,8 @@ import { useSession } from "next-auth/react";
 
 import { toast } from "react-toastify";
 
+import { format } from "date-fns";
+
 import tableStyles from '@core/styles/table.module.css'
 
 import TablePaginationComponent from "@/components/TablePaginationComponent";
@@ -50,6 +52,8 @@ import { getLocalizedUrl } from '@/utils/i18n'
 import { monthsOpt, yearsOpt } from '@/configs/customDataConfig'
 
 import CustomTextField from "@/@core/components/mui/TextField";
+
+import CandidateInfo from "@/components/CandidateInfo";
 
 const fuzzyFilter = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -95,7 +99,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue, jobId}) => {
+const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandidates, selectValue, jobId, jobTitle}) => {
 
   const [value, setValue] = useState(selectValue || '30%')
   const [rowSelection, setRowSelection] = useState({})
@@ -166,7 +170,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target="blank" href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -207,7 +211,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
         header: 'Invited At',
         cell: ({ row }) => (
           <Typography color='text.primary'>
-            {row.original?.invited_at}
+            {row.original?.invited_at ? format(row.original?.invited_at, 'dd MMM, yy') : ''}
           </Typography>
         )
       }),
@@ -219,6 +223,9 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
             <div className='flex flex-col'>
               <Typography color='text.primary' className='font-medium'>
                 {row.original?.full_name}
+                {row.original?.status_info?.length > 0 && row.original?.status_info?.find(info => info.job_id === row.original?.pivot?.job_id) && (
+                  <CandidateInfo info={row.original?.status_info?.find(info => info.job_id === row.original?.pivot?.job_id)} />
+                )}
               </Typography>
               <Typography variant='body2'>{row.original?.profile_title}</Typography>
             </div>
@@ -424,7 +431,7 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
         <i className='tabler-x' />
       </DialogCloseButton>
       <DialogTitle>
-        {appliedCandidates ? 'Applied Candidates' : 'Matched Candidates'}
+        {appliedCandidates ? 'Applied ' : 'Matched '} Candidates for &quot;{jobTitle}&quot;
         {/* Matched Candidates */}
       </DialogTitle>
       <DialogContent>

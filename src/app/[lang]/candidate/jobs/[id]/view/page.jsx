@@ -36,7 +36,7 @@ const fetchData = async (id, lang) => {
 
   } catch (error) {
     console.log("error:", error)
-    
+
     return [];
   }
 
@@ -48,7 +48,7 @@ const ViewJobPage = async (props) => {
   const id = params.id
   const data = await fetchData(id, lang);
 
-  return <JobView job={data?.job} isCandidate={true} />
+  return <JobView jobData={data?.job} isCandidate={true} />
 
   // return <FormAddEditJob jobId={id} skillsData={data?.skills} industries={data?.industries} departments={data?.departments} jobData={data?.job} locations={data?.locations}/>
 }

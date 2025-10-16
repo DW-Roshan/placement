@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Typography } from "@mui/material";
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Typography } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
@@ -67,7 +67,13 @@ const SourceCriteriaDialog = ({ open, handleClose, data }) => {
             <Typography variant='body2' className='font-medium'>5. Key Skills - Keywords</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <JobDescription html={data?.skills} full />
+            <div className="flex gap-2 flex-wrap">
+              {data?.skills_list.map(skill => (
+                <Chip variant="outlined" size="small" color="primary" key={skill.id} label={skill.name} />
+              ))}
+            </div>
+
+            {/* <JobDescription html={data?.skills_list} full /> */}
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Typography variant='body2' className='font-medium'>6. Companies to source from</Typography>
@@ -76,10 +82,10 @@ const SourceCriteriaDialog = ({ open, handleClose, data }) => {
             <JobDescription html={data?.company_source} full />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="h6">Min. Salary: {data?.min_salary ? `₹${data?.min_salary}` : ''}</Typography>
+            <Typography variant="h6">Min. Salary: {data?.min_salary ? `₹${data?.min_salary} LPA` : ''}</Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="h6">Max. Salary: {data?.max_salary ? `₹${data?.max_salary}` : ''}</Typography>
+            <Typography variant="h6">Max. Salary: {data?.max_salary ? `₹${data?.max_salary} LPA` : ''}</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Typography variant='body2' className='font-medium'>7. Increment Criteria (in %)</Typography>

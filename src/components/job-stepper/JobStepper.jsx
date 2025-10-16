@@ -94,11 +94,11 @@ export default function JobStepper({ job, setJobData }) {
         );
       case "offer_accepted":
         return (
-          <OfferLetterAcceptedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.selected_candidates} offerAcceptedCandidateIds={job?.offer_letter_accepted_candidates?.map(c => c.id) || []} jobId={job?.id} />
+          <OfferLetterAcceptedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.selected_candidates} offerAcceptedCandidateIds={job?.offer_letter_accepted_candidates?.map(c => c.id) || []} jobId={job?.id} offerNotAcceptedCandidateIds={job?.rejected_candidates?.filter(c => c.pivot.status_type === 15)?.map(c => c.id) || []} />
         );
       case "onboarded":
         return (
-          <OnboardedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.offer_letter_accepted_candidates} onboardedCandidateIds={job?.onboarded_candidates?.map(c => c.id) || []} jobId={job?.id} />
+          <OnboardedCandidates handleClose={() => setDialogOpen(false)} setJobData={setJobData} candidateData={job?.offer_letter_accepted_candidates} onboardedCandidateIds={job?.onboarded_candidates?.map(c => c.id) || []} jobId={job?.id} notOnboardedCandidateIds={job?.rejected_candidates?.filter(c => c.pivot.status_type === 16)?.map(c => c.id) || []} />
         );
       default:
         return null;

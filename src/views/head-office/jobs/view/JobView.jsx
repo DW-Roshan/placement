@@ -22,6 +22,8 @@ import CustomIconButton from "@/@core/components/mui/IconButton";
 import { getLocalizedUrl } from "@/utils/i18n";
 import SourceCriteriaDialog from "@/components/SourceCriteriaDialog";
 
+import { qualificationData } from "@/configs/customDataConfig";
+
 const JobView = ({ job, isCandidate }) => {
 
   const [applied, setApplied] = useState(false);
@@ -154,11 +156,18 @@ const JobView = ({ job, isCandidate }) => {
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Education</Typography>
-              {job?.education.map((edu, index) => {
+              {qualificationData.map((qual, index) => {
+                if(job?.education.includes(qual.value)){
+                  return (
+                    <div key={index}>{qual.label}</div>
+                  )
+                }
+              })}
+              {/* {job?.education.map((edu, index) => {
                 return (
                   <div key={index}>{edu}</div>
                 )
-              })}
+              })} */}
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Gender</Typography>
@@ -174,6 +183,12 @@ const JobView = ({ job, isCandidate }) => {
                 ))}
               </div>
             </Grid>
+            {job?.additional_benefits &&
+            <Grid size={{ xs: 12 }}>
+              <Typography variant='h6'>Additional Benefits</Typography>
+              <JobDescription html={job?.additional_benefits} full></JobDescription>
+              {/* <Typography>{job?.additional_benefits}</Typography> */}
+            </Grid>}
             <Grid size={{ xs: 12 }}>
               <Typography variant='h5'>About Company</Typography>
               <JobDescription html={job?.about_company} full></JobDescription>

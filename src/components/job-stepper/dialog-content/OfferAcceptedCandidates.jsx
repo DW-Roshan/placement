@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJobData, offerAcceptedCandidateIds}) => {
+const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJobData, offerAcceptedCandidateIds, offerNotAcceptedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -116,19 +116,19 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
   const { data: session } = useSession()
   const token = session?.user?.token
 
-  useEffect(() => {
-    if (candidateData && offerAcceptedCandidateIds.length > 0) {
+  // useEffect(() => {
+  //   if (candidateData && offerAcceptedCandidateIds.length > 0) {
 
-      const selected = {};
+  //     const selected = {};
 
-      candidateData.forEach(candidate => {
-        if (offerAcceptedCandidateIds.includes(candidate.id)) {
-          selected[candidate.id] = true;
-        }
-      });
-      setRowSelection(selected);
-    }
-  }, [candidateData, offerAcceptedCandidateIds]);
+  //     candidateData.forEach(candidate => {
+  //       if (offerAcceptedCandidateIds.includes(candidate.id)) {
+  //         selected[candidate.id] = true;
+  //       }
+  //     });
+  //     setRowSelection(selected);
+  //   }
+  // }, [candidateData, offerAcceptedCandidateIds]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -177,14 +177,20 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
           />
         ),
         cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
-            }}
-          />
+          offerAcceptedCandidateIds.includes(row.original.id) ? (
+            <CustomAvatar color="success" size={24}><i className='tabler-check text-sm' /></CustomAvatar>
+          ) : offerNotAcceptedCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="error" size={24}><i className='tabler-x text-sm' /></CustomAvatar>
+          ) : (
+            <Checkbox
+              {...{
+                checked: row.getIsSelected(),
+                disabled: !row.getCanSelect(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler()
+              }}
+            />
+          )
         )
       },
       columnHelper.accessor('full_name', {
@@ -298,7 +304,7 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target="blank" href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -349,7 +355,7 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    enableRowSelection: row => !row.original?.pivot?.offer_letter_accepted, // or enable row selection conditionally per row
+    enableRowSelection: row => !row.original?.pivot?.offer_letter_accepted && !offerNotAcceptedCandidateIds.includes(row.original.id), // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -374,7 +380,7 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
 
   console.log("selected id:", selectedIds);
 
-  const handleCandidateOfferLetterAccepted = async () => {
+  const handleCandidateOfferLetterAccepted = async (isReject) => {
 
     // setRowSelection({});
 
@@ -392,6 +398,7 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
+          reject: isReject
         })
       });
 
@@ -467,6 +474,16 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
             >
               Export
             </Button> */}
+            <Button
+              color='error'
+              variant='contained'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-x' />}
+              className='max-sm:is-full'
+              disabled={newSelectedIds.length <= 0 || loading}
+              onClick={() => handleCandidateOfferLetterAccepted(true)}
+            >
+              {loading ? 'Updating...' : 'Offer Not Accepted'}
+            </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'
@@ -474,7 +491,7 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
                 disabled={newSelectedIds.length <= 0 || loading}
-                onClick={handleCandidateOfferLetterAccepted}
+                onClick={() => handleCandidateOfferLetterAccepted()}
               >
                 {loading ? 'Updating...' : 'Offer Accepted'}
               </Button>

@@ -297,7 +297,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData, cvSha
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target="blank" href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>

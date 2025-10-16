@@ -44,9 +44,9 @@ const Education = ({ data, setOpenEduForm }) => {
                 <td className='pli-2 plb-3'>
                   <div className='flex flex-col'>
                     <Typography color='text.primary'>{row?.degree}</Typography>
-                    <Typography variant='body2' color='text.disabled'>
+                    {/* <Typography variant='body2' color='text.disabled'>
                       {row?.degree}
-                    </Typography>
+                    </Typography> */}
                   </div>
                 </td>
                 <td className='pli-2 plb-3'>

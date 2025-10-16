@@ -50,7 +50,7 @@
     "tailwind.config.js",
     "**/*.js",
     "**/*.jsx"
-  ],
+, "src/views/candidate/profile/basicDetails"  ],
   "exclude": [
     "node_modules"
   ]

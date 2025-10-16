@@ -24,7 +24,9 @@ import RegisterCandidate from "@/views/RegisterCandidate";
 import JobStepper from "@/components/job-stepper/JobStepper";
 import SourceCriteriaDialog from "@/components/SourceCriteriaDialog";
 
-const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered }) => {
+import { qualificationData } from "@/configs/customDataConfig";
+
+const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered, isInvite }) => {
 
   const [job, setJobData] = useState(jobData);
   const [applied, setApplied] = useState(false);
@@ -59,16 +61,26 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
           <Grid container spacing={4}>
             <Grid size={{ xs: 12 }}>
               <div className="flex gap-3 justify-between flex-wrap">
+                {!isCandidate &&
                 <div className="flex-1">
                   <Typography variant="h5" className='flex gap-2'>Openings: <div className='text-[var(--mui-palette-text-primary)]'>{job?.total_positions}</div></Typography>
-                </div>
-                {!isCandidate && 
+                </div>}
+                {!isCandidate &&
                 <Button disabled={!job?.source_criteria} variant='contained' className='flex gap-2' onClick={() => setOpenSourceCriteria(true)}>
                   Source Criteria
                 </Button>}
-                <Button variant='contained' className='flex gap-2' onClick={() => router.back()}>
-                  Go Back
-                </Button>
+                {token && (
+                <>
+                  {isInvite ? (
+                    <Button variant="outlined" className="flex gap-2" onClick={() => router.push(getLocalizedUrl('/dashboard', 'en'))}>
+                      Dashboard
+                    </Button>
+                  ) : (
+                    <Button variant="contained" className="flex gap-2" onClick={() => router.back()}>
+                      Go Back
+                    </Button>
+                  )}
+                </>)}
               </div>
             </Grid>
             <Grid size={{ xs: 12 }}>
@@ -174,11 +186,18 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Education</Typography>
-              {job?.education.map((edu, index) => {
+              {qualificationData.map((qual, index) => {
+                if(job?.education.includes(qual.value)){
+                  return (
+                    <div key={index}>{qual.label}</div>
+                  )
+                }
+              })}
+              {/* {job?.education.map((edu, index) => {
                 return (
                   <div key={index}>{edu}</div>
                 )
-              })}
+              })} */}
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant='h6'>Gender</Typography>
@@ -194,6 +213,12 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered 
                 ))}
               </div>
             </Grid>
+            {job?.additional_benefits &&
+              <Grid size={{ xs: 12 }}>
+                <Typography variant='h6'>Additional Benefits</Typography>
+                <JobDescription html={job?.additional_benefits} full></JobDescription>
+                {/* <Typography>{job?.additional_benefits}</Typography> */}
+              </Grid>}
             <Grid size={{ xs: 12 }}>
               <Typography variant='h5'>About Company</Typography>
               <JobDescription html={job?.about_company} full></JobDescription>

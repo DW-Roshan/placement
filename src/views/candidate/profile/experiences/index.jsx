@@ -1,6 +1,6 @@
 'use client'
 
-import { format, parse } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 
 import { TimelineConnector, TimelineContent, TimelineDot, TimelineItem, TimelineSeparator } from "@mui/lab";
 
@@ -23,21 +23,74 @@ const Experience = ({ data, setOpenExpForm }) => {
 
   // console.log("experience:", data);
 
+  // function getAllMonths(start, end) {
+  //   const months = [];
+  //   const formats = ['dd-MM-yyyy', 'MM-yyyy', 'yyyy-MM-dd', 'yyyy-MM'];
+
+  //   const parsedStartDate = formats.reduce((acc, format) => {
+  //     const parsed = parse(start, format, new Date());
+
+  //     return isNaN(parsed) ? acc : parsed;
+  //   }, new Date());
+
+  //   const parsedEndDate = end && end != 'current_time' ? formats.reduce((acc, format) => {
+  //     const parsed = parse(end, format, new Date());
+
+  //     return isNaN(parsed) ? acc : parsed;
+  //   }, new Date()) : new Date();
+
+  //   const date = new Date(parsedStartDate);
+
+  //   while (date <= parsedEndDate) {
+  //     months.push(format(date, 'yyyy-MM'));
+  //     date.setMonth(date.getMonth() + 1);
+  //   }
+
+  //   return months;
+  // }
+
   function getAllMonths(start, end) {
     const months = [];
     const formats = ['dd-MM-yyyy', 'MM-yyyy', 'yyyy-MM-dd', 'yyyy-MM'];
 
+    // ✅ Early exit if start is missing
+    if (!start) {
+
+      // console.error('Start date is required');
+
+      return months;
+    }
+
+    // ✅ Parse start date
     const parsedStartDate = formats.reduce((acc, format) => {
       const parsed = parse(start, format, new Date());
 
-      return isNaN(parsed) ? acc : parsed;
-    }, new Date());
+      return isValid(parsed) ? parsed : acc;
+    }, null);
 
-    const parsedEndDate = end && end != 'current_time' ? formats.reduce((acc, format) => {
-      const parsed = parse(end, format, new Date());
+    if (!parsedStartDate) {
 
-      return isNaN(parsed) ? acc : parsed;
-    }, new Date()) : new Date();
+      // console.error('Invalid start date:', start);
+
+      return months;
+    }
+
+    // ✅ Parse end date or use current date
+    const parsedEndDate =
+      end && end !== 'current_time'
+        ? formats.reduce((acc, format) => {
+            const parsed = parse(end, format, new Date());
+
+            return isValid(parsed) ? parsed : acc;
+          }, null)
+        : new Date();
+
+    if (!parsedEndDate) {
+
+      // console.error('Invalid end date:', end);
+
+      return months;
+    }
 
     const date = new Date(parsedStartDate);
 

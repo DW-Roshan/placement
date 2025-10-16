@@ -96,7 +96,7 @@ const userStatusObj = {
 
 const columnHelper = createColumnHelper()
 
-const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onboardedCandidateIds}) => {
+const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onboardedCandidateIds, notOnboardedCandidateIds}) => {
 
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -115,19 +115,19 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
   const { data: session } = useSession()
   const token = session?.user?.token
 
-  useEffect(() => {
-    if (candidateData && onboardedCandidateIds?.length > 0) {
+  // useEffect(() => {
+  //   if (candidateData && onboardedCandidateIds?.length > 0) {
 
-      const selected = {};
+  //     const selected = {};
 
-      candidateData.forEach(candidate => {
-        if (onboardedCandidateIds.includes(candidate.id)) {
-          selected[candidate.id] = true;
-        }
-      });
-      setRowSelection(selected);
-    }
-  }, [candidateData, onboardedCandidateIds]);
+  //     candidateData.forEach(candidate => {
+  //       if (onboardedCandidateIds.includes(candidate.id)) {
+  //         selected[candidate.id] = true;
+  //       }
+  //     });
+  //     setRowSelection(selected);
+  //   }
+  // }, [candidateData, onboardedCandidateIds]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
@@ -176,14 +176,20 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
           />
         ),
         cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
-            }}
-          />
+          onboardedCandidateIds.includes(row.original.id) ? (
+            <CustomAvatar color="success" size={24}><i className='tabler-check text-sm' /></CustomAvatar>
+          ) : notOnboardedCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="error" size={24}><i className='tabler-x text-sm' /></CustomAvatar>
+          ) : (
+            <Checkbox
+              {...{
+                checked: row.getIsSelected(),
+                disabled: !row.getCanSelect(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler()
+              }}
+            />
+          )
         )
       },
       columnHelper.accessor('full_name', {
@@ -297,7 +303,7 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target="blank" href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -348,7 +354,7 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
       }
     },
     enableRowSelection: true, //enable row selection for all rows
-    enableRowSelection: row => !row.original?.pivot?.onboarding, // or enable row selection conditionally per row
+    enableRowSelection: row => !row.original?.pivot?.onboarding && !notOnboardedCandidateIds.includes(row.original.id), // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -373,7 +379,7 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
 
   console.log("selected id:", selectedIds);
 
-  const handleOnboardedCandidates = async () => {
+  const handleOnboardedCandidates = async (isReject) => {
 
     // setRowSelection({});
 
@@ -391,6 +397,7 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
         method: 'POST',
         body: JSON.stringify({
           selectedIds : selectedIds,
+          reject: isReject
         })
       });
 
@@ -466,6 +473,16 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
             >
               Export
             </Button> */}
+            <Button
+              color='error'
+              variant='contained'
+              startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-x' />}
+              className='max-sm:is-full'
+              disabled={newSelectedIds.length <= 0 || loading}
+              onClick={() => handleOnboardedCandidates(true)}
+            >
+              {loading ? 'Updating...' : 'Not Joined'}
+            </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
                 color='primary'
@@ -473,7 +490,7 @@ const OnboardedCandidates = ({handleClose, candidateData, jobId, setJobData, onb
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
                 disabled={newSelectedIds.length <= 0 || loading}
-                onClick={handleOnboardedCandidates}
+                onClick={() => handleOnboardedCandidates()}
               >
                 {loading ? 'Updating...' : 'Onboarded'}
               </Button>

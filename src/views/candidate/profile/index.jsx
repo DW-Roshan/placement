@@ -21,7 +21,9 @@ import EducationForm from './forms/EducationForm'
 import Skills from './skills'
 import SkillForm from './forms/SkillForm'
 
-import BasicDetails from './basicDetails.jsx'
+import BasicDetails from './basicDetails'
+
+import JobStatus from './jobStatus'
 
 import UserProfileHeaderSkeleton from '@/components/skeletons/UserProfileHeaderSkeleton'
 
@@ -58,7 +60,7 @@ const UserProfile = ({ tabContentList, data, token, id, isCandidate }) => {
       });
 
       const data = res.ok ? await res.json() : null;
-      
+
       setData(data || null);
 
     } catch (error) {
@@ -123,6 +125,11 @@ const UserProfile = ({ tabContentList, data, token, id, isCandidate }) => {
           <Grid size={{ xs: 12, md: 5, lg: 4 }}>
             <Skills data={allData?.candidate?.skills} setOpenSkillForm={setOpenSkillForm} />
           </Grid>
+          {!isCandidate && allData?.candidate?.status_info?.length > 0 && (
+            <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+              <JobStatus data={allData?.candidate?.status_info} />
+            </Grid>
+          )}
         </Grid>
       </Grid>
 

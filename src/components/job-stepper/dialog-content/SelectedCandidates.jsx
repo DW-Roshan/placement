@@ -177,15 +177,37 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
           />
         ),
         cell: ({ row }) => (
+          selectedCandidateIds.includes(row.original.id) ? (
+            <CustomAvatar color="success" size={24}><i className='tabler-check text-sm' /></CustomAvatar>
+          ) : notSelectedCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="error" size={24}><i className='tabler-x text-sm' /></CustomAvatar>
+          ) : absentCandidateIds?.includes(row.original.id) ? (
+            <CustomAvatar color="warning" size={24}><i className='tabler-alert-circle text-sm' /></CustomAvatar>
+          ) : (
           <Checkbox
             {...{
               checked: row.getIsSelected(),
+
+              // disabled: approvedCandidateIds.includes(row.original.id),
+
               disabled: !row.getCanSelect(),
               indeterminate: row.getIsSomeSelected(),
               onChange: row.getToggleSelectedHandler()
             }}
           />
-        )
+        ))
+
+        // cell: ({ row }) => (
+        //   <Checkbox
+        //     {...{
+        //       checked: row.getIsSelected(),
+        //       disabled: !row.getCanSelect(),
+        //       indeterminate: row.getIsSomeSelected(),
+        //       onChange: row.getToggleSelectedHandler()
+        //     }}
+        //   />
+        // )
+
       },
       columnHelper.accessor('full_name', {
         header: 'Candidate',
@@ -298,7 +320,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
               <i className='tabler-trash text-textSecondary' />
             </IconButton> */}
             <IconButton>
-              <Link href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
+              <Link target="blank" href={getLocalizedUrl(`/candidates/${row.original.id}/view`, locale)} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
               </Link>
             </IconButton>
@@ -495,7 +517,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
                 startIcon={loading ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-check' />}
                 className='max-sm:is-full'
                 disabled={newSelectedIds.length <= 0 || loading}
-                onClick={handleCandidateSelection}
+                onClick={() => handleCandidateSelection('select')}
               >
                 {loading ? 'Selecting...' : 'Select Candidate'}
               </Button>

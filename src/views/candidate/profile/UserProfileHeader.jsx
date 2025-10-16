@@ -17,9 +17,9 @@ const UserProfileHeader = ({ data, setOpenBasicForm }) => {
 
   return (
     <Card>
-      <CardMedia image={'/images/pages/profile-banner.png'} className='bs-[250px]' />
-      <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row !pt-0 md:justify-start'>
-        <div className='flex rounded-full mbs-[-40px] border-[5px] mis-[-5px] border-be-0  border-backgroundPaper bg-backgroundPaper'>
+      {/* <CardMedia image={'/images/pages/profile-banner.png'} className='bs-[250px]' /> */}
+      <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row md:justify-start'>
+        <div className='flex rounded-full  border-[5px]  border-be-0  border-backgroundPaper bg-backgroundPaper'>
           <Avatar sx={{ height: 120, width: 120 }} src={data?.profile_image} />
           {/* <img height={120} width={120} src={data?.profile} className='rounded-full' alt='Profile Background' /> */}
         </div>
