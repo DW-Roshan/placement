@@ -470,7 +470,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData, cvSha
               disabled={selectedIds.length <= 0 || loading}
               onClick={() => handleCVShare(inviteTypes, true)}
             >
-              {loading ? 'Not Sharing...' : 'CV Not Share'}
+              {loading ? 'Not Sharing...' : 'Do Not Share CV'}
             </Button>
             <div className="flex flex-col max-sm:is-full">
               <Button
@@ -481,7 +481,7 @@ const AppliedCandidates = ({handleClose, candidateData, jobId, setJobData, cvSha
                 disabled={selectedIds.length <= 0 || loading}
                 onClick={() => handleCVShare(inviteTypes)}
               >
-                {loading ? 'Sharing...' : 'CV Share'}
+                {loading ? 'Sharing...' : 'Share CV'}
               </Button>
 
               {/* <FormGroup row>
