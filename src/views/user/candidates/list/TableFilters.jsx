@@ -15,7 +15,6 @@ const TableFilters = ({ setData, tableData }) => {
   const [industry, setIndustry] = useState('')
   const [department, setDepartment] = useState('')
   const [skillsFilter, setSkillsFilter] = useState([]);
-  const [status, setStatus] = useState('')
   const [industries, setIndustries] = useState(null);
   const [departments, setDepartments] = useState(null);
   const [skills, setSkills] = useState(null);
@@ -28,20 +27,18 @@ const TableFilters = ({ setData, tableData }) => {
       if (department && candidate.department_id != department) return false
 
       if (skillsFilter.length > 0) {
-        
+
         const candidateSkillIds = candidate.skills?.map(s => s.id) || [];
         const hasAll = skillsFilter.every(skillId => candidateSkillIds.includes(skillId));
 
         if (!hasAll) return false;
       }
 
-      if (status && candidate.status != status) return false
-
       return true
     })
 
     setData(filteredData || [])
-  }, [industry, department, skillsFilter, status, tableData, setData])
+  }, [industry, department, skillsFilter, tableData, setData])
 
   useEffect(() => {
 
@@ -122,22 +119,6 @@ const TableFilters = ({ setData, tableData }) => {
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
             renderInput={(params) => (
               <TextField label='Select Skills' {...params} />
-            )}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Autocomplete
-            fullWidth
-            options={[{id: '1', name: 'Active'},{id: '0', name: 'Inactive'}]}
-            getOptionLabel={(department) => department?.name || ''}
-            value={[{id: '1', name: 'Active'},{id: '0', name: 'Inactive'}].find(opt => opt.id === status) || null}
-            onChange={(event, value) => {
-              setStatus(value?.id || '');
-            }}
-            size='small'
-            isOptionEqualToValue={(option, value) => option?.id === value?.id}
-            renderInput={(params) => (
-              <TextField label='Select Status' {...params}/>
             )}
           />
         </Grid>
