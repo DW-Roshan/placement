@@ -133,10 +133,10 @@ const UserProfile = ({ tabContentList, data, token, id, isCandidate }) => {
         </Grid>
       </Grid>
 
-      <BasicDetailForm data={allData?.candidate} setData={setData} industries={allData?.industries} departments={allData?.departments} open={openBasicForm} handleClose={() => setOpenBasicForm(!openBasicForm)} />
-      <ExperienceForm data={allData?.candidate?.experiences} setData={setData} open={openExpForm} handleClose={() => setOpenExpForm(!openExpForm)} />
-      <EducationForm data={allData?.candidate?.educations} setData={setData} open={openEduForm} handleClose={() => setOpenEduForm(!openEduForm)} />
-      <SkillForm data={allData?.candidate?.skills} setData={setData} open={openSkillForm} handleClose={() => setOpenSkillForm(!openSkillForm)} skillsData={allData?.skills} />
+      <BasicDetailForm data={allData?.candidate} setData={setData} industries={allData?.industries} departments={allData?.departments} open={openBasicForm} handleClose={() => setOpenBasicForm(!openBasicForm)} isCandidate={isCandidate} />
+      <ExperienceForm data={allData?.candidate?.experiences} setData={setData} open={openExpForm} handleClose={() => setOpenExpForm(!openExpForm)} isCandidate={isCandidate} />
+      <EducationForm data={allData?.candidate?.educations} setData={setData} open={openEduForm} handleClose={() => setOpenEduForm(!openEduForm)} isCandidate={isCandidate} />
+      <SkillForm data={allData?.candidate?.skills} setData={setData} open={openSkillForm} handleClose={() => setOpenSkillForm(!openSkillForm)} skillsData={allData?.skills} isCandidate={isCandidate} />
     </Grid>
   )
 }

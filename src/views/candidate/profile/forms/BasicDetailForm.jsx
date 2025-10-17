@@ -44,13 +44,18 @@ import DialogCloseButton from '@/components/dialogs/DialogCloseButton'
 
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
 
-const BasicDetailForm = ({ setData, open, data, industries, departments, handleClose}) => {
+const BasicDetailForm = ({ setData, open, data, industries, departments, handleClose, isCandidate}) => {
 
   // console.log('industry:', data)
 
   // const [selected, setSelected] = useState(data?.work_status || '')
   const [loadingCities, setLoadingCities] = useState(false);
   const [cities, setCities] = useState([]);
+  const [roleCategories, setRoleCategories] = useState([]);
+  const [loadingRoleCategories, setLoadingRoleCategories] = useState(false);
+  const [jobRoles, setJobRoles] = useState([]);
+  const [loadingJobRoles, setLoadingJobRoles] = useState(false);
+  const [candidate_id, setCandidateId] = useState(data?.id || null);
 
   const { data: session } = useSession()
   const token = session?.user?.token
@@ -158,7 +163,7 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
     if (!parsedEndDate) {
 
       // console.error('Invalid end date:', end);
-      
+
       return months;
     }
 
@@ -192,7 +197,7 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
 
   // console.log('years and month', years, months);
 
-  const { control, handleSubmit, watch, reset, setValue, setError, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, reset, resetField, setValue, setError, formState: { errors } } = useForm({
 
     values: {
       fullName: data?.full_name || '',
@@ -200,14 +205,16 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
       mobileNo: data?.mobile_no || '',
       industry: data?.industry_id || '',
       department: data?.department_id || '',
+      roleCategory: data?.role_category_id || '',
+      jobRole: data?.job_role_id || '',
       city: data?.city_id || '',
       profileTitle: data?.profile_title || '',
       profileSummary: data?.profile_summary || '',
       workStatus: data?.work_status || '',
       dateOfBirth: data?.date_of_birth ? new Date(data?.date_of_birth) : null,
       totalExperience: data?.total_experience || '',
-      years: years.toString() ||'',
-      months: months.toString() ||'',
+      years: data?.total_experience ? data?.total_experience?.split('.')[0] : years.toString() ||'',
+      months: data?.total_experience ? data?.total_experience?.split('.')[1] : months.toString() ||'',
       currentCTC: data?.current_ctc || '',
 
       createAccount: data?.is_account === '1' ? true : false
@@ -238,7 +245,7 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({...data, candidate_id: candidate_id, }),
       });
 
       const result = await res.json();
@@ -278,6 +285,87 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
   const selectedYears = watch('years');
   const selectedMonths = watch('months');
   const workStatus = watch('workStatus');
+  const selectedDepartment = watch("department");
+  const selectedRoleCategory = watch("roleCategory");
+
+  const fetchRoleCategories = async () => {
+    if(!selectedDepartment) return
+
+    setLoadingRoleCategories(true);
+
+    resetField('roleCategory');
+    resetField('jobRole');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/departments/${selectedDepartment}/role-categories`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await res.json();
+
+      if(res.ok){
+        setRoleCategories(result?.role_categories || []);
+      } else {
+        setRoleCategories([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching role categories:', error);
+      setRoleCategories([]);
+    } finally {
+      setLoadingRoleCategories(false);
+    }
+
+  }
+
+  const fetchJobRoles = async () => {
+    if(!selectedRoleCategory) return
+
+    setLoadingJobRoles(true);
+
+    resetField('jobRole');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/role-categories/${selectedRoleCategory}/job-roles`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await res.json();
+
+      if(res.ok){
+        setJobRoles(result?.job_roles || []);
+      } else {
+        setJobRoles([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching job roles:', error);
+      setJobRoles([]);
+    } finally {
+      setLoadingJobRoles(false);
+    }
+
+  }
+
+  useEffect(() => {
+    if (selectedDepartment) {
+      fetchRoleCategories();
+    }
+  }, [selectedDepartment]);
+
+  useEffect(() => {
+    if (selectedRoleCategory) {
+      fetchJobRoles();
+    }
+  }, [selectedRoleCategory]);
 
   return (
     <Dialog
@@ -447,6 +535,65 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
                 )}
               />
             </Grid>
+            {selectedDepartment &&
+              <Grid size={{ xs: 12, sm: selectedRoleCategory ? 6 : 12 }}>
+                <Controller
+                  name='roleCategory'
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      loading={loadingRoleCategories}
+                      value={roleCategories && roleCategories.length > 0 && roleCategories.find(roleCategory => roleCategory.id === field.value) || null}
+                      options={roleCategories || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(roleCategory) => roleCategory.name || ''}
+                      onChange={(event, value) => {
+                        field.onChange(value?.id || '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label='Role Category'
+                          placeholder='Select Role Category'
+                          error={!!errors?.roleCategory}
+                          helperText={errors?.roleCategory?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              } {selectedRoleCategory &&
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name='jobRole'
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      loading={loadingJobRoles}
+                      value={jobRoles && jobRoles.length > 0 && jobRoles.find(jobRole => jobRole.id === field.value) || null}
+                      options={jobRoles || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(jobRole) => jobRole.name || ''}
+                      onChange={(event, value) => {
+                        field.onChange(value?.id || '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label='Job Role'
+                          placeholder='Select Job Role'
+                          error={!!errors?.jobRole}
+                          helperText={errors?.jobRole?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              }
             <Grid size={{ xs: 12, sm: 6 }}>
               <Controller
                 name="profileTitle"

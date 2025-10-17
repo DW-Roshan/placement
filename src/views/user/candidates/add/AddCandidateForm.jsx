@@ -51,6 +51,10 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   const [skills, setSkills] = useState();
   const [industries, setIndustries] = useState();
   const [departments, setDepartments] = useState();
+  const [roleCategories, setRoleCategories] = useState([]);
+  const [loadingRoleCategories, setLoadingRoleCategories] = useState(false);
+  const [jobRoles, setJobRoles] = useState([]);
+  const [loadingJobRoles, setLoadingJobRoles] = useState(false);
   const [candidateData, setCandidateData] = useState(candiData);
   const [citiesLoading, setLoadingCities] = useState(false);
   const { data: session } = useSession()
@@ -63,6 +67,8 @@ const AddCandidateForm = ({candidateId, candiData}) => {
 
   const [matchedIndustry, setMatchedIndustry] = useState(null);
   const [matchedDepartment, setMatchedDepartment] = useState(null);
+  const [matchedRoleCategory, setMatchedRoleCategory] = useState(null);
+  const [matchedJobRole, setMatchedJobRole] = useState(null);
   const [matchedCity, setMatchedCity] = useState(null);
 
   function getAllMonths(start, end) {
@@ -395,13 +401,42 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           setMatchedCity(matched || null);
         }
 
+
+        if( roleCategories ){
+          let matched = roleCategories ? roleCategories.find(
+            (roleCategory) => roleCategory?.name?.toLowerCase() === (candidateData?.role_category?.name || '')?.toLowerCase()
+          ) : '';
+          
+          if(!matched){
+            matched = roleCategories ? roleCategories.find(roleCategory =>
+              roleCategory?.name?.toLowerCase().includes(candidateData?.role_category?.trim()?.toLowerCase() || 'other')
+            ) : '';
+          }
+
+          setMatchedRoleCategory(matched || null);
+        }
+
+        if( jobRoles ){
+          let matched = jobRoles ? jobRoles.find(
+            (jobRole) => jobRole?.name?.toLowerCase() === (candidateData?.job_role?.name || '')?.toLowerCase()
+          ) : '';
+
+          if(!matched){
+            matched = jobRoles ? jobRoles.find(jobRole =>
+              jobRole?.name?.toLowerCase().includes(candidateData?.job_role?.trim()?.toLowerCase() || 'other')
+            ) : '';
+          }
+
+          setMatchedJobRole(matched || null);
+        }
+
       }
 
     }
 
   }, [candidateData, token, industries, departments, cities]);
 
-  const { control, handleSubmit, watch, reset, setValue, setError, formState: { errors } } = useForm({
+  const { control, handleSubmit, watch, reset, resetField, setValue, setError, formState: { errors } } = useForm({
 
     values: {
       fullName: candidateData?.full_name || '',
@@ -409,11 +444,13 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       mobileNo: candidateData?.mobile_no || '',
       industry: candidateData?.industry_id || matchedIndustry?.id || '',
       department: candidateData?.department_id || matchedDepartment?.id || '',
+      roleCategory: candidateData?.role_category_id || matchedRoleCategory?.id || '',
+      jobRole: candidateData?.job_role_id || matchedJobRole?.id || '',
       city: candidateData?.city_id || matchedCity?.id || '',
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
       workStatus: candidateData?.work_status || '',
-      dateOfBirth: candidateData?.date_of_birth ? parseDateFromString(candidateData?.date_of_birth) : null,
+      dateOfBirth: candidateData?.date_of_birth ? new Date(candidateData?.date_of_birth) : null,
       gender: (candidateData?.gender?.toLowerCase() === 'female' || candidateData?.gender?.toLowerCase() === 'f') ? 'f' : 'm',
       totalExperience: candidateData?.total_experience || '',
       years: years.toString() ||'',
@@ -498,6 +535,89 @@ const AddCandidateForm = ({candidateId, candiData}) => {
     control,
     name: 'experiences',
   });
+
+
+  const selectedDepartment = watch("department");
+  const selectedRoleCategory = watch("roleCategory");
+
+  const fetchRoleCategories = async () => {
+    if(!selectedDepartment) return
+
+    setLoadingRoleCategories(true);
+
+    resetField('roleCategory');
+    resetField('jobRole');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/departments/${selectedDepartment}/role-categories`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await res.json();
+
+      if(res.ok){
+        setRoleCategories(result?.role_categories || []);
+      } else {
+        setRoleCategories([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching role categories:', error);
+      setRoleCategories([]);
+    } finally {
+      setLoadingRoleCategories(false);
+    }
+
+  }
+
+  const fetchJobRoles = async () => {
+    if(!selectedRoleCategory) return
+
+    setLoadingJobRoles(true);
+
+    resetField('jobRole');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/role-categories/${selectedRoleCategory}/job-roles`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await res.json();
+
+      if(res.ok){
+        setJobRoles(result?.job_roles || []);
+      } else {
+        setJobRoles([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching job roles:', error);
+      setJobRoles([]);
+    } finally {
+      setLoadingJobRoles(false);
+    }
+
+  }
+
+  useEffect(() => {
+    if (selectedDepartment) {
+      fetchRoleCategories();
+    }
+  }, [selectedDepartment]);
+
+  useEffect(() => {
+    if (selectedRoleCategory) {
+      fetchJobRoles();
+    }
+  }, [selectedRoleCategory]);
 
   const onSubmit = async (data) => {
 
@@ -769,6 +889,65 @@ const AddCandidateForm = ({candidateId, candiData}) => {
                   )}
                 />
               </Grid>
+              {selectedDepartment &&
+              <Grid size={{ xs: 12, sm: selectedRoleCategory ? 6 : 12 }}>
+                <Controller
+                  name='roleCategory'
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      loading={loadingRoleCategories}
+                      value={roleCategories && roleCategories.length > 0 && roleCategories.find(roleCategory => roleCategory.id === field.value) || null}
+                      options={roleCategories || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(roleCategory) => roleCategory.name || ''}
+                      onChange={(event, value) => {
+                        field.onChange(value?.id || '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label='Role Category'
+                          placeholder='Select Role Category'
+                          error={!!errors?.roleCategory}
+                          helperText={errors?.roleCategory?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              } {selectedRoleCategory &&
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Controller
+                  name='jobRole'
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      fullWidth
+                      loading={loadingJobRoles}
+                      value={jobRoles && jobRoles.length > 0 && jobRoles.find(jobRole => jobRole.id === field.value) || null}
+                      options={jobRoles || []}
+                      getOptionKey={option => option.id}
+                      getOptionLabel={(jobRole) => jobRole.name || ''}
+                      onChange={(event, value) => {
+                        field.onChange(value?.id || '')
+                      }}
+                      renderInput={(params) => (
+                        <CustomTextField
+                          {...params}
+                          label='Job Role'
+                          placeholder='Select Job Role'
+                          error={!!errors?.jobRole}
+                          helperText={errors?.jobRole?.message}
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              }
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="profileTitle"

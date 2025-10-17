@@ -51,6 +51,22 @@ const BasicDetails = ({ data }) => {
           <div className='flex items-center gap-2'>
             <div className='flex items-center flex-wrap gap-2'>
               <Typography className='font-medium'>
+                Role Category:
+              </Typography>
+              <Typography>{data?.role_category?.name}</Typography>
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center flex-wrap gap-2'>
+              <Typography className='font-medium'>
+                Job Role:
+              </Typography>
+              <Typography>{data?.job_role?.name}</Typography>
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center flex-wrap gap-2'>
+              <Typography className='font-medium'>
                 Current CTC:
               </Typography>
               {data?.current_ctc && <Chip size='small' variant='tonal' label={data?.current_ctc} color='success' icon={<i className='tabler-currency-rupee' />} /> }

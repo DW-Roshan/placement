@@ -1,6 +1,6 @@
 import { Card } from "@mui/material";
 
-import AddCandidateForm from "@/views/AddCandidateForm"
+import AddCandidateForm from "@/views/user/candidates/add/AddCandidateForm"
 
 const EditCandidatePage = async (props) => {
   const params = await props.params;
