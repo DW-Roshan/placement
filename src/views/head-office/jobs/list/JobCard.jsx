@@ -125,48 +125,48 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
     setCloneLoading(false);
   }
 
-  // const getMatchedCandidates = async () => {
+  const getMatchedCandidates = async () => {
 
-  //   console.log("sdfa")
-  //   if(!token || !job.id) return
+    console.log("sdfa")
+    if(!token || !job.id) return
 
-  //   setMatchedCandidateLoading(true);
+    setMatchedCandidateLoading(true);
 
-  //   try {
+    try {
 
-  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${job.id}/matched-candidates`, {
-  //       method: "GET",
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `Bearer ${token}`
-  //       }
-  //     })
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${job.id}/matched-candidates`, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
 
-  //     if(res.ok){
-  //       const data = await res.json();
+      if(res.ok){
+        const data = await res.json();
 
-  //       setMatchedCandidates(data?.matched_candidates || []);
-  //     } else {
-  //       setMatchedCandidates([]);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching matched candidates:', error);
-  //     setMatchedCandidates([]);
+        setMatchedCandidates(data?.matched_candidates || []);
+      } else {
+        setMatchedCandidates([]);
+      }
+    } catch (error) {
+      console.error('Error fetching matched candidates:', error);
+      setMatchedCandidates([]);
 
-  //   } finally {
-  //     setMatchedCandidateLoading(false);
-  //   }
+    } finally {
+      setMatchedCandidateLoading(false);
+    }
 
-  // }
+  }
 
-  // const fetchedRef = useRef(false);
+  const fetchedRef = useRef(false);
 
-  // useEffect(() => {
-  //   if (token && job.id && !fetchedRef.current) {
-  //     fetchedRef.current = true;
-  //     getMatchedCandidates();
-  //   }
-  // }, [job.id, token]);
+  useEffect(() => {
+    if (token && job.id && !fetchedRef.current) {
+      fetchedRef.current = true;
+      getMatchedCandidates();
+    }
+  }, [job.id, token]);
 
   return (
     <Card variant='outlined'>
@@ -176,13 +176,18 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
         }
         action={
           <>
-            <Switch id='status-switch' onChange={handleChange} defaultChecked={job?.status} color='success' />
+            <Tooltip title='Toggle Job Status'>
+              <Switch id='status-switch' onChange={handleChange} defaultChecked={job?.status} color='success' />
+            </Tooltip>
             <Avatar variant='square' sx={{ width: 50, height: 50}} alt={job?.company_name} src={''} >{getInitials(job?.company_name)}</Avatar>
           </>
         }
       />
       <CardContent>
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12 }}>
+            <Typography variant='h6'>Branches: {job?.branches?.map(branch => branch?.business_name).join(', ') || 'N/A'}</Typography>
+          </Grid>
           <Grid size={{ xs: 12 }} className='flex flex-wrap gap-2'>
             <Chip
               label={
@@ -228,6 +233,26 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
       </CardContent>
       <CardActions className='justify-between'>
         <Grid container spacing={2} className='flex-1'>
+          {/* <Grid size={{ xs: 12 }}>
+            <Typography variant='h6'>Matched Candidates</Typography>
+            <div className='flex gap-2'>
+              { matchedCandidateLoading ?
+                <>
+                  <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                  <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                  <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                  <Skeleton variant='rectangular' width={80} height={30} sx={{ borderRadius: 1 }} />
+                </> : <>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('100%')}} variant='contained' color='primary' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['100%']?.length === 0}>100% ({matchedCandidates?.['100%']?.length || 0})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('70%')}} variant='contained' color='success' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['70%']?.length === 0}>70% ({matchedCandidates?.['70%']?.length || 0})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('50%')}} variant='contained' color='warning' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['50%']?.length === 0}>50% ({matchedCandidates?.['50%']?.length || 0})</Button>
+                <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length || 0})</Button>
+              </>}
+            </div>
+          </Grid> */}
+          <Grid size={{ xs: 12 }}>
+            <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
+          </Grid>
           <Grid size={{ xs: 12 }} className='flex justify-between items-center gap-2 flex-wrap'>
             <Typography variant='body2' >{formatDistanceToNow(job?.created_at, {addSuffix: true})}</Typography>
 
