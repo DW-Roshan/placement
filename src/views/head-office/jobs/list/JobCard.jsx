@@ -127,7 +127,6 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
 
   const getMatchedCandidates = async () => {
 
-    console.log("sdfa")
     if(!token || !job.id) return
 
     setMatchedCandidateLoading(true);
@@ -201,6 +200,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
             />
             <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='contained' icon={ <i className='tabler-currency-rupee' /> } />
             {Array.isArray(job?.locations) && job.locations.length > 0 && (
+              <Link href={getLocalizedUrl(`${authUser?.userType === 'HO' ? `/head-office/jobs/${job?.id}/view?highlight=locations` : `/jobs/${job?.id}/view?highlight=locations`}`, locale)}>
               <Chip
                 label={
                   job.locations.length === 1
@@ -211,6 +211,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
                 variant="contained"
                 icon={<i className="tabler-map-pin" />}
               />
+              </Link>
             )}
 
 
@@ -233,7 +234,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
       </CardContent>
       <CardActions className='justify-between'>
         <Grid container spacing={2} className='flex-1'>
-          {/* <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant='h6'>Matched Candidates</Typography>
             <div className='flex gap-2'>
               { matchedCandidateLoading ?
@@ -249,7 +250,7 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
                 <Button onClick={() => {setOpenMatchedCandidate(true); setTabOpen('30%')}} variant='contained' color='error' size='small' className='m-0' disabled={matchedCandidates?.length === 0 || matchedCandidates?.['30%']?.length === 0}>30% ({matchedCandidates?.['30%']?.length || 0})</Button>
               </>}
             </div>
-          </Grid> */}
+          </Grid>
           <Grid size={{ xs: 12 }}>
             <Button onClick={() => {setOpenAppliedCandidate(true)}} variant='contained' color='primary' size='small' className='m-0' disabled={job?.candidates?.length === 0}>Applicants ({job?.candidates?.length})</Button>
           </Grid>

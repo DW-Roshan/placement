@@ -141,6 +141,7 @@ const JobCard = ({job, isCandidate}) => {
               icon={<i className='tabler-briefcase' />}
             />
             <Chip label={job?.min_ctc && job?.max_ctc ? `${job?.min_ctc}-${job?.max_ctc} Lacs PA` : 'Not disclosed' } color='success' variant='contained' icon={ <i className='tabler-currency-rupee' /> } />
+            <Link href={getLocalizedUrl(`/jobs/${job?.id}/view?highlight=locations`, locale)}>
             <Chip
               label={
                 Array.isArray(job?.locations) && job.locations.length > 0
@@ -153,6 +154,7 @@ const JobCard = ({job, isCandidate}) => {
               variant="contained"
               icon={<i className="tabler-map-pin" />}
             />
+            </Link>
 
 
           </Grid>

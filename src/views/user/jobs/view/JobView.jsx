@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import dynamic from "next/dynamic";
 
@@ -41,6 +41,9 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered,
   const userId = session?.user?.id;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const highlightParam = searchParams.get("highlight") || searchParams.get("hightight");
+  const highlight = highlightParam?.toLowerCase()?.trim();
 
   useEffect(() => {
     if(userId && job){
@@ -120,7 +123,12 @@ const JobView = ({ jobData, isCandidate, jobUuid, setAppliedSuccess, registered,
                 </div>
                 <div className='flex items-center gap-2'>
                   <i className='tabler-map-pin text-[20px] max-w-[20px]' />
+                  {highlight=='locations' ? <mark>
+                    <Typography className="text-black">{job?.locations?.map(loc => loc?.city_name).join(', ')}</Typography>
+                    </mark>
+                  :
                   <Typography>{job?.locations?.map(loc => loc?.city_name).join(', ')}</Typography>
+                  }
                 </div>
               </div>
               {isCandidate && <div className='flex gap-2'>
