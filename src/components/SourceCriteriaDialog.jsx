@@ -30,10 +30,10 @@ const SourceCriteriaDialog = ({ open, handleClose, data }) => {
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="h6">Min Experience: {yearsOpt.find(year => year.value === data?.min_exp.toString())?.label || 0}</Typography>
+            <Typography variant="h6">Min Experience: {yearsOpt.find(year => year.value === data?.min_exp?.toString())?.label || 0}</Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="h6">Max Experience: {yearsOpt.find(year => year.value === data?.max_exp.toString())?.label || 0}</Typography>
+            <Typography variant="h6">Max Experience: {yearsOpt.find(year => year.value === data?.max_exp?.toString())?.label || 0}</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Typography variant='body2' className='font-medium'>
