@@ -519,7 +519,7 @@ const SelectedCandidates = ({handleClose, candidateData, jobId, setJobData, sele
                 disabled={newSelectedIds.length <= 0 || loading}
                 onClick={() => handleCandidateSelection('select')}
               >
-                {loading ? 'Selecting...' : 'Select Candidate'}
+                {loading ? 'Selecting...' : 'Candidate Selected'}
               </Button>
 
               {/* <FormGroup row>
