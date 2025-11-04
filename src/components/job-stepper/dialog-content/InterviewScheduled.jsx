@@ -32,7 +32,7 @@ import { useSession } from "next-auth/react";
 
 import { toast } from "react-toastify";
 
-import { setHours, setMinutes } from "date-fns";
+import { format, parseISO, setHours, setMinutes } from "date-fns";
 
 import { Controller, useForm } from "react-hook-form";
 
@@ -172,7 +172,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
   const onSaveRow = async (rowId) => {
     const values = watch(rowId.toString()); // get current values for that row
 
-    // console.log("save button", rowId, values)
+    console.log("save button", rowId, values)
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${jobId}/interview-schedule`, {
@@ -233,12 +233,16 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
       const endTime = row.pivot?.interview_end_time;     // e.g. "16:30:00"
 
       acc[row.id.toString()] = {
+        interview_type: row.pivot?.interview_type || "",
         interview_date: date ? new Date(date) : null,
         interview_start_time:
           date && startTime ? new Date(`${date}T${startTime}`) : null,
         interview_end_time:
           date && endTime ? new Date(`${date}T${endTime}`) : null,
         interview_address: row.pivot?.interview_address || "",
+        interview_platform: row.pivot?.interview_platform || "",
+        meeting_id: row.pivot?.meeting_id || "",
+        passcode: row.pivot?.passcode || "",
         interview_contact_person: row.pivot?.interview_contact_person || "",
       };
 
@@ -299,10 +303,30 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
           cell: ({ row }) => <Typography>{row.original?.mobile_no}</Typography>
         }),
 
+        columnHelper.accessor("pivot.interview_type", {
+          header: "Interview Type",
+          cell: ({ row }) => (
+            row.original?.pivot?.interview_type === 1 ? <Typography>Physical</Typography> : row.original?.pivot?.interview_type === 2 ? <Typography>Virtual</Typography> :
+            <Controller
+              name={`${row.original.id}.interview_type`}
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  {...field}
+                  select
+                  fullWidth
+                >
+                  <MenuItem value="1">Physical</MenuItem>
+                  <MenuItem value="2">Virtual</MenuItem>
+                </CustomTextField>
+              )}
+            />
+          ),
+        }),
         columnHelper.accessor("pivot.interview_date", {
           header: "Interview Date",
           cell: ({ row }) => (
-            row.original?.pivot?.interview_date ||
+            row.original?.pivot?.interview_date ? <Typography>{format(row.original?.pivot?.interview_date, 'dd-MMM-yyyy')}</Typography> :
             <Controller
               name={`${row.original.id}.interview_date`}
               control={control}
@@ -320,7 +344,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
         columnHelper.accessor("pivot.interview_start_time", {
           header: "Start Time",
           cell: ({ row }) => (
-            row.original?.pivot?.interview_start_time ||
+            row.original?.pivot?.interview_start_time ? <Typography>{format(new Date(`${row.original.pivot.interview_date}T${row.original.pivot.interview_start_time}`), "h:mm a")}</Typography> :
             <Controller
               name={`${row.original?.id}.interview_start_time`}
               control={control}
@@ -343,7 +367,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
         columnHelper.accessor("pivot.interview_end_time", {
           header: "End Time",
           cell: ({ row }) => (
-            row.original?.pivot?.interview_end_time ||
+            row.original?.pivot?.interview_end_time ? <Typography>{format(new Date(`${row.original.pivot.interview_date}T${row.original.pivot.interview_end_time}`), "h:mm a")}</Typography> :
             <Controller
               name={`${row.original.id}.interview_end_time`}
               control={control}
@@ -365,25 +389,114 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
         }),
         columnHelper.accessor("pivot.interview_address", {
           header: "Venue",
-          cell: ({ row }) => (
-            row.original?.pivot?.interview_address ? <Typography>{row.original?.pivot?.interview_address}</Typography> :
-            <Controller
-              name={`${row.original.id}.interview_address`}
-              control={control}
-              render={({ field }) => <CustomTextField {...field} fullWidth className="min-w-[200px]" />}
-            />
-          ),
+          cell: ({ row }) => {
+
+            const interviewType = watch(`${row.original.id}.interview_type`);
+            const isDisabled = interviewType === "2"; // Virtual
+
+            return (
+              row.original?.pivot?.interview_address ? <Typography>{row.original?.pivot?.interview_address}</Typography> :
+              <Controller
+                name={`${row.original.id}.interview_address`}
+                control={control}
+                disabled={isDisabled}
+                render={({ field }) => <CustomTextField {...field} fullWidth className="min-w-[200px]" />}
+              />
+            );
+          },
         }),
         columnHelper.accessor("pivot.interview_contact_person", {
           header: "Contact Person",
-          cell: ({ row }) => (
-            row.original?.pivot?.interview_contact_person ? <Typography>{row.original?.pivot?.interview_contact_person}</Typography> :
-            <Controller
-              name={`${row.original.id}.interview_contact_person`}
-              control={control}
-              render={({ field }) => <CustomTextField {...field} fullWidth size="small" />}
-            />
-          ),
+          cell: ({ row }) => {
+            
+            const interviewType = watch(`${row.original.id}.interview_type`);
+            const isDisabled = interviewType === "2"; // Virtual
+
+            return (
+              row.original?.pivot?.interview_contact_person ? <Typography>{row.original?.pivot?.interview_contact_person}</Typography> :
+              <Controller
+                name={`${row.original.id}.interview_contact_person`}
+                control={control}
+                disabled={isDisabled}
+                render={({ field }) => <CustomTextField {...field} fullWidth size="small" />}
+              />
+            );
+          },
+        }),
+        columnHelper.accessor("pivot.interview_platform", {
+          header: "Interview Platform",
+          cell: ({ row }) => {
+
+            const interviewType = watch(`${row.original.id}.interview_type`);
+            const isDisabled = interviewType === "1"; // Physical
+
+            const platforms = [
+              { value: "1", label: "Microsoft Teams" },
+              { value: "2", label: "Zoom" },
+              { value: "3", label: "Google Meet" },
+            ];
+
+            return (
+              row.original?.pivot?.interview_platform ? <Typography>{platforms.find(p => Number(p.value) === Number(row.original.pivot.interview_platform))?.label}</Typography> :
+              row.original?.pivot?.interview_type === 1 ? null :
+              <Controller
+                name={`${row.original.id}.interview_platform`}
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    select
+                    fullWidth
+                    disabled={isDisabled}
+                  >
+                    {platforms.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                )}
+              />
+            );
+          },
+        }),
+        columnHelper.accessor("pivot.meeting_id", {
+          header: "Meeting ID",
+          cell: ({ row }) =>  {
+
+            const interviewType = watch(`${row.original.id}.interview_type`);
+            const isDisabled = interviewType === "1"; // Physical
+
+            return (
+              row.original?.pivot?.meeting_id ? <Typography>{row.original?.pivot?.meeting_id}</Typography> :
+              row.original?.pivot?.interview_type === 1 ? null :
+              <Controller
+                name={`${row.original.id}.meeting_id`}
+                control={control}
+                disabled={isDisabled}
+                render={({ field }) => <CustomTextField {...field} fullWidth className="min-w-[200px]" />}
+              />
+            );
+          },
+        }),
+        columnHelper.accessor("pivot.passcode", {
+          header: "Passcode",
+          cell: ({ row }) => {
+            
+            const interviewType = watch(`${row.original.id}.interview_type`);
+            const isDisabled = interviewType === "1"; // Physical
+
+            return (
+              row.original?.pivot?.passcode ? <Typography>{row.original?.pivot?.passcode}</Typography> :
+              row.original?.pivot?.interview_type === 1 ? null :
+              <Controller
+                name={`${row.original.id}.passcode`}
+                control={control}
+                disabled={isDisabled}
+                render={({ field }) => <CustomTextField {...field} fullWidth className="min-w-[200px]" />}
+              />
+            );
+          },
         }),
         {
           id: "actions",
@@ -397,10 +510,18 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
             if (row.original?.pivot?.interview_date) return null;
 
             // check if Save button should be disabled
-            const isDisabled = !rowValues?.interview_date ||
+            // const isDisabled = !rowValues?.interview_date ||
+            //                   !rowValues?.interview_start_time ||
+            //                   !rowValues?.interview_address ||
+            //                   !rowValues?.interview_contact_person;
+
+            const interviewType = rowValues?.interview_type;
+            
+            const isDisabled = !interviewType ||
+                              !rowValues?.interview_date ||
                               !rowValues?.interview_start_time ||
-                              !rowValues?.interview_address ||
-                              !rowValues?.interview_contact_person;
+                              (interviewType === "1" ? !rowValues?.interview_address : !rowValues?.interview_platform) ||
+                              (interviewType === "1" ? !rowValues?.interview_contact_person : (!rowValues?.meeting_id && !rowValues?.passcode));
 
             const copyPrevious = () => {
               if (rowIndex > 0) {
@@ -408,11 +529,15 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
                 const prevValues = watch(prevRow.original.id.toString());
 
                 if (prevValues) {
+                  setValue(`${row.original.id}.interview_type`, prevValues.interview_type);
                   setValue(`${row.original.id}.interview_date`, prevValues.interview_date);
                   setValue(`${row.original.id}.interview_start_time`, prevValues.interview_start_time);
                   setValue(`${row.original.id}.interview_end_time`, prevValues.interview_end_time);
                   setValue(`${row.original.id}.interview_address`, prevValues.interview_address);
                   setValue(`${row.original.id}.interview_contact_person`, prevValues.interview_contact_person);
+                  setValue(`${row.original.id}.interview_platform`, prevValues.interview_platform);
+                  setValue(`${row.original.id}.meeting_id`, prevValues.meeting_id);
+                  setValue(`${row.original.id}.passcode`, prevValues.passcode);
                 }
               }
             };

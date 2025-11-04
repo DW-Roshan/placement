@@ -25,7 +25,7 @@ const fetchData = async (id, lang) => {
 
   const data = await res.json();
 
-  // console.log("api data", data);
+  console.log("api data", data);
 
   if (!res.ok) {
 
