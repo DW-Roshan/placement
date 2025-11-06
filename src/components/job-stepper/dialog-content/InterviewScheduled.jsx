@@ -396,6 +396,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
 
             return (
               row.original?.pivot?.interview_address ? <Typography>{row.original?.pivot?.interview_address}</Typography> :
+              row.original?.pivot?.interview_type === 2 ? null :
               <Controller
                 name={`${row.original.id}.interview_address`}
                 control={control}
@@ -408,12 +409,13 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
         columnHelper.accessor("pivot.interview_contact_person", {
           header: "Contact Person",
           cell: ({ row }) => {
-            
+
             const interviewType = watch(`${row.original.id}.interview_type`);
             const isDisabled = interviewType === "2"; // Virtual
 
             return (
               row.original?.pivot?.interview_contact_person ? <Typography>{row.original?.pivot?.interview_contact_person}</Typography> :
+              row.original?.pivot?.interview_type === 2 ? null :
               <Controller
                 name={`${row.original.id}.interview_contact_person`}
                 control={control}
@@ -482,7 +484,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
         columnHelper.accessor("pivot.passcode", {
           header: "Passcode",
           cell: ({ row }) => {
-            
+
             const interviewType = watch(`${row.original.id}.interview_type`);
             const isDisabled = interviewType === "1"; // Physical
 
@@ -516,7 +518,7 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
             //                   !rowValues?.interview_contact_person;
 
             const interviewType = rowValues?.interview_type;
-            
+
             const isDisabled = !interviewType ||
                               !rowValues?.interview_date ||
                               !rowValues?.interview_start_time ||
