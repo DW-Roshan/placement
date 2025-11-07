@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
 
 import CustomTextField from '@/@core/components/mui/TextField';
+import { getNestedValue } from '@/utils/getNestedValue';
 
 const SkillSearchOnly = ({ name, label, control, errors, selectedSkills, setSelectedSkills }) => {
   const [skillsData, setSkillsData] = useState([]);
@@ -159,8 +160,8 @@ const SkillSearchOnly = ({ name, label, control, errors, selectedSkills, setSele
                 <CustomTextField
                   {...params}
                   label={label || "Key Skills"}
-                  error={!!errors?.[name]}
-                  helperText={errors?.[name]?.message}
+                  error={!!getNestedValue(errors, name)}
+                  helperText={getNestedValue(errors, `${name}.message`)}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
