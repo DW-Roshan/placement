@@ -51,6 +51,7 @@ import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import ChangePasswordDialog from '@/components/ChangePasswordDialog'
 
 // import { getCookie } from '@/utils/cookies'
 // import { useSession } from 'next-auth/react'
@@ -117,6 +118,8 @@ const UserListTable = ({userData}) => {
   const [data, setData] = useState(...[userData])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [openChangePassword, setOpenChangePassword] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // Hooks
   const { lang: locale } = useParams()
@@ -143,6 +146,12 @@ const UserListTable = ({userData}) => {
       setTimeout(runAfterMount, 0);
     });
   }, []);
+
+  const handleChangePassword = (id) => {
+    setOpenChangePassword(true);
+    setSelectedUserId(id);
+    console.log("Change password for user ID:", id);
+  }
 
   const columns = useMemo(
     () => [
@@ -277,37 +286,20 @@ const UserListTable = ({userData}) => {
         )
       }),
       columnHelper.accessor('action', {
-        header: 'Action',
+        header: 'Actions',
         cell: ({ row }) => (
-          <div className='flex items-center'>
-            {/* <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original?.id))}>
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton> */}
-            {/* <IconButton> */}
-              {/* <Link href={getLocalizedUrl('/user/view', locale)} className='flex'> */}
-                <i className='tabler-eye text-textSecondary' />
-              {/* </Link> */}
-            {/* </IconButton> */}
-            {/* <IconButton>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton> */}
-            {/* <OptionMenu
-              iconButtonProps={{ size: 'medium' }}
-              iconClassName='text-textSecondary'
-              options={[
-                {
-                  text: 'Download',
-                  icon: 'tabler-download',
-                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
+          <OptionMenu
+            iconClassName='text-textSecondary'
+            options={[
+              {
+                text: 'Change Password',
+                icon: 'tabler-key',
+                menuItemProps: {
+                  onClick: () => handleChangePassword(row.original.id)
                 },
-                {
-                  text: 'Edit',
-                  icon: 'tabler-edit',
-                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
-                }
-              ]}
-            /> */}
-          </div>
+              },
+            ]}
+          />
         ),
         enableSorting: false
       })
@@ -468,6 +460,7 @@ const UserListTable = ({userData}) => {
         userData={data}
         setData={setData}
       />
+      <ChangePasswordDialog open={openChangePassword} onClose={() => {setOpenChangePassword(false); setSelectedUserId(null); }} userId={selectedUserId} />
     </>
   )
 }
