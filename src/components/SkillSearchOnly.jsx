@@ -72,9 +72,15 @@ const SkillSearchOnly = ({ name, label, control, errors, selectedSkills, setSele
       if (res.ok) {
         return data.skill;
       } else if(res.status === 422) {
-        toast.error(data.errors?.name?.[0] || 'Validation error');
+        toast.error(data.errors?.name?.[0] || 'Validation error', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
       } else {
-        toast.error(data.message || 'Failed to add skill');
+        toast.error(data.message || 'Failed to add skill', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         console.log('Failed to add skill:', data);
 
         return null;

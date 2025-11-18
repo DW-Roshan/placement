@@ -23,13 +23,13 @@ export function useSaveToJob({ token, jobId, applied, saved, setSaved, handleClo
 
       if (!res.ok) {
         toast.error(data?.message || 'Application failed', {
-          autoClose: 2000,
+          autoClose: 10000,
           hideProgressBar: false,
         });
       } else {
         setSaved(true);
         toast.success(data?.message || 'Saved successfully', {
-          autoClose: 2000,
+          autoClose: 10000,
           hideProgressBar: false,
         });
       }
@@ -37,7 +37,7 @@ export function useSaveToJob({ token, jobId, applied, saved, setSaved, handleClo
     } catch (error) {
       console.error('error:', error);
       toast.error('Something went wrong.', {
-        autoClose: 2000,
+        autoClose: 10000,
         hideProgressBar: false,
       });
     } finally {

@@ -78,12 +78,18 @@ const JobsListCard = ({ jobs, branchData, isCandidate, hideSearch }) => {
       const error = sessionStorage.getItem('error');
 
       if (success) {
-        toast.success(success);
+        toast.success(success, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('success');
       }
 
       if (error) {
-        toast.error(error);
+        toast.error(error, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('error');
       }
     };
@@ -176,11 +182,11 @@ const JobsListCard = ({ jobs, branchData, isCandidate, hideSearch }) => {
         <Divider />
         <Grid size={{ xs: 12 }}>
           <CardContent>
-            {searching ? 
-              <CardSkeletons totalCards={3} /> 
-              : 
+            {searching ?
+              <CardSkeletons totalCards={3} />
+              :
               <Grid container spacing={6}>
-              {jobsData?.length <= 0 ? 
+              {jobsData?.length <= 0 ?
                 <Grid size={{ xs: 12 }}>
                   <div className="flex flex-col items-center py-10">
                     <Avatar sx={{ width: 56, height: 56, mb: 2 }}>

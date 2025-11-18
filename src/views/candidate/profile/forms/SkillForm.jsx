@@ -66,7 +66,10 @@ const SkillForm = ({setData, open, data, skillsData, handleClose}) => {
 
         setData(result.data);
 
-        toast.success(result.message);
+        toast.success(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         handleClose();
 
@@ -86,7 +89,10 @@ const SkillForm = ({setData, open, data, skillsData, handleClose}) => {
       } else {
 
         handleClose();
-        toast.error(result.message);
+        toast.error(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         reset();
 

@@ -369,7 +369,7 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
           let matched = roleCategories ? roleCategories.find(
             (roleCategory) => roleCategory?.name?.toLowerCase() === (candidateData?.role_category?.name || '')?.toLowerCase()
           ) : '';
-          
+
           if(!matched){
             matched = roleCategories ? roleCategories.find(roleCategory =>
               roleCategory?.name?.toLowerCase().includes(candidateData?.role_category?.trim()?.toLowerCase() || 'other')
@@ -752,7 +752,10 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
       if (res && res.ok && res.error === null) {
 
-        toast.success(result?.message || 'Registered successfully.')
+        toast.success(result?.message || 'Registered successfully.', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         router.push('/candidate/jobs/applied-success');
 
@@ -764,7 +767,10 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
         // router.replace(getLocalizedUrl(redirectURL, locale))
 
       } else {
-        toast.error("Registered Login failed!")
+        toast.error("Registered Login failed!", {
+          autoClose: 10000,
+          hideProgressBar: false,
+        })
       }
 
       reset();
@@ -775,7 +781,10 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
     } else if(res.status == 422) {
 
-      toast.error(result?.message || 'Error in Validation')
+      toast.error(result?.message || 'Error in Validation', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       // Laravel returns validation errors in the `errors` object
       Object.entries(result.errors).forEach(([field, messages]) => {
@@ -790,7 +799,10 @@ const AddCandidateForm = ({uploadedCV, candidateId, candiData, self, jobId, jobU
 
       // router.push('/candidates/list');
 
-      toast.error(result?.message || 'Something went wrong.')
+      toast.error(result?.message || 'Something went wrong.', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
 
     }

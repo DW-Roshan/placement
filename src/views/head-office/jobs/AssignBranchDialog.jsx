@@ -352,14 +352,20 @@ const AssignBranchDialog = ({ open, handleClose, branchData, appliedCandidates, 
 
                 const data = await res.json();
 
-                toast.success(data?.message || 'Assigned to branch successfully!')
+                toast.success(data?.message || 'Assigned to branch successfully!', {
+                  autoClose: 10000,
+                  hideProgressBar: false,
+                });
 
                 console.log("data from assigned:", data);
             }
 
         } catch (error) {
 
-            toast.error('Something went wrong.');
+            toast.error('Something went wrong.', {
+              autoClose: 10000,
+              hideProgressBar: false,
+            });
 
             console.log("error:", error);
 

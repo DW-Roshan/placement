@@ -135,7 +135,10 @@ const EducationForm = ({ setData, open, data, handleClose }) => {
 
           setData(result.data);
 
-          toast.success(result.message);
+          toast.success(result.message, {
+            autoClose: 10000,
+            hideProgressBar: false,
+          });
 
           // fetchData();
 
@@ -159,7 +162,10 @@ const EducationForm = ({ setData, open, data, handleClose }) => {
 
           // router.push('/candidates/list');
           handleClose();
-          toast.error(result.message);
+          toast.error(result.message, {
+            autoClose: 10000,
+            hideProgressBar: false,
+          });
 
           reset();
 
@@ -167,7 +173,10 @@ const EducationForm = ({ setData, open, data, handleClose }) => {
 
       } catch (error) {
         console.log("error", error);
-        toast.error("Something went wrong.")
+        toast.error("Something went wrong.", {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         setLoading(false);
       }
 

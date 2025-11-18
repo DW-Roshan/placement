@@ -89,7 +89,10 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
     const result = await res.json();
 
     if (res.ok) {
-      toast.success(result?.message || 'Candidate invited successfully');
+      toast.success(result?.message || 'Candidate invited successfully', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     } else if (res.status === 422) {
       Object.entries(result.errors).forEach(([field, messages]) => {
         setError(field, {
@@ -99,7 +102,10 @@ const InviteCandidateDialog = ({ open, jobId, handleClose }) => {
       });
 
     } else {
-      toast.error(result?.message || 'Failed to invite candidate');
+      toast.error(result?.message || 'Failed to invite candidate', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
 
     reset();

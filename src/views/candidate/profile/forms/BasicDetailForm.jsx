@@ -254,7 +254,10 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
 
         setData(result.data);
 
-        toast.success(result.message);
+        toast.success(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         handleClose();
 
@@ -274,7 +277,10 @@ const BasicDetailForm = ({ setData, open, data, industries, departments, handleC
       } else {
 
         handleClose();
-        toast.error(result.message);
+        toast.error(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         reset();
 

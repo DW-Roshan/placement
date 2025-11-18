@@ -23,13 +23,13 @@ export function useApplyToJob({ token, jobId, applied, setApplied, handleClose }
 
       if (!res.ok) {
         toast.error(data?.message || 'Application failed', {
-          autoClose: 2000,
+          autoClose: 10000,
           hideProgressBar: false,
         });
       } else {
         setApplied(true);
         toast.success(data?.message || 'Applied successfully', {
-          autoClose: 2000,
+          autoClose: 10000,
           hideProgressBar: false,
         });
       }
@@ -37,7 +37,7 @@ export function useApplyToJob({ token, jobId, applied, setApplied, handleClose }
     } catch (error) {
       console.error('error:', error);
       toast.error('Something went wrong.', {
-        autoClose: 2000,
+        autoClose: 10000,
         hideProgressBar: false,
       });
     } finally {

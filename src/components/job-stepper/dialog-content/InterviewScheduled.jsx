@@ -185,13 +185,22 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
 
       if(res.ok) {
 
-        toast.success(result?.message || "Interview updated!");
+        toast.success(result?.message || "Interview updated!", {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         setJobData(result?.job)
       } else {
-        toast.error(result?.message || 'Failed to interview schedule')
+        toast.error(result?.message || 'Failed to interview schedule', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
       }
     } catch (err) {
-      toast.error("Failed to save");
+      toast.error("Failed to save", {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
   };
 
@@ -641,14 +650,20 @@ const InterviewScheduled = ({handleClose, setJobData, candidateData, jobId}) => 
 
         const data = await res.json();
 
-        toast.success(data?.message || 'Interview sent successfully!')
+        toast.success(data?.message || 'Interview sent successfully!', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         setJobData(data?.job);
 
       }
 
     } catch (error) {
 
-      toast.error('Something went wrong.');
+      toast.error('Something went wrong.', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       console.log("error:", error);
 

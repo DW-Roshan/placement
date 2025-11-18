@@ -381,14 +381,20 @@ const MatchedCandidateDialog = ({open, handleClose, candidateData, appliedCandid
 
         const data = await res.json();
 
-        toast.success(data?.message || 'Mail sent successfully!')
+        toast.success(data?.message || 'Mail sent successfully!', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         console.log("data from invite sent:", data);
       }
 
     } catch (error) {
 
-      toast.error('Something went wrong.');
+      toast.error('Something went wrong.', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       console.log("error:", error);
 

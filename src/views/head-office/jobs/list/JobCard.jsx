@@ -94,9 +94,15 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
     const result = await res.json();
 
     if(res?.ok){
-      toast.success(result?.message || 'Status Changed');
+      toast.success(result?.message || 'Status Changed', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     } else {
-      toast.error(result?.message || 'Something went wrong');
+      toast.error(result?.message || 'Something went wrong', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
   }
 
@@ -117,9 +123,15 @@ const JobCard = ({job, branchData, isCandidate, setJobsData}) => {
     if(res?.ok){
 
       setJobsData(prev => [result.job, ...prev]);
-      toast.success(result?.message || 'Job Cloned Successfully');
+      toast.success(result?.message || 'Job Cloned Successfully', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     } else {
-      toast.error(result?.message || 'Something went wrong');
+      toast.error(result?.message || 'Something went wrong', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
 
     setCloneLoading(false);

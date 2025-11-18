@@ -63,7 +63,8 @@ const ChangePassword = () => {
 
         // Success: Show a success toast
         toast.success('Password changed successfully!', {
-          autoClose: 3000,
+          autoClose: 10000,
+          hideProgressBar: false,
         });
 
         reset()
@@ -82,7 +83,8 @@ const ChangePassword = () => {
 
         // Failure: Show an error toast with the message from the API
         toast.error(result.message || 'Something went wrong. Please try again.', {
-          autoClose: 3000,
+          autoClose: 10000,
+          hideProgressBar: false,
         });
 
       }
@@ -90,7 +92,8 @@ const ChangePassword = () => {
 
       // Error: Show a toast for network or unexpected error
       toast.error('Network error or something went wrong. Please try again later.', {
-        autoClose: 3000,
+        autoClose: 10000,
+        hideProgressBar: false,
       });
 
     }

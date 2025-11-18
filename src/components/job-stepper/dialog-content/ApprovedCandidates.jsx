@@ -414,7 +414,10 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
 
         const data = await res.json();
 
-        toast.success(data?.message || 'Mail sent successfully!')
+        toast.success(data?.message || 'Candidate approved successfully!', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         setJobData(data?.job);
 
         console.log("data from invite sent:", data);
@@ -422,7 +425,10 @@ const ApprovedCandidates = ({handleClose, setJobData, candidateData, approvedCan
 
     } catch (error) {
 
-      toast.error('Something went wrong.');
+      toast.error('Something went wrong, please try again later.', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       console.log("error:", error);
 

@@ -406,17 +406,26 @@ const OfferLetterAcceptedCandidates = ({handleClose, candidateData, jobId, setJo
 
       if(res.ok) {
 
-        toast.success(data?.message || 'Candidate offer letter accepted successfully!')
+        toast.success(data?.message || 'Candidate offer letter accepted successfully!', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         setJobData(data?.job);
 
         console.log("data from invite sent:", data);
       } else {
-        toast.error(data?.message || 'Service not available right now. Please try again later.');
+        toast.error(data?.message || 'Service not available right now. Please try again later.', {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
       }
 
     } catch (error) {
 
-      toast.error('Something went wrong.');
+      toast.error('Something went wrong.', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       console.log("error:", error);
 

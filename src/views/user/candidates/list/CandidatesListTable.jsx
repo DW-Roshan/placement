@@ -139,12 +139,18 @@ const CandidatesListTable = ({ tableData }) => {
       const error = sessionStorage.getItem('error');
 
       if (success) {
-        toast.success(success);
+        toast.success(success, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('success');
       }
 
       if (error) {
-        toast.error(error);
+        toast.error(error, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('error');
       }
     };
@@ -433,9 +439,15 @@ const CandidatesListTable = ({ tableData }) => {
 
     if(res.ok){
 
-      toast.success(result?.message);
+      toast.success(result?.message, {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     } else {
-      toast.error(result?.message || 'Something went wrong');
+      toast.error(result?.message || 'Something went wrong', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
 
   }

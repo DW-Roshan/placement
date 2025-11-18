@@ -81,14 +81,14 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
 
             setLoadingFile(false);
           } else {
-            toast.error('Upload failed. Can not extract data from file.', { autoClose: 3000 });
+            toast.error('Upload failed. Can not extract data from file. You can manually fill the form.', { autoClose: 10000, hideProgressBar: false });
 
             setLoadingFile(false);
           }
 
         } catch (error) {
           console.error('Upload error:', error);
-          toast.error('Upload failed. Please try again.', { autoClose: 3000 });
+          toast.error('Upload failed. Please try again.', { autoClose: 10000, hideProgressBar: false });
           setFiles([])
           setUploadedData([])
           setLoadingFile(false);
@@ -97,8 +97,9 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
 
     },
     onDropRejected: () => {
-      toast.error('Only one PDF file is allowed, and the size must be under 2 MB.', {
-        autoClose: 3000
+      toast.error('Only one PDF file is allowed, and the size must be under 5 MB.', {
+        autoClose: 10000,
+        hideProgressBar: false,
       })
     }
   });

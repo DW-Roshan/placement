@@ -67,7 +67,7 @@ const AddLocationDialog = ({open, handleClose, stateData, locationData, setData}
       setData(result?.locations)
 
       toast.success(result.message, {
-        autoClose: 3000,
+        autoClose: 10000,
         hideProgressBar: false
       });
       reset();
@@ -85,7 +85,10 @@ const AddLocationDialog = ({open, handleClose, stateData, locationData, setData}
 
     } else {
 
-      toast.error(result.message);
+      toast.error(result.message, {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
       reset();
       handleClose();
 

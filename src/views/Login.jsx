@@ -185,7 +185,8 @@ const Login = ({ mode, isCandidate }) => {
 
     } catch (error) {
       toast.error("Something went wrong. Server is not working", {
-        autoClose: 3000
+        autoClose: 10000,
+        hideProgressBar: false,
       });
 
       console.log("error:", error)

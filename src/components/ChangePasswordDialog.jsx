@@ -64,7 +64,8 @@ const ChangePasswordDialog = ({ open, onClose, userId }) => {
 
         // Success: Show a success toast
         toast.success('Password changed successfully!', {
-          autoClose: 3000,
+          autoClose: 10000,
+          hideProgressBar: false,
         });
 
         handleClose()
@@ -83,7 +84,8 @@ const ChangePasswordDialog = ({ open, onClose, userId }) => {
 
         // Failure: Show an error toast with the message from the API
         toast.error(result.message || 'Something went wrong. Please try again.', {
-          autoClose: 3000,
+          autoClose: 10000,
+          hideProgressBar: false,
         });
 
       }
@@ -91,7 +93,8 @@ const ChangePasswordDialog = ({ open, onClose, userId }) => {
 
       // Error: Show a toast for network or unexpected error
       toast.error('Network error or something went wrong. Please try again later.', {
-        autoClose: 3000,
+        autoClose: 10000,
+        hideProgressBar: false,
       });
 
     } finally {

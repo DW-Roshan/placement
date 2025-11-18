@@ -110,7 +110,10 @@ const ExperienceForm = ({setData, open, data, handleClose}) => {
 
         setData(result.data);
 
-        toast.success(result.message);
+        toast.success(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         // fetchData();
 
@@ -134,7 +137,10 @@ const ExperienceForm = ({setData, open, data, handleClose}) => {
 
         // router.push('/candidates/list');
         handleClose();
-        toast.error(result.message);
+        toast.error(result.message, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
 
         reset();
 

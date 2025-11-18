@@ -134,12 +134,18 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
       const error = sessionStorage.getItem('error');
 
       if (success) {
-        toast.success(success);
+        toast.success(success, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('success');
       }
 
       if (error) {
-        toast.error(error);
+        toast.error(error, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('error');
       }
     };
@@ -171,7 +177,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
     if(res?.ok){
 
       toast.success(result?.message, {
-        autoClose: 3000,
+        autoClose: 10000,
         hideProgressBar: false
       })
 
@@ -180,7 +186,7 @@ const LocationListTable = ({ tableData, stateData, isAdmin }) => {
     } else {
 
       toast.error(result?.message, {
-        autoClose: 3000,
+        autoClose: 10000,
         hideProgressBar: false
       })
 

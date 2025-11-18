@@ -406,7 +406,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
           let matched = roleCategories ? roleCategories.find(
             (roleCategory) => roleCategory?.name?.toLowerCase() === (candidateData?.role_category?.name || '')?.toLowerCase()
           ) : '';
-          
+
           if(!matched){
             matched = roleCategories ? roleCategories.find(roleCategory =>
               roleCategory?.name?.toLowerCase().includes(candidateData?.role_category?.trim()?.toLowerCase() || 'other')
@@ -708,7 +708,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
             });
           });
 
-          toast.error(result.message || 'Please check the form for errors.', {autoClose: 3000, hideProgressBar: false});
+          toast.error(result.message || 'Please check the form for errors.', {autoClose: 10000, hideProgressBar: false});
 
         } else {
           sessionStorage.setItem('error', result.message);

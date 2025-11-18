@@ -126,12 +126,18 @@ const HOListTable = ({ tableData }) => {
       const error = sessionStorage.getItem('error');
 
       if (success) {
-        toast.success(success);
+        toast.success(success, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('success');
       }
 
       if (error) {
-        toast.error(error);
+        toast.error(error, {
+          autoClose: 10000,
+          hideProgressBar: false,
+        });
         sessionStorage.removeItem('error');
       }
     };

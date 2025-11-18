@@ -127,7 +127,10 @@ const CandidateRegister = () => {
 
     if(res.ok){
 
-      toast.success('Registered Successfully')
+      toast.success('Registered Successfully', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
       router.push('/candidates/login');
 
@@ -145,7 +148,10 @@ const CandidateRegister = () => {
       });
 
     } else {
-      toast.error('Something went wrong')
+      toast.error('Something went wrong', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      })
     }
   };
 

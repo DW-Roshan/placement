@@ -36,10 +36,16 @@ const AlertTemplateData = ({template}) => {
 
     if(res.ok){
 
-      toast.success(data?.message || 'Status Changed')
+      toast.success(data?.message || 'Status Changed', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
 
     } else {
-      toast.success(data?.message || 'Status Not Changed')
+      toast.success(data?.message || 'Status Not Changed', {
+        autoClose: 10000,
+        hideProgressBar: false,
+      });
     }
 
   };

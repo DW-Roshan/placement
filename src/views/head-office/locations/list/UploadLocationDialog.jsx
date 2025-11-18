@@ -87,10 +87,16 @@ const UploadLocationDialog = ({ open, handleClose }) => {
               setApiErrors(flatErrors);
             }
           } else {
-            toast.success(result?.message || 'Locations uploaded successfully!');
+            toast.success(result?.message || 'Locations uploaded successfully!', {
+              autoClose: 10000,
+              hideProgressBar: false,
+            });
           }
         } catch (err) {
-          toast.error('Upload failed.');
+          toast.error('Upload failed.', {
+            autoClose: 10000,
+            hideProgressBar: false,
+          });
         } finally {
           setLoading(false);
         }
@@ -100,7 +106,8 @@ const UploadLocationDialog = ({ open, handleClose }) => {
     },
     onDropRejected: () => {
       toast.error('Only one Excel file is allowed, and the size must be under 2 MB.', {
-        autoClose: 3000
+        autoClose: 10000,
+        hideProgressBar: false,
       })
     }
   });
