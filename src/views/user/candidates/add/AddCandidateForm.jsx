@@ -130,6 +130,10 @@ const AddCandidateForm = ({candidateId, candiData}) => {
   function parseDateFromString(dateStr) {
     if (!dateStr) return null;
 
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return new Date(dateStr);
+    }
+
     const parts = dateStr.split("-");
 
     // Case 1: "MM-YYYY"
@@ -450,7 +454,7 @@ const AddCandidateForm = ({candidateId, candiData}) => {
       profileTitle: candidateData?.profile_title || '',
       profileSummary: candidateData?.profile_summary || '',
       workStatus: candidateData?.work_status || '',
-      dateOfBirth: candidateData?.date_of_birth ? new Date(candidateData?.date_of_birth) : null,
+      dateOfBirth: candidateData?.date_of_birth ? parseDateFromString(candidateData?.date_of_birth) : null,
       gender: (candidateData?.gender?.toLowerCase() === 'female' || candidateData?.gender?.toLowerCase() === 'f') ? 'f' : 'm',
       totalExperience: candidateData?.total_experience || '',
       years: years.toString() ||'',

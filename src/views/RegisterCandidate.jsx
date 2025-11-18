@@ -97,7 +97,8 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
 
     },
     onDropRejected: () => {
-      toast.error('Only one PDF file is allowed, and the size must be under 5 MB.', {
+      setLoadingFile(false);
+      toast.error('Please upload only a PDF file of your resume, with a maximum file size of 5 MB.', {
         autoClose: 10000,
         hideProgressBar: false,
       })
@@ -192,7 +193,7 @@ const RegisterCandidate = ({ open, handleClose, jobId, jobUuid, setAppliedSucces
                   Drop Resume here or click to upload.
                 </Typography>
                 <Typography>Allowed *.pdf</Typography>
-                <Typography>Only 1 file and max size of 2 MB</Typography>
+                <Typography>Only 1 file and max size of 5 MB</Typography>
                 </>
                 )}
               </div>
